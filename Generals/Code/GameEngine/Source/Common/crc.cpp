@@ -23,9 +23,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+// TODO: undo this once we have more working parts,
+// or remove it since it compiles fine without it
+//#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
 
-#include "Common/CRC.h"
+#include "Common/crc.h"
 #include "Common/Debug.h"
 
 
@@ -78,4 +80,3 @@ UnsignedInt CRC::get( void )
 	return tcrc;
 
 }  // end skip
-

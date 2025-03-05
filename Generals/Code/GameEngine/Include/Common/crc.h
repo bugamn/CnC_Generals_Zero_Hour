@@ -32,7 +32,7 @@
 #define _CRC_H_
 
 #include "Lib/BaseType.h"
-#include "winsock2.h" // for htonl
+// #include "winsock2.h" // for htonl // htonl is not in use - TODO: remove
 
 class CRC
 {
