@@ -1,4 +1,5 @@
 add_library(Common
+  CommandLine.cpp
   crc.cpp
   DiscreteCircle.cpp
   PartitionSolver.cpp
