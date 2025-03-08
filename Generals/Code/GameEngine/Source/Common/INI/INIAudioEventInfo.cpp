@@ -193,12 +193,12 @@ static void parsePitchShift(INI *ini, void *instance, void *store,
 // STATIC DEFINIITIONS
 // ////////////////////////////////////////////////////////////////////////////
 
-char *theAudioPriorityNames[] = {"LOWEST", "LOW",      "NORMAL",
-                                 "HIGH",   "CRITICAL", NULL};
+const char *theAudioPriorityNames[] = {"LOWEST", "LOW",      "NORMAL",
+                                       "HIGH",   "CRITICAL", NULL};
 
-char *theSoundTypeNames[] = {"UI",       "WORLD",  "SHROUDED", "GLOBAL",
-                             "VOICE",    "PLAYER", "ALLIES",   "ENEMIES",
-                             "EVERYONE", NULL};
+const char *theSoundTypeNames[] = {"UI",       "WORLD",  "SHROUDED", "GLOBAL",
+                                   "VOICE",    "PLAYER", "ALLIES",   "ENEMIES",
+                                   "EVERYONE", NULL};
 
-char *theAudioControlNames[] = {"LOOP",      "RANDOM",    "ALL",
-                                "POSTDELAY", "INTERRUPT", NULL};
+const char *theAudioControlNames[] = {"LOOP",      "RANDOM",    "ALL",
+                                      "POSTDELAY", "INTERRUPT", NULL};

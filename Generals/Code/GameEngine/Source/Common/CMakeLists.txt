@@ -27,6 +27,8 @@ add_library(Common
   Version.cpp
 )
 
+add_subdirectory(INI)
+
 target_include_directories(Common PUBLIC
                            "${PROJECT_SOURCE_DIR}/GameEngine/Include"
                            "${PROJECT_SOURCE_DIR}/GameEngine/Include/Precompiled"

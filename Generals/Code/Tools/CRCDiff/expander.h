@@ -27,7 +27,7 @@
 #define __EXPANDER_H__
 
 #include <map>
-#include <hash_map>
+#include <unordered_map>
 #include <string>
 
 typedef std::map<std::string, std::string> ExpansionMap;
@@ -51,4 +51,3 @@ class Expander
 };
 
 #endif // __EXPANDER_H__
-

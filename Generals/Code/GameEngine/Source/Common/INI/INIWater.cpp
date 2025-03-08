@@ -61,7 +61,7 @@ void INI::parseWaterSettingDefinition(INI* ini) {
   char** timeOfDayName = TimeOfDayNames;
   Int timeOfDayIndex = 0;  // TIME_OF_DAY_INVALID
   while (timeOfDayName && *timeOfDayName) {
-    if (stricmp(*timeOfDayName, name.str()) == 0) {
+    if (strcasecmp(*timeOfDayName, name.str()) == 0) {
       waterSetting = &WaterSettings[timeOfDayIndex];
       break;
 

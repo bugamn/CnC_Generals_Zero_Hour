@@ -125,4 +125,9 @@ class STLSpecialAlloc;
 #include "Common/Thing.h"
 #include "Common/UnicodeString.h"
 
+#ifndef _MAX_PATH
+// TODO: replace usage of this
+#define _MAX_PATH 260
+#endif
+
 #endif /* __PRERTS_H__ */

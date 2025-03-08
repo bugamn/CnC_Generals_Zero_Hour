@@ -41,7 +41,7 @@
 class ArmorStore;
 
 //-------------------------------------------------------------------------------------------------
-/** 
+/**
 	An Armor encapsulates the a particular type of actual modifier to damage taken, in order
 	to simulate different materials, and to help make game balance easier to adjust.
 */
@@ -56,8 +56,8 @@ public:
 
 	/**
 		This is the real "meat" of the class: given a damage type and amount, adjust the damage
-		and return the amount that should be dealt. 
-	*/	
+		and return the amount that should be dealt.
+	*/
 	Real adjustDamage(DamageType t, Real damage) const;
 
 	static void parseArmorCoefficients( INI* ini, void *instance, void* /* store */, const void* userData );
@@ -66,15 +66,15 @@ protected:
 
 private:
 	Real						m_damageCoefficient[DAMAGE_NUM_TYPES];	///< modifiers to damage
-};  
+};
 
 //-------------------------------------------------------------------------------------------------
 class Armor
 {
 public:
 
-	inline Armor(const ArmorTemplate* tmpl = NULL) : m_template(tmpl) 
-	{ 
+	inline Armor(const ArmorTemplate* tmpl = NULL) : m_template(tmpl)
+	{
 	}
 
 	inline Real adjustDamage(DamageType t, Real damage) const
@@ -122,7 +122,7 @@ public:
 
 private:
 
-	typedef std::hash_map< NameKeyType, ArmorTemplate, rts::hash<NameKeyType>, rts::equal_to<NameKeyType> > ArmorTemplateMap;
+	typedef std::unordered_map< NameKeyType, ArmorTemplate, rts::hash<NameKeyType>, rts::equal_to<NameKeyType> > ArmorTemplateMap;
 	ArmorTemplateMap m_armorTemplates;
 
 };
@@ -131,4 +131,3 @@ private:
 extern ArmorStore *TheArmorStore;
 
 #endif // _Armor_H_
-

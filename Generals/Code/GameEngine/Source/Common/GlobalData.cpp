@@ -41,13 +41,13 @@
 #define DEFINE_BODYDAMAGETYPE_NAMES
 #define DEFINE_PANNING_NAMES
 
-#include "Common/CRC.h"
 #include "Common/File.h"
 #include "Common/FileSystem.h"
 #include "Common/GameAudio.h"
 #include "Common/INI.h"
 #include "Common/UserPreferences.h"
 #include "Common/Version.h"
+#include "Common/crc.h"
 #include "GameClient/Color.h"
 #include "GameClient/TerrainVisual.h"
 #include "GameLogic/AI.h"
@@ -67,6 +67,7 @@ GlobalData* GlobalData::m_theOriginal = NULL;
 // ///////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /*static*/ const FieldParse GlobalData::s_GlobalDataFieldParseTable[] = {
+// TODO: might need to do something about use of offsetof
 #if !defined(_PLAYTEST)
     {"Windowed", INI::parseBool, NULL, offsetof(GlobalData, m_windowed)},
     {"XResolution", INI::parseInt, NULL, offsetof(GlobalData, m_xResolution)},

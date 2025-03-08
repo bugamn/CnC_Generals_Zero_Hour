@@ -49,6 +49,7 @@
 #include "Common/GameSpeech.h"
 #include "Common/INI.h"
 #include "Common/STLTypedefs.h"
+#include "Common/KindOf.h"
 
 //----------------------------------------------------------------------------
 //         Externals
@@ -189,7 +190,7 @@ class Speaker : public SpeakerInterface {
 };
 
 typedef std::vector<Speech> VecSpeech;
-typedef std::hash_map<const char *, Speech, std::hash<const char *>,
+typedef std::unordered_map<const char *, Speech, std::hash<const char *>,
                       rts::equal_to<const char *> >
     HashSpeech;
 

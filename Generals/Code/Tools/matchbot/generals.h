@@ -32,7 +32,7 @@
 #include <bitset>
 #include <vector>
 #include <map>
-#include <hash_map>
+#include <unordered_map>
 typedef std::vector<bool> MapBitSet;
 
 // =====================================================================
@@ -190,4 +190,3 @@ private:
 ;
 
 #endif /* __GENERALS_H__ */
-

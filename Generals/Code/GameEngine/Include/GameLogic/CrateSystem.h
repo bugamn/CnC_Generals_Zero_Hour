@@ -35,6 +35,8 @@
 #include "Common/INI.h"
 #include "Common/Overridable.h"
 #include "Common/Override.h"
+#include "Common/KindOf.h"
+#include "Common/SubsystemInterface.h"
 
 enum ScienceType : int;
 
