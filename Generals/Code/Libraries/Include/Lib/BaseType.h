@@ -34,6 +34,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <algorithm>
 
 /*
 **	Turn off some unneeded warnings.
@@ -97,13 +98,13 @@
 //#define abs(x) (((x) < 0) ? -(x) : (x))
 //#endif
 
-#ifndef min
-#define min(x,y) (((x)<(y)) ? (x) : (y))
-#endif
+// #ifndef min
+// #define min(x,y) (((x)<(y)) ? (x) : (y))
+// #endif
 
-#ifndef max
-#define max(x,y) (((x)>(y)) ? (x) : (y))
-#endif
+// #ifndef max
+// #define max(x,y) (((x)>(y)) ? (x) : (y))
+// #endif
 
 #ifndef TRUE
 #define TRUE true
@@ -225,8 +226,8 @@ struct RealRange
 	// both ranges
 	void combine( RealRange &other )
 	{
-		lo = min( lo, other.lo );
-		hi = max( hi, other.hi );
+	  lo = std::min( lo, other.lo );
+	  hi = std::max( hi, other.hi );
 	}
 };
 
