@@ -6,9 +6,24 @@ add_library(Common
   DamageFX.cpp
   Dict.cpp
   DiscreteCircle.cpp
+  # GameEngine.cpp
   GameLOD.cpp
+  # GameMain.cpp
+  # GlobalData.cpp
+  # Language.cpp
+  # MessageStream.cpp
+  # MiniLog.cpp
+  # MultiplayerSettings.cpp
+  # NameKeyGenerator.cpp
   PartitionSolver.cpp
+  # PerfTimer.cpp
   RandomValue.cpp
+  # Recorder.cpp
+  # SkirmishBattleHonors.cpp
+  # StateMachine.cpp
+  # StatsCollector.cpp
+  # TerrainTypes.cpp
+  # UserPreferences.cpp
   Version.cpp
 )
 
