@@ -4,6 +4,7 @@ add_library(Common
   crc.cpp
   CRCDebug.cpp
   DamageFX.cpp
+  Dict.cpp
   DiscreteCircle.cpp
   PartitionSolver.cpp
   RandomValue.cpp
