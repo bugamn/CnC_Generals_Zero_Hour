@@ -3,6 +3,7 @@ add_library(Common
   CommandLine.cpp
   crc.cpp
   CRCDebug.cpp
+  DamageFX.cpp
   DiscreteCircle.cpp
   PartitionSolver.cpp
   RandomValue.cpp

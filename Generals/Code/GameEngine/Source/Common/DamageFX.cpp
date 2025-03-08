@@ -149,7 +149,7 @@ static void parseCommonStuff(INI* ini, ConstCharPtrArray names,
   }
 
   const char* damageName = ini->getNextToken();
-  if (stricmp(damageName, "Default") == 0) {
+  if (strcasecmp(damageName, "Default") == 0) {
     damageFirst = (DamageType)0;
     damageLast = (DamageType)(DAMAGE_NUM_TYPES - 1);
   } else {
