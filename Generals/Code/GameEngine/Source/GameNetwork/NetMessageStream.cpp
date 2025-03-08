@@ -18,19 +18,20 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 // NetMessageStream.cpp
 // Holds misc functions to encapsulate GameMessages into Command Packets to send
 // over the network.
 // Author: Matthew D. Campbell, July 2001
 /*
-#include "stdlib.h"				// VC++ wants this here, or gives compile error...
+#include "stdlib.h"				// VC++ wants this here, or
+gives compile error...
 
 #include "Common/GameType.h"
 #include "Common/MessageStream.h"
@@ -42,99 +43,97 @@
 
 
 // The per-player pointers for the list of commands
-static CommandMsg *CommandHead[MAX_SLOTS] = {  /// @todo: remove static initialization
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+static CommandMsg *CommandHead[MAX_SLOTS] = {  /// @todo: remove static
+initialization NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 static CommandMsg *CommandTail[MAX_SLOTS] = {
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL
 };
 
 /**
  * AddToNetCommandList adds a CommandMsg to a list of commands.
  *
-static Bool AddToNetCommandList(GameMessage *msg, UnsignedInt timestamp, CommandMsg *& CommandHead, CommandMsg *& CommandTail)
+static Bool AddToNetCommandList(GameMessage *msg, UnsignedInt timestamp,
+CommandMsg *& CommandHead, CommandMsg *& CommandTail)
 {
-	CommandMsg *cmdMsg = NEW CommandMsg(timestamp, msg);
-	if (!cmdMsg)
-	{
-		DEBUG_LOG(("Alloc failed!\n"));
-		return false;
-	}
+        CommandMsg *cmdMsg = NEW CommandMsg(timestamp, msg);
+        if (!cmdMsg)
+        {
+                DEBUG_LOG(("Alloc failed!\n"));
+                return false;
+        }
 
-	if (CommandTail == NULL)
-	{
-		CommandHead = cmdMsg;
-		CommandTail = cmdMsg;
-	}
-	else
-	{
-		cmdMsg->SetPrevCommandMsg(CommandTail);
-		CommandTail->SetNextCommandMsg(cmdMsg);
-		CommandTail = cmdMsg;
-	}
+        if (CommandTail == NULL)
+        {
+                CommandHead = cmdMsg;
+                CommandTail = cmdMsg;
+        }
+        else
+        {
+                cmdMsg->SetPrevCommandMsg(CommandTail);
+                CommandTail->SetNextCommandMsg(cmdMsg);
+                CommandTail = cmdMsg;
+        }
 
-	return true;
+        return true;
 }
 
 /**
- * AddToRemoteNetCommandList is used by TheNetwork to queue up commands recieved from other players.
+ * AddToRemoteNetCommandList is used by TheNetwork to queue up commands recieved
+from other players.
  *
 Bool AddToNetCommandList(Int playerNum, GameMessage *msg, UnsignedInt timestamp)
 {
-	if (playerNum < 0 || playerNum >= MAX_SLOTS)
-		return false;
+        if (playerNum < 0 || playerNum >= MAX_SLOTS)
+                return false;
 
-	DEBUG_LOG(("Adding msg to NetCommandList %d\n", playerNum));
-	return AddToNetCommandList(msg, timestamp, CommandHead[playerNum], CommandTail[playerNum]);
+        DEBUG_LOG(("Adding msg to NetCommandList %d\n", playerNum));
+        return AddToNetCommandList(msg, timestamp, CommandHead[playerNum],
+CommandTail[playerNum]);
 }
 
 /**
- * GetCommandMsg returns a GameMessage (deleting its CommandMsg wrapper) that is valid
+ * GetCommandMsg returns a GameMessage (deleting its CommandMsg wrapper) that is
+valid
  * for the current frame, or NULL.
  *
-static GameMessage * GetCommandMsg(UnsignedInt timestamp, CommandMsg *& CommandHead, CommandMsg *& CommandTail)
+static GameMessage * GetCommandMsg(UnsignedInt timestamp, CommandMsg *&
+CommandHead, CommandMsg *& CommandTail)
 {
-	if (!CommandHead)
-		return NULL;
+        if (!CommandHead)
+                return NULL;
 
-	if (CommandHead->GetTimestamp() < timestamp)
-	{
-		DEBUG_LOG(("Time is %d, yet message timestamp is %d!\n", timestamp, CommandHead->GetTimestamp()));
-		return NULL;
-	}
+        if (CommandHead->GetTimestamp() < timestamp)
+        {
+                DEBUG_LOG(("Time is %d, yet message timestamp is %d!\n",
+timestamp, CommandHead->GetTimestamp())); return NULL;
+        }
 
-	if (CommandHead->GetTimestamp() != timestamp)
-		return NULL;
+        if (CommandHead->GetTimestamp() != timestamp)
+                return NULL;
 
-	CommandMsg *theMsg = CommandHead;
+        CommandMsg *theMsg = CommandHead;
 
-	if (CommandHead->GetNextCommandMsg())
-	{
-		CommandHead->GetNextCommandMsg()->SetPrevCommandMsg(NULL);
-		CommandHead = CommandHead->GetNextCommandMsg();
-	}
-	else
-	{
-		CommandHead = CommandTail = NULL;
-	}
+        if (CommandHead->GetNextCommandMsg())
+        {
+                CommandHead->GetNextCommandMsg()->SetPrevCommandMsg(NULL);
+                CommandHead = CommandHead->GetNextCommandMsg();
+        }
+        else
+        {
+                CommandHead = CommandTail = NULL;
+        }
 
-	GameMessage *msg = theMsg->GetGameMessage();
-	delete theMsg;
-	return msg;
+        GameMessage *msg = theMsg->GetGameMessage();
+        delete theMsg;
+        return msg;
 }
 
 /**
@@ -142,11 +141,12 @@ static GameMessage * GetCommandMsg(UnsignedInt timestamp, CommandMsg *& CommandH
  *
 GameMessage * GetCommandMsg(UnsignedInt timestamp, Int playerNum)
 {
-	if (playerNum < 0 || playerNum >= MAX_SLOTS)
-		return NULL;
+        if (playerNum < 0 || playerNum >= MAX_SLOTS)
+                return NULL;
 
-	//DEBUG_LOG(("Adding msg to NetCommandList %d\n", playerNum));
-	return GetCommandMsg(timestamp, CommandHead[playerNum], CommandTail[playerNum]);
+        //DEBUG_LOG(("Adding msg to NetCommandList %d\n", playerNum));
+        return GetCommandMsg(timestamp, CommandHead[playerNum],
+CommandTail[playerNum]);
 }
 
 
@@ -154,17 +154,17 @@ GameMessage * GetCommandMsg(UnsignedInt timestamp, Int playerNum)
 
 //====================================================================================
 
-// The commandBuf & commandPacket hold the commands we're building up for the frame.
-static unsigned char commandBuf[sizeof(CommandPacket)+1];
-static CommandPacket *commandPacket = (CommandPacket *)(commandBuf+1);
+// The commandBuf & commandPacket hold the commands we're building up for the
+frame. static unsigned char commandBuf[sizeof(CommandPacket)+1]; static
+CommandPacket *commandPacket = (CommandPacket *)(commandBuf+1);
 
 /**
  * ClearCommandPacket clears the command packet at the start of the frame.
  *
 void ClearCommandPacket(UnsignedInt frame)
 {
-	commandPacket->m_frame = frame;
-	commandPacket->m_numCommands = 0;
+        commandPacket->m_frame = frame;
+        commandPacket->m_numCommands = 0;
 }
 
 /**
@@ -173,44 +173,50 @@ void ClearCommandPacket(UnsignedInt frame)
  *
 Bool AddCommandToPacket(const GameMessage *msg)
 {
-	int messageSize = sizeofMessageHeader + sizeofMessageArg * msg->getArgumentCount();
+        int messageSize = sizeofMessageHeader + sizeofMessageArg *
+msg->getArgumentCount();
 
-	// If we have too much, send what we have
-	if (bytesUsed && (bytesUsed + sizeof(CommandPacketHeader) + messageSize >= MAX_MESSAGE_LEN))
-	{
-		commandBuf[0] = MSGTYPE_PARTIALCOMMAND;
-		if (!TheNetwork->queueSend(BROADCAST_CON, commandBuf, bytesUsed + sizeof(CommandPacketHeader) + 1, MSG_NEEDACK | MSG_SEQUENCED))
-		{
-			//DEBUG_ASSERTCRASH(false, ("Too many commands in one frame!  Some will be dropped."));
-			DEBUG_LOG(("Too many commands in one frame!  Some will be dropped."));
-			return false;
-		}
-		commandBuf[0] = MSGTYPE_COMMANDCOUNT;
-		commandPacket->header.m_numCommands = 0;
-		bytesUsed = 0;
-	}
+        // If we have too much, send what we have
+        if (bytesUsed && (bytesUsed + sizeof(CommandPacketHeader) + messageSize
+>= MAX_MESSAGE_LEN))
+        {
+                commandBuf[0] = MSGTYPE_PARTIALCOMMAND;
+                if (!TheNetwork->queueSend(BROADCAST_CON, commandBuf, bytesUsed
++ sizeof(CommandPacketHeader) + 1, MSG_NEEDACK | MSG_SEQUENCED))
+                {
+                        //DEBUG_ASSERTCRASH(false, ("Too many commands in one
+frame!  Some will be dropped.")); DEBUG_LOG(("Too many commands in one frame!
+Some will be dropped.")); return false;
+                }
+                commandBuf[0] = MSGTYPE_COMMANDCOUNT;
+                commandPacket->header.m_numCommands = 0;
+                bytesUsed = 0;
+        }
 
-	if (bytesUsed + sizeof(CommandPacketHeader) + messageSize >= MAX_MESSAGE_LEN)
-	{
-		//DEBUG_ASSERTCRASH(false, ("Too many commands in one frame!  Some will be dropped."));
-		DEBUG_LOG(("Too many commands in one frame!  Some will be dropped."));
-		return false;
-	}
+        if (bytesUsed + sizeof(CommandPacketHeader) + messageSize >=
+MAX_MESSAGE_LEN)
+        {
+                //DEBUG_ASSERTCRASH(false, ("Too many commands in one frame!
+Some will be dropped.")); DEBUG_LOG(("Too many commands in one frame!  Some will
+be dropped.")); return false;
+        }
 
-	// We have room, so add the message
-	commandPacket->header.m_numCommands++;
-	commandPacket->m_commands[bytesUsed++] = (unsigned char)msg->getType();
-	commandPacket->m_commands[bytesUsed++] = msg->getArgumentCount();
+        // We have room, so add the message
+        commandPacket->header.m_numCommands++;
+        commandPacket->m_commands[bytesUsed++] = (unsigned char)msg->getType();
+        commandPacket->m_commands[bytesUsed++] = msg->getArgumentCount();
 
-	for (int i=0; i<msg->getArgumentCount(); ++i)
-	{
-		memcpy((unsigned char *)(commandPacket->m_commands + bytesUsed), (unsigned char *)msg->getArgument(i), sizeofMessageArg);
-		bytesUsed += sizeofMessageArg;
-	}
+        for (int i=0; i<msg->getArgumentCount(); ++i)
+        {
+                memcpy((unsigned char *)(commandPacket->m_commands + bytesUsed),
+(unsigned char *)msg->getArgument(i), sizeofMessageArg); bytesUsed +=
+sizeofMessageArg;
+        }
 
-	//DEBUG_ASSERTCRASH(bytesUsed + sizeof(CommandPacketHeader) < MAX_MESSAGE_LEN, ("Memory overwrite constructing command packet!"));
-	//DEBUG_LOG(("Memory overwrite constructing command packet!"));
-	return true;
+        //DEBUG_ASSERTCRASH(bytesUsed + sizeof(CommandPacketHeader) <
+MAX_MESSAGE_LEN, ("Memory overwrite constructing command packet!"));
+        //DEBUG_LOG(("Memory overwrite constructing command packet!"));
+        return true;
 }
 
 /**
@@ -218,8 +224,8 @@ Bool AddCommandToPacket(const GameMessage *msg)
  *
 CommandPacket *GetCommandPacket(void)
 {
-	commandBuf[0] = MSGTYPE_COMMANDCOUNT;
-	return commandPacket;
+        commandBuf[0] = MSGTYPE_COMMANDCOUNT;
+        return commandPacket;
 }
 
 //====================================================================================

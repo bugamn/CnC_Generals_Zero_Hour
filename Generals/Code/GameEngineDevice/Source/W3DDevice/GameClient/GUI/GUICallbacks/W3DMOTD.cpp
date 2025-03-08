@@ -18,18 +18,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: W3DMOTD.cpp //////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 // Project:    RTS3
@@ -44,15 +45,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
 #include "Common/NameKeyGenerator.h"
-#include "GameClient/GameWindow.h"
-#include "GameClient/GameWindowManager.h"
 #include "GameClient/DisplayStringManager.h"
 #include "GameClient/GadgetSlider.h"
+#include "GameClient/GameWindow.h"
+#include "GameClient/GameWindowManager.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // DEFINES ////////////////////////////////////////////////////////////////////
@@ -80,50 +81,39 @@ static NameKeyType closeButtonID = NAMEKEY_INVALID;
 // MOTDSystem =================================================================
 /** Message of the day */
 //=============================================================================
-WindowMsgHandledType MOTDSystem( GameWindow *window, UnsignedInt msg,
-								 WindowMsgData mData1, WindowMsgData mData2 )
-{
-	switch( msg ) 
-	{
+WindowMsgHandledType MOTDSystem(GameWindow *window, UnsignedInt msg,
+                                WindowMsgData mData1, WindowMsgData mData2) {
+  switch (msg) {
+    // ------------------------------------------------------------------------
+    case GWM_CREATE: {
+      // load id's needed
+      closeButtonID = TheNameKeyGenerator->nameToKey("MOTD.wnd:CloseMOTD");
 
-		// ------------------------------------------------------------------------
-		case GWM_CREATE:
-		{
-			
-			// load id's needed
-			closeButtonID = TheNameKeyGenerator->nameToKey( "MOTD.wnd:CloseMOTD" );
+      break;
 
-			break;
+    }  // end create
 
-		}  // end create
+    // ------------------------------------------------------------------------
+    case GWM_DESTROY: {
+      break;
 
-		// ------------------------------------------------------------------------
-		case GWM_DESTROY:
-		{
+    }  // end case
 
-			break;
+    // ------------------------------------------------------------------------
+    case GBM_SELECTED: {
+      GameWindow *control = (GameWindow *)mData1;
+      Int controlID = control->winGetWindowId();
 
-		}  // end case
+      if (controlID == closeButtonID) window->winHide(!window->winIsHidden());
 
-		// ------------------------------------------------------------------------
-		case GBM_SELECTED:
-		{
-			GameWindow *control = (GameWindow *)mData1;
-			Int controlID = control->winGetWindowId();
+      break;
 
-			if( controlID == closeButtonID )					
-				window->winHide( !window->winIsHidden() );
+    }  // end selected
 
-			break;
+    default:
+      return MSG_IGNORED;
+  }  // end switch
 
-		}  // end selected
+  return MSG_HANDLED;
 
-		default:
-			return MSG_IGNORED;
-	}  // end switch
-
-	return MSG_HANDLED;
-	
 }  // end MOTDSystem
-
-

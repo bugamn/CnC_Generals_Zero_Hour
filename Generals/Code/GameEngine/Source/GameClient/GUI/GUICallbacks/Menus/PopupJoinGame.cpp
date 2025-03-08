@@ -18,18 +18,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: PopupJoinGame.cpp /////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Electronic Arts Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2002 - All Rights Reserved                  
-//                                                                          
+//
+//                       Electronic Arts Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2002 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 //	created:	Jul 2002
@@ -37,7 +38,7 @@
 //	Filename: 	PopupJoinGame.cpp
 //
 //	author:		Matthew D. Campbell
-//	
+//
 //	purpose:	Contains the Callbacks for the Join Game Popup
 //
 //-----------------------------------------------------------------------------
@@ -50,19 +51,17 @@
 //-----------------------------------------------------------------------------
 // USER INCLUDES //////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
 #include "Common/GlobalData.h"
 #include "Common/NameKeyGenerator.h"
-#include "GameClient/WindowLayout.h"
 #include "GameClient/Gadget.h"
-#include "GameClient/KeyDefs.h"
-#include "GameClient/GadgetTextEntry.h"
 #include "GameClient/GadgetStaticText.h"
-#include "GameNetwork/GameSpy/Peerdefs.h"
+#include "GameClient/GadgetTextEntry.h"
+#include "GameClient/KeyDefs.h"
+#include "GameClient/WindowLayout.h"
 #include "GameNetwork/GameSpy/PeerThread.h"
+#include "GameNetwork/GameSpy/Peerdefs.h"
 #include "GameNetwork/GameSpyOverlay.h"
-
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-----------------------------------------------------------------------------
 // DEFINES ////////////////////////////////////////////////////////////////////
@@ -75,7 +74,7 @@ static NameKeyType buttonCancelID = NAMEKEY_INVALID;
 static GameWindow *parentPopup = NULL;
 static GameWindow *textEntryGamePassword = NULL;
 
-static void joinGame( AsciiString password );
+static void joinGame(AsciiString password);
 
 //-----------------------------------------------------------------------------
 // PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
@@ -84,180 +83,163 @@ static void joinGame( AsciiString password );
 //-------------------------------------------------------------------------------------------------
 /** Initialize the PopupHostGameInit menu */
 //-------------------------------------------------------------------------------------------------
-void PopupJoinGameInit( WindowLayout *layout, void *userData )
-{
-	parentPopupID = TheNameKeyGenerator->nameToKey(AsciiString("PopupJoinGame.wnd:ParentJoinPopUp"));
-	parentPopup = TheWindowManager->winGetWindowFromId(NULL, parentPopupID);
+void PopupJoinGameInit(WindowLayout *layout, void *userData) {
+  parentPopupID = TheNameKeyGenerator->nameToKey(
+      AsciiString("PopupJoinGame.wnd:ParentJoinPopUp"));
+  parentPopup = TheWindowManager->winGetWindowFromId(NULL, parentPopupID);
 
-	textEntryGamePasswordID = TheNameKeyGenerator->nameToKey(AsciiString("PopupJoinGame.wnd:TextEntryGamePassword"));
-	textEntryGamePassword = TheWindowManager->winGetWindowFromId(parentPopup, textEntryGamePasswordID);
-	GadgetTextEntrySetText(textEntryGamePassword, UnicodeString::TheEmptyString);
+  textEntryGamePasswordID = TheNameKeyGenerator->nameToKey(
+      AsciiString("PopupJoinGame.wnd:TextEntryGamePassword"));
+  textEntryGamePassword = TheWindowManager->winGetWindowFromId(
+      parentPopup, textEntryGamePasswordID);
+  GadgetTextEntrySetText(textEntryGamePassword, UnicodeString::TheEmptyString);
 
-	NameKeyType staticTextGameNameID = TheNameKeyGenerator->nameToKey(AsciiString("PopupJoinGame.wnd:StaticTextGameName"));
-	GameWindow *staticTextGameName = TheWindowManager->winGetWindowFromId(parentPopup, staticTextGameNameID);
-	GadgetStaticTextSetText(staticTextGameName, UnicodeString::TheEmptyString);
+  NameKeyType staticTextGameNameID = TheNameKeyGenerator->nameToKey(
+      AsciiString("PopupJoinGame.wnd:StaticTextGameName"));
+  GameWindow *staticTextGameName =
+      TheWindowManager->winGetWindowFromId(parentPopup, staticTextGameNameID);
+  GadgetStaticTextSetText(staticTextGameName, UnicodeString::TheEmptyString);
 
-	buttonCancelID = NAMEKEY("PopupJoinGame.wnd:ButtonCancel");
+  buttonCancelID = NAMEKEY("PopupJoinGame.wnd:ButtonCancel");
 
-	GameSpyStagingRoom *ourRoom = TheGameSpyInfo->findStagingRoomByID(TheGameSpyInfo->getCurrentStagingRoomID());
-	if (ourRoom)
-		GadgetStaticTextSetText(staticTextGameName, ourRoom->getGameName());
+  GameSpyStagingRoom *ourRoom = TheGameSpyInfo->findStagingRoomByID(
+      TheGameSpyInfo->getCurrentStagingRoomID());
+  if (ourRoom)
+    GadgetStaticTextSetText(staticTextGameName, ourRoom->getGameName());
 
-	TheWindowManager->winSetFocus( parentPopup );
-	TheWindowManager->winSetModal( parentPopup );
-
+  TheWindowManager->winSetFocus(parentPopup);
+  TheWindowManager->winSetModal(parentPopup);
 }
 
 //-------------------------------------------------------------------------------------------------
 /** PopupHostGameInput callback */
 //-------------------------------------------------------------------------------------------------
-WindowMsgHandledType PopupJoinGameInput( GameWindow *window, UnsignedInt msg, WindowMsgData mData1, WindowMsgData mData2 )
-{
-	switch( msg ) 
-	{
+WindowMsgHandledType PopupJoinGameInput(GameWindow *window, UnsignedInt msg,
+                                        WindowMsgData mData1,
+                                        WindowMsgData mData2) {
+  switch (msg) {
+    // --------------------------------------------------------------------------------------------
+    case GWM_CHAR: {
+      UnsignedByte key = mData1;
+      UnsignedByte state = mData2;
+      //			if (buttonPushed)
+      //				break;
 
-		// --------------------------------------------------------------------------------------------
-		case GWM_CHAR:
-		{
-			UnsignedByte key = mData1;
-			UnsignedByte state = mData2;
-//			if (buttonPushed)
-//				break;
+      switch (key) {
+        // ----------------------------------------------------------------------------------------
+        case KEY_ESC: {
+          //
+          // send a simulated selected event to the parent window of the
+          // back/exit button
+          //
+          if (BitTest(state, KEY_STATE_UP)) {
+            GameSpyCloseOverlay(GSOVERLAY_GAMEPASSWORD);
+            SetLobbyAttemptHostJoin(FALSE);
+            parentPopup = NULL;
+          }  // end if
 
-			switch( key )
-			{
+          // don't let key fall through anywhere else
+          return MSG_HANDLED;
 
-				// ----------------------------------------------------------------------------------------
-				case KEY_ESC:
-				{
-					
-					//
-					// send a simulated selected event to the parent window of the
-					// back/exit button
-					//
-					if( BitTest( state, KEY_STATE_UP ) )
-					{
-						GameSpyCloseOverlay(GSOVERLAY_GAMEPASSWORD);
-						SetLobbyAttemptHostJoin( FALSE );
-						parentPopup = NULL;
-					}  // end if
+        }  // end escape
 
-					// don't let key fall through anywhere else
-					return MSG_HANDLED;
+      }  // end switch( key )
 
-				}  // end escape
+    }  // end char
 
-			}  // end switch( key )
+  }  // end switch( msg )
 
-		}  // end char
-
-	}  // end switch( msg )
-
-	return MSG_IGNORED;
-
+  return MSG_IGNORED;
 }
 
 //-------------------------------------------------------------------------------------------------
 /** PopupHostGameSystem callback */
 //-------------------------------------------------------------------------------------------------
-WindowMsgHandledType PopupJoinGameSystem( GameWindow *window, UnsignedInt msg, WindowMsgData mData1, WindowMsgData mData2 )
-{
-  switch( msg ) 
-	{
+WindowMsgHandledType PopupJoinGameSystem(GameWindow *window, UnsignedInt msg,
+                                         WindowMsgData mData1,
+                                         WindowMsgData mData2) {
+  switch (msg) {
+    // --------------------------------------------------------------------------------------------
+    case GWM_CREATE: {
+      break;
 
-		// --------------------------------------------------------------------------------------------
-		case GWM_CREATE:
-		{
+    }  // end create
+      //---------------------------------------------------------------------------------------------
+    case GWM_DESTROY: {
+      break;
 
-			break;
+    }  // end case
 
-		}  // end create
     //---------------------------------------------------------------------------------------------
-		case GWM_DESTROY:
-		{
-
-			break;
-
-		}  // end case
-
-		//---------------------------------------------------------------------------------------------
-		case GBM_SELECTED:
-		{
-			GameWindow *control = (GameWindow *)mData1;
-			Int controlID = control->winGetWindowId();
-			if (controlID == buttonCancelID)
-			{
-				GameSpyCloseOverlay(GSOVERLAY_GAMEPASSWORD);
-				SetLobbyAttemptHostJoin( FALSE );
-				parentPopup = NULL;
-			}
-			break;
-		}
+    case GBM_SELECTED: {
+      GameWindow *control = (GameWindow *)mData1;
+      Int controlID = control->winGetWindowId();
+      if (controlID == buttonCancelID) {
+        GameSpyCloseOverlay(GSOVERLAY_GAMEPASSWORD);
+        SetLobbyAttemptHostJoin(FALSE);
+        parentPopup = NULL;
+      }
+      break;
+    }
 
     //----------------------------------------------------------------------------------------------
-    case GWM_INPUT_FOCUS:
-		{
+    case GWM_INPUT_FOCUS: {
+      // if we're givin the opportunity to take the keyboard focus we must say
+      // we want it
+      if (mData1 == TRUE) *(Bool *)mData2 = TRUE;
 
-			// if we're givin the opportunity to take the keyboard focus we must say we want it
-			if( mData1 == TRUE )
-				*(Bool *)mData2 = TRUE;
+      break;
 
-			break;
+    }  // end input
+      //---------------------------------------------------------------------------------------------
+    case GEM_EDIT_DONE: {
+      GameWindow *control = (GameWindow *)mData1;
+      Int controlID = control->winGetWindowId();
 
-		}  // end input
-    //---------------------------------------------------------------------------------------------
-		case GEM_EDIT_DONE:
-		{
-			GameWindow *control = (GameWindow *)mData1;
-			Int controlID = control->winGetWindowId();
-     
-      if( controlID == textEntryGamePasswordID )
-			{
-				// read the user's input and clear the entry box
-				UnicodeString txtInput;
-				txtInput.set(GadgetTextEntryGetText( textEntryGamePassword ));
-				GadgetTextEntrySetText(textEntryGamePassword, UnicodeString::TheEmptyString);
-				txtInput.trim();
-				if (!txtInput.isEmpty())
-				{
-					AsciiString munkee;
-					munkee.translate(txtInput);
-					joinGame(munkee);
-				}
-			}
-			break;
-		}
-		default:
-			return MSG_IGNORED;
+      if (controlID == textEntryGamePasswordID) {
+        // read the user's input and clear the entry box
+        UnicodeString txtInput;
+        txtInput.set(GadgetTextEntryGetText(textEntryGamePassword));
+        GadgetTextEntrySetText(textEntryGamePassword,
+                               UnicodeString::TheEmptyString);
+        txtInput.trim();
+        if (!txtInput.isEmpty()) {
+          AsciiString munkee;
+          munkee.translate(txtInput);
+          joinGame(munkee);
+        }
+      }
+      break;
+    }
+    default:
+      return MSG_IGNORED;
 
-	}  // end switch
+  }  // end switch
 
-	return MSG_HANDLED;
-
+  return MSG_HANDLED;
 }
-
 
 //-----------------------------------------------------------------------------
 // PRIVATE FUNCTIONS //////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 
-static void joinGame( AsciiString password )
-{
-	GameSpyStagingRoom *ourRoom = TheGameSpyInfo->findStagingRoomByID(TheGameSpyInfo->getCurrentStagingRoomID());
-	if (!ourRoom)
-	{
-		GameSpyCloseOverlay(GSOVERLAY_GAMEPASSWORD);
-		SetLobbyAttemptHostJoin( FALSE );
-		parentPopup = NULL;
-		return;
-	}
-	PeerRequest req;
-	req.peerRequestType = PeerRequest::PEERREQUEST_JOINSTAGINGROOM;
-	req.text = ourRoom->getGameName().str();
-	req.stagingRoom.id = ourRoom->getID();
-	req.password = password.str();
-	TheGameSpyPeerMessageQueue->addRequest(req);
-	DEBUG_LOG(("Attempting to join game %d(%ls) with password [%s]\n", ourRoom->getID(), ourRoom->getGameName().str(), password.str()));
-	GameSpyCloseOverlay(GSOVERLAY_GAMEPASSWORD);
-	parentPopup = NULL;
+static void joinGame(AsciiString password) {
+  GameSpyStagingRoom *ourRoom = TheGameSpyInfo->findStagingRoomByID(
+      TheGameSpyInfo->getCurrentStagingRoomID());
+  if (!ourRoom) {
+    GameSpyCloseOverlay(GSOVERLAY_GAMEPASSWORD);
+    SetLobbyAttemptHostJoin(FALSE);
+    parentPopup = NULL;
+    return;
+  }
+  PeerRequest req;
+  req.peerRequestType = PeerRequest::PEERREQUEST_JOINSTAGINGROOM;
+  req.text = ourRoom->getGameName().str();
+  req.stagingRoom.id = ourRoom->getID();
+  req.password = password.str();
+  TheGameSpyPeerMessageQueue->addRequest(req);
+  DEBUG_LOG(("Attempting to join game %d(%ls) with password [%s]\n",
+             ourRoom->getID(), ourRoom->getGameName().str(), password.str()));
+  GameSpyCloseOverlay(GSOVERLAY_GAMEPASSWORD);
+  parentPopup = NULL;
 }

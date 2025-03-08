@@ -16,46 +16,41 @@
 **	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*********************************************************************************************** 
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               *** 
- *********************************************************************************************** 
- *                                                                                             * 
- *                 Project Name : Command & Conquer                                            * 
- *                                                                                             * 
- *                     $Archive:: /Commando/Code/wwlib/STIMER.CPP                             $* 
- *                                                                                             * 
- *                      $Author:: Greg_h                                                      $*
- *                                                                                             * 
- *                     $Modtime:: 7/09/99 1:46p                                               $*
- *                                                                                             * 
- *                    $Revision:: 3                                                           $*
+/***********************************************************************************************
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
+ ***********************************************************************************************
  *                                                                                             *
- *---------------------------------------------------------------------------------------------* 
- * Functions:                                                                                  * 
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ *                 Project Name : Command & Conquer *
+ *                                                                                             *
+ *                     $Archive:: /Commando/Code/wwlib/STIMER.CPP $*
+ *                                                                                             *
+ *                      $Author:: Greg_h $*
+ *                                                                                             *
+ *                     $Modtime:: 7/09/99 1:46p $*
+ *                                                                                             *
+ *                    $Revision:: 3 $*
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
-#include	"always.h"
-#include	"stimer.h"
-#include	"win.h"
+#include "stimer.h"
+
+#include "always.h"
+#include "win.h"
 
 #ifdef _MSC_VER
-#pragma warning (push,3)
+#pragma warning(push, 3)
 #endif
 
 #include <mmsystem.h>
 
 #ifdef _MSC_VER
-#pragma warning (pop)
+#pragma warning(pop)
 #endif
 
+long SystemTimerClass::operator()(void) const { return timeGetTime() / 16; }
 
-long SystemTimerClass::operator () (void) const
-{
-	return timeGetTime()/16;
-}
-
-
-SystemTimerClass::operator long (void) const
-{
-	return timeGetTime()/16;
-}
+SystemTimerClass::operator long(void) const { return timeGetTime() / 16; }

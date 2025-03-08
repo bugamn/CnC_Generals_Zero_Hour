@@ -17,36 +17,40 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : Max2W3D                                                      *
+ *                 Project Name : Max2W3D *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/Tools/max2w3d/genlodextensiondialog.cpp      $*
+ *                     $Archive::
+ * /Commando/Code/Tools/max2w3d/genlodextensiondialog.cpp      $*
  *                                                                                             *
- *              Original Author:: Greg Hjelstrom                                               *
+ *              Original Author:: Greg Hjelstrom *
  *                                                                                             *
- *                      $Author:: Greg_h                                                      $*
+ *                      $Author:: Greg_h $*
  *                                                                                             *
- *                     $Modtime:: 10/10/00 11:14a                                             $*
+ *                     $Modtime:: 10/10/00 11:14a $*
  *                                                                                             *
- *                    $Revision:: 1                                                           $*
+ *                    $Revision:: 1 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- *   GenLodExtensionDialogClass::GenLodExtensionDialogClass -- Constructor                     *
- *   GenLodExtensionDialogClass::~GenLodExtensionDialogClass -- Destructor                     *
- *   GenLodExtensionDialogClass::Get_Options -- Presents the dialog, gets user input           *
- *   GenLodExtensionDialogClass::Dialog_Proc -- Windows message handling                       *
- *   _gen_lod_ext_dialog_proc -- windows dialog proc                                           *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+ * Functions: * GenLodExtensionDialogClass::GenLodExtensionDialogClass --
+ *Constructor                     *
+ *   GenLodExtensionDialogClass::~GenLodExtensionDialogClass -- Destructor *
+ *   GenLodExtensionDialogClass::Get_Options -- Presents the dialog, gets user
+ *input           * GenLodExtensionDialogClass::Dialog_Proc -- Windows message
+ *handling                       * _gen_lod_ext_dialog_proc -- windows dialog
+ *proc                                           *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "genlodextensiondialog.h"
-#include "dllmain.h"
-#include "resource.h"
+
 #include <Max.h>
 
+#include "dllmain.h"
+#include "resource.h"
 
 /**********************************************************************************************
 **
@@ -54,155 +58,129 @@
 **
 **********************************************************************************************/
 
+/***********************************************************************************************
+ * GenLodExtensionDialogClass::GenLodExtensionDialogClass -- Constructor *
+ *                                                                                             *
+ * INPUT: *
+ *                                                                                             *
+ * OUTPUT: *
+ *                                                                                             *
+ * WARNINGS: *
+ *                                                                                             *
+ * HISTORY: *
+ *=============================================================================================*/
+GenLodExtensionDialogClass::GenLodExtensionDialogClass(Interface *maxinterface)
+    : Hwnd(NULL),
+      Options(NULL),
+      MaxInterface(maxinterface),
+      LodIndexSpin(NULL) {}
 
 /***********************************************************************************************
- * GenLodExtensionDialogClass::GenLodExtensionDialogClass -- Constructor                       *
+ * GenLodExtensionDialogClass::~GenLodExtensionDialogClass -- Destructor *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-GenLodExtensionDialogClass::GenLodExtensionDialogClass(Interface * maxinterface) :
-	Hwnd(NULL),
-	Options(NULL),
-	MaxInterface(maxinterface),
-	LodIndexSpin(NULL)
-{
+GenLodExtensionDialogClass::~GenLodExtensionDialogClass(void) {
+  ReleaseISpinner(LodIndexSpin);
 }
-
 
 /***********************************************************************************************
- * GenLodExtensionDialogClass::~GenLodExtensionDialogClass -- Destructor                       *
+ * GenLodExtensionDialogClass::Get_Options -- Presents the dialog, gets user
+ *input             *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-GenLodExtensionDialogClass::~GenLodExtensionDialogClass(void)
-{
-	ReleaseISpinner(LodIndexSpin);
-}
+bool GenLodExtensionDialogClass::Get_Options(OptionsStruct *options) {
+  Options = options;
 
+  // Put up the options dialog box.
+  BOOL result = DialogBoxParam(
+      AppInstance, MAKEINTRESOURCE(IDD_GENERATE_LOD_EXTENSION_DIALOG),
+      MaxInterface->GetMAXHWnd(), (DLGPROC)_gen_lod_ext_dialog_proc,
+      (LPARAM)this);
+
+  if (result == TRUE) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 /***********************************************************************************************
- * GenLodExtensionDialogClass::Get_Options -- Presents the dialog, gets user input             *
+ * GenLodExtensionDialogClass::Dialog_Proc -- Windows message handling *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-bool GenLodExtensionDialogClass::Get_Options(OptionsStruct * options)
-{
-	Options = options;
+bool GenLodExtensionDialogClass::Dialog_Proc(HWND hWnd, UINT message,
+                                             WPARAM wParam, LPARAM) {
+  switch (message) {
+    case WM_INITDIALOG:
 
-	// Put up the options dialog box.
-	BOOL result = DialogBoxParam
-						(
-							AppInstance,
-							MAKEINTRESOURCE (IDD_GENERATE_LOD_EXTENSION_DIALOG),
-							MaxInterface->GetMAXHWnd(),
-							(DLGPROC) _gen_lod_ext_dialog_proc,
-							(LPARAM) this
-						);
+      // Setup the LOD spinner control.
+      LodIndexSpin =
+          SetupIntSpinner(Hwnd, IDC_LOD_INDEX_SPIN, IDC_LOD_INDEX_EDIT,
+                          MIN_LOD_INDEX, MAX_LOD_INDEX, INITIAL_LOD_INDEX);
 
-	if (result == TRUE) {
-		return true;
-	} else {
-		return false;
-	}
+      return 1;
+
+    case WM_COMMAND:
+
+      switch (LOWORD(wParam)) {
+        case IDOK:
+          Options->LodIndex = LodIndexSpin->GetIVal();
+          EndDialog(Hwnd, 1);
+          break;
+
+        case IDCANCEL:
+          EndDialog(Hwnd, 0);
+          break;
+      }
+      return 1;
+  }
+  return 0;
 }
-
 
 /***********************************************************************************************
- * GenLodExtensionDialogClass::Dialog_Proc -- Windows message handling                         *
+ * _gen_lod_ext_dialog_proc -- windows dialog proc *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-bool GenLodExtensionDialogClass::Dialog_Proc(HWND hWnd,UINT message,WPARAM wParam,LPARAM)
-{
-	switch (message )	{
+static BOOL CALLBACK _gen_lod_ext_dialog_proc(HWND hwnd, UINT message,
+                                              WPARAM wparam, LPARAM lparam) {
+  static GenLodExtensionDialogClass *dialog = NULL;
 
-		case WM_INITDIALOG:
+  if (message == WM_INITDIALOG) {
+    dialog = (GenLodExtensionDialogClass *)lparam;
+    dialog->Hwnd = hwnd;
+  }
 
-			// Setup the LOD spinner control.
-			LodIndexSpin = SetupIntSpinner
-			(
-				Hwnd,
-				IDC_LOD_INDEX_SPIN,
-				IDC_LOD_INDEX_EDIT,
-				MIN_LOD_INDEX,MAX_LOD_INDEX,INITIAL_LOD_INDEX
-			);
-			
-			return 1;
-
-		case WM_COMMAND:
-
-			switch (LOWORD(wParam))
-			{
-				case IDOK:
-					Options->LodIndex = LodIndexSpin->GetIVal();
-					EndDialog(Hwnd, 1);
-					break;
-
-				case IDCANCEL:
-					EndDialog(Hwnd, 0);
-					break;
-			}
-			return 1;
-	}
-	return 0;
+  if (dialog) {
+    return dialog->Dialog_Proc(hwnd, message, wparam, lparam);
+  } else {
+    return FALSE;
+  }
 }
-
-
-/***********************************************************************************************
- * _gen_lod_ext_dialog_proc -- windows dialog proc                                             *
- *                                                                                             *
- * INPUT:                                                                                      *
- *                                                                                             *
- * OUTPUT:                                                                                     *
- *                                                                                             *
- * WARNINGS:                                                                                   *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
- *=============================================================================================*/
-static BOOL CALLBACK _gen_lod_ext_dialog_proc(HWND hwnd,UINT message,WPARAM wparam,LPARAM lparam)
-{
-	static GenLodExtensionDialogClass * dialog = NULL;
-
-	if (message == WM_INITDIALOG) {
-		dialog = (GenLodExtensionDialogClass *)lparam;
-		dialog->Hwnd = hwnd;
-	}
-
-	if (dialog) {
-		return dialog->Dialog_Proc(hwnd, message, wparam, lparam);
-	} else {
-		return FALSE;
-	}
-}
-
-
-
-

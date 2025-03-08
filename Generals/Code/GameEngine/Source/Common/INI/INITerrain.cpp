@@ -18,45 +18,43 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: INITerrain.cpp ///////////////////////////////////////////////////////////////////////////
+// FILE: INITerrain.cpp
+// ///////////////////////////////////////////////////////////////////////////
 // Author: Colin Day, December 2001
 // Desc:   Terrain type INI loading
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
 #include "Common/INI.h"
 #include "Common/TerrainTypes.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-------------------------------------------------------------------------------------------------
 /** Parse Terrain type entry */
 //-------------------------------------------------------------------------------------------------
-void INI::parseTerrainDefinition( INI* ini )
-{
-	AsciiString name;
-	TerrainType *terrainType;
+void INI::parseTerrainDefinition(INI* ini) {
+  AsciiString name;
+  TerrainType* terrainType;
 
-	// read the name
-	const char* c = ini->getNextToken();
-	name.set( c );	
+  // read the name
+  const char* c = ini->getNextToken();
+  name.set(c);
 
-	// find existing item if present
-	terrainType = TheTerrainTypes->findTerrain( name );
-	if( terrainType == NULL )
-		terrainType = TheTerrainTypes->newTerrain( name );
+  // find existing item if present
+  terrainType = TheTerrainTypes->findTerrain(name);
+  if (terrainType == NULL) terrainType = TheTerrainTypes->newTerrain(name);
 
-	// sanity
-	DEBUG_ASSERTCRASH( terrainType, ("Unable to allocate terrain type '%s'\n", name.str()) );
+  // sanity
+  DEBUG_ASSERTCRASH(terrainType,
+                    ("Unable to allocate terrain type '%s'\n", name.str()));
 
-	// parse the ini definition
-	ini->initFromINI( terrainType, terrainType->getFieldParse() );
+  // parse the ini definition
+  ini->initFromINI(terrainType, terrainType->getFieldParse());
 
 }  // end parseTerrain
-
-
-

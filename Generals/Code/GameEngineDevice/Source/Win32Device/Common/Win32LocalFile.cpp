@@ -18,7 +18,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -28,8 +29,6 @@
 
 #include "Win32Device/Common/Win32LocalFile.h"
 
-Win32LocalFile::Win32LocalFile() : LocalFile() {
-}
+Win32LocalFile::Win32LocalFile() : LocalFile() {}
 
-Win32LocalFile::~Win32LocalFile() {
-}
+Win32LocalFile::~Win32LocalFile() {}

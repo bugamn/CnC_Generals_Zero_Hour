@@ -17,48 +17,47 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WWSaveLoad                                                   *
+ *                 Project Name : WWSaveLoad *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/wwsaveload/definitionfactory.cpp             $*
+ *                     $Archive::
+ * /Commando/Code/wwsaveload/definitionfactory.cpp             $*
  *                                                                                             *
- *                       Author:: Patrick Smith                                                *
+ *                       Author:: Patrick Smith *
  *                                                                                             *
- *                     $Modtime:: 9/09/99 7:12p                                               $*
+ *                     $Modtime:: 9/09/99 7:12p $*
  *                                                                                             *
- *                    $Revision:: 6                                                           $*
+ *                    $Revision:: 6 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "definitionfactory.h"
-#include "definitionfactorymgr.h"
 
+#include "definitionfactorymgr.h"
 
 /////////////////////////////////////////////////////////
 //
 //	DefinitionFactoryClass
 //
 /////////////////////////////////////////////////////////
-DefinitionFactoryClass::DefinitionFactoryClass (void)
-	:	m_NextFactory (0),
-		m_PrevFactory (0)
-{
-	DefinitionFactoryMgrClass::Register_Factory (this);
-	return ;
+DefinitionFactoryClass::DefinitionFactoryClass(void)
+    : m_NextFactory(0), m_PrevFactory(0) {
+  DefinitionFactoryMgrClass::Register_Factory(this);
+  return;
 }
-
 
 /////////////////////////////////////////////////////////
 //
 //	~DefinitionFactoryClass
 //
 /////////////////////////////////////////////////////////
-DefinitionFactoryClass::~DefinitionFactoryClass (void)
-{
-	DefinitionFactoryMgrClass::Unregister_Factory (this);
-	return ;
+DefinitionFactoryClass::~DefinitionFactoryClass(void) {
+  DefinitionFactoryMgrClass::Unregister_Factory(this);
+  return;
 }

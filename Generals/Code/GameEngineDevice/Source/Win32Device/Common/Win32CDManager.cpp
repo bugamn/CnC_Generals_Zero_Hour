@@ -18,17 +18,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 //----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //----------------------------------------------------------------------------
 //
 // Project:   Generals
@@ -42,195 +43,137 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//         Includes                                                      
+//         Includes
 //----------------------------------------------------------------------------
-
-#include "windows.h"
-
-#include "Common/GameMemory.h"
-#include "Common/FileSystem.h"
 
 #include "Win32DEvice/Common/Win32CDManager.h"
 
-//----------------------------------------------------------------------------
-//         Externals                                                     
-//----------------------------------------------------------------------------
-
-
+#include "Common/FileSystem.h"
+#include "Common/GameMemory.h"
+#include "windows.h"
 
 //----------------------------------------------------------------------------
-//         Defines                                                         
+//         Externals
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Types                                                     
+//         Defines
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Data                                                     
+//         Private Types
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Public Data                                                      
+//         Private Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Prototypes                                               
+//         Public Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Functions                                               
+//         Private Prototypes
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Public Functions                                                
+//         Private Functions
 //----------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------
+//         Public Functions
+//----------------------------------------------------------------------------
 
-CDManagerInterface* CreateCDManager( void )
-{
-	return NEW Win32CDManager;
-}
+CDManagerInterface* CreateCDManager(void) { return NEW Win32CDManager; }
 
 //============================================================================
 // Win32CDDrive::Win32CDDrive
 //============================================================================
 
-Win32CDDrive::Win32CDDrive()
-{
-
-}
+Win32CDDrive::Win32CDDrive() {}
 
 //============================================================================
 // Win32CDDrive::~Win32CDDrive
 //============================================================================
 
-Win32CDDrive::~Win32CDDrive()
-{
-
-}
+Win32CDDrive::~Win32CDDrive() {}
 
 //============================================================================
 // Win32CDDrive::refreshInfo
 //============================================================================
 
-void Win32CDDrive::refreshInfo( void )
-{
-	Bool mayRequireUpdate = (m_disk != CD::NO_DISK);
-	Char volName[1024];
-	// read the volume info
-	if ( GetVolumeInformation( m_drivePath.str(), volName, sizeof(volName) -1, NULL, NULL, NULL, NULL, 0 ))
-	{
-		m_diskName = volName;
-		m_disk = CD::UNKNOWN_DISK;
-	}
-	else
-	{
-		m_diskName.clear();
-		m_disk = CD::NO_DISK;
-		
-		if (mayRequireUpdate) 
-			TheFileSystem->unloadMusicFilesFromCD();
-	}
+void Win32CDDrive::refreshInfo(void) {
+  Bool mayRequireUpdate = (m_disk != CD::NO_DISK);
+  Char volName[1024];
+  // read the volume info
+  if (GetVolumeInformation(m_drivePath.str(), volName, sizeof(volName) - 1,
+                           NULL, NULL, NULL, NULL, 0)) {
+    m_diskName = volName;
+    m_disk = CD::UNKNOWN_DISK;
+  } else {
+    m_diskName.clear();
+    m_disk = CD::NO_DISK;
 
-	// This is an override, not an extension of CDDrive
+    if (mayRequireUpdate) TheFileSystem->unloadMusicFilesFromCD();
+  }
+
+  // This is an override, not an extension of CDDrive
 }
 
 //============================================================================
 // Win32CDManager::Win32CDManager
 //============================================================================
 
-Win32CDManager::Win32CDManager()
-{
-
-}
+Win32CDManager::Win32CDManager() {}
 
 //============================================================================
 // Win32CDManager::~Win32CDManager
 //============================================================================
 
-Win32CDManager::~Win32CDManager()
-{
-
-}
+Win32CDManager::~Win32CDManager() {}
 
 //============================================================================
 // Win32CDManager::init
 //============================================================================
 
-void Win32CDManager::init( void )
-{
-	CDManager::init();	// init base classes
+void Win32CDManager::init(void) {
+  CDManager::init();  // init base classes
 
-	destroyAllDrives();
+  destroyAllDrives();
 
-	// detect CD Drives
-	for ( Char driveLetter = 'a'; driveLetter <= 'z'; driveLetter++ )
-	{
-		AsciiString drivePath;
-		drivePath.format( "%c:\\", driveLetter );
+  // detect CD Drives
+  for (Char driveLetter = 'a'; driveLetter <= 'z'; driveLetter++) {
+    AsciiString drivePath;
+    drivePath.format("%c:\\", driveLetter);
 
-		if ( GetDriveType( drivePath.str() ) == DRIVE_CDROM )
-		{
-			newDrive( drivePath.str() );
-		}
-	}
+    if (GetDriveType(drivePath.str()) == DRIVE_CDROM) {
+      newDrive(drivePath.str());
+    }
+  }
 
-	refreshDrives();
+  refreshDrives();
 }
 
 //============================================================================
 // Win32CDManager::update
 //============================================================================
 
-void Win32CDManager::update( void )
-{
-	CDManager::update();
-
-
-}
+void Win32CDManager::update(void) { CDManager::update(); }
 
 //============================================================================
 // Win32CDManager::reset
 //============================================================================
 
-void Win32CDManager::reset( void )
-{
-	CDManager::reset();
-
-}
+void Win32CDManager::reset(void) { CDManager::reset(); }
 
 //============================================================================
 // Win32CDManager::createDrive
 //============================================================================
 
-CDDriveInterface* Win32CDManager::createDrive( void )
-{
-	return NEW Win32CDDrive;
-}
-
+CDDriveInterface* Win32CDManager::createDrive(void) { return NEW Win32CDDrive; }
 
 //============================================================================
 // Win32CDManager::refreshDrives
 //============================================================================
 
-void Win32CDManager::refreshDrives( void )
-{
-	CDManager::refreshDrives();
-}
-
-
-
-
+void Win32CDManager::refreshDrives(void) { CDManager::refreshDrives(); }

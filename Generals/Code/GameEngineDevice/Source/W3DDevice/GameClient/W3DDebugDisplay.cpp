@@ -18,17 +18,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 //----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //----------------------------------------------------------------------------
 //
 // Project:   Generals
@@ -42,122 +43,98 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//         Includes                                                      
+//         Includes
 //----------------------------------------------------------------------------
 
 #include "W3DDevice/GameClient/W3DDebugDisplay.h"
-#include "GameClient/GameFont.h"
-#include "GameClient/DisplayStringManager.h"
+
 #include "GameClient/DisplayString.h"
+#include "GameClient/DisplayStringManager.h"
+#include "GameClient/GameFont.h"
 
 //----------------------------------------------------------------------------
-//         Externals                                                     
+//         Externals
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Defines                                                         
+//         Defines
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Types                                                     
+//         Private Types
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Data                                                     
+//         Private Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Public Data                                                      
+//         Public Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Prototypes                                               
+//         Private Prototypes
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Functions                                               
+//         Private Functions
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Public Functions                                                
+//         Public Functions
 //----------------------------------------------------------------------------
 
 //============================================================================
 // W3DDebugDisplay::W3DDebugDisplay
 //============================================================================
 
-W3DDebugDisplay::W3DDebugDisplay()
-: m_displayString(NULL)
-{
-
-}
+W3DDebugDisplay::W3DDebugDisplay() : m_displayString(NULL) {}
 
 //============================================================================
 // W3DDebugDisplay::~W3DDebugDisplay
 //============================================================================
 
-W3DDebugDisplay::~W3DDebugDisplay()
-{
-	if ( m_displayString )
-	{
-		TheDisplayStringManager->freeDisplayString( m_displayString );
-	}
+W3DDebugDisplay::~W3DDebugDisplay() {
+  if (m_displayString) {
+    TheDisplayStringManager->freeDisplayString(m_displayString);
+  }
 }
 
 //============================================================================
 // W3DDebugDisplay::init
 //============================================================================
 
-void W3DDebugDisplay::init( void )
-{
-	m_displayString = TheDisplayStringManager->newDisplayString();
+void W3DDebugDisplay::init(void) {
+  m_displayString = TheDisplayStringManager->newDisplayString();
 }
 
 //============================================================================
 // W3DDebugDisplay::drawText
 //============================================================================
 
-void W3DDebugDisplay::drawText( Int x, Int y, Char *text )
-{
-	if ( m_font == NULL || m_displayString == NULL )
-	{
-		return ;
-	}
+void W3DDebugDisplay::drawText(Int x, Int y, Char *text) {
+  if (m_font == NULL || m_displayString == NULL) {
+    return;
+  }
 
-	::Color textColor = GameMakeColor( 255, 255, 255, 255 );
-	::Color dropColor = GameMakeColor( 0, 0, 0, 255 );
+  ::Color textColor = GameMakeColor(255, 255, 255, 255);
+  ::Color dropColor = GameMakeColor(0, 0, 0, 255);
 
-	UnicodeString unicode;
+  UnicodeString unicode;
 
-	unicode.translate( AsciiString( text ) );
-	m_displayString->setText( unicode );
-	m_displayString->draw( x*m_fontWidth, 13 + y*m_fontHeight, textColor, dropColor );
+  unicode.translate(AsciiString(text));
+  m_displayString->setText(unicode);
+  m_displayString->draw(x * m_fontWidth, 13 + y * m_fontHeight, textColor,
+                        dropColor);
 }
 
 //============================================================================
 // W3DDebugDisplay::setFont
 //============================================================================
 
-void W3DDebugDisplay::setFont( GameFont *font )
-{
-	m_font = font;
-	if ( m_displayString )
-	{
-		m_displayString->setFont( m_font );
-	}
+void W3DDebugDisplay::setFont(GameFont *font) {
+  m_font = font;
+  if (m_displayString) {
+    m_displayString->setFont(m_font);
+  }
 }
-

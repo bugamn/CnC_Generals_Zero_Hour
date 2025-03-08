@@ -18,12 +18,12 @@
 
 // FILE: WinMain.cpp //////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 // Project:    MapCacheBuilder
@@ -38,72 +38,59 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
-#include <windows.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
-#include "Lib/BaseType.h"
+#include <io.h>
+
+#include "Common/ArchiveFileSystem.h"
+#include "Common/DamageFX.h"
 #include "Common/Debug.h"
+#include "Common/FileSystem.h"
+#include "Common/GameAudio.h"
 #include "Common/GameMemory.h"
 #include "Common/GlobalData.h"
-#include "Common/NameKeyGenerator.h"
-#include "Resource.h"
-
-#include "Common/ThingFactory.h"
-#include "Common/FileSystem.h"
-#include "Win32Device/Common/Win32LocalFileSystem.h"
-#include "Win32Device/Common/Win32BIGFileSystem.h"
-#include "Common/SubSystemInterface.h"
-#include "GameClient/MapUtil.h"
-#include "W3DDevice/Common/W3DModuleFactory.h"
-
-
-#include "Common/FileSystem.h"
-#include "Common/ArchiveFileSystem.h"
-#include "Common/LocalFileSystem.h"
-#include "Common/Debug.h"
-#include "Common/StackDump.h"
-#include "Common/GameMemory.h"
-#include "Common/Science.h"
-#include "Common/ThingFactory.h"
 #include "Common/INI.h"
-#include "Common/GameAudio.h"
-#include "Common/SpecialPower.h"
-#include "Common/TerrainTypes.h"
-#include "Common/DamageFX.h"
-#include "Common/Upgrade.h"
+#include "Common/LocalFileSystem.h"
 #include "Common/ModuleFactory.h"
-#include "Common/PlayerTemplate.h"
 #include "Common/MultiplayerSettings.h"
-
+#include "Common/NameKeyGenerator.h"
+#include "Common/PlayerTemplate.h"
+#include "Common/Science.h"
+#include "Common/SpecialPower.h"
+#include "Common/StackDump.h"
+#include "Common/SubSystemInterface.h"
+#include "Common/TerrainTypes.h"
+#include "Common/ThingFactory.h"
+#include "Common/Upgrade.h"
+#include "GameClient/Anim2D.h"
+#include "GameClient/FXList.h"
+#include "GameClient/GameText.h"
+#include "GameClient/MapUtil.h"
+#include "GameClient/ParticleSys.h"
+#include "GameClient/TerrainRoads.h"
+#include "GameClient/VideoPlayer.h"
+#include "GameClient/Water.h"
 #include "GameLogic/Armor.h"
 #include "GameLogic/CaveSystem.h"
 #include "GameLogic/CrateSystem.h"
-#include "GameLogic/ObjectCreationList.h"
-#include "GameLogic/Weapon.h"
-#include "GameLogic/RankInfo.h"
-#include "GameLogic/SidesList.h"
-#include "GameLogic/ScriptEngine.h"
-#include "GameLogic/ScriptActions.h"
-#include "GameClient/Anim2D.h"
-#include "GameClient/GameText.h"
-#include "GameClient/ParticleSys.h"
-#include "GameClient/Water.h"
-#include "GameClient/TerrainRoads.h"
-#include "GameClient/FXList.h"
-#include "GameClient/VideoPlayer.h"
 #include "GameLogic/Locomotor.h"
-
+#include "GameLogic/ObjectCreationList.h"
+#include "GameLogic/RankInfo.h"
+#include "GameLogic/ScriptActions.h"
+#include "GameLogic/ScriptEngine.h"
+#include "GameLogic/SidesList.h"
+#include "GameLogic/Weapon.h"
+#include "Lib/BaseType.h"
+#include "MilesAudioDevice/MilesAudioManager.h"
+#include "Resource.h"
 #include "W3DDevice/Common/W3DModuleFactory.h"
 #include "W3DDevice/GameClient/W3DParticleSys.h"
-#include "MilesAudioDevice/MilesAudioManager.h"
-
-#include <io.h>
-#include "win32device/GameClient/Win32Mouse.h"
-#include "Win32Device/Common/Win32LocalFileSystem.h"
 #include "Win32Device/Common/Win32BIGFileSystem.h"
-
+#include "Win32Device/Common/Win32LocalFileSystem.h"
+#include "win32device/GameClient/Win32Mouse.h"
 
 // DEFINES ////////////////////////////////////////////////////////////////////
 
@@ -111,19 +98,20 @@
 
 #ifdef _INTERNAL
 // for occasional debugging...
-//#pragma optimize("", off)
-//#pragma message("************************************** WARNING, optimization disabled for debugging purposes")
+// #pragma optimize("", off)
+// #pragma message("************************************** WARNING, optimization
+// disabled for debugging purposes")
 #endif
 
 // PRIVATE DATA ///////////////////////////////////////////////////////////////
 
 static SubsystemInterfaceList _TheSubsystemList;
 
-template<class SUBSYSTEM>
-void initSubsystem(SUBSYSTEM*& sysref, SUBSYSTEM* sys, const char* path1 = NULL, const char* path2 = NULL, const char* dirpath = NULL)
-{
-	sysref = sys;
-	_TheSubsystemList.initSubsystem(sys, path1, path2, dirpath, NULL);
+template <class SUBSYSTEM>
+void initSubsystem(SUBSYSTEM *&sysref, SUBSYSTEM *sys, const char *path1 = NULL,
+                   const char *path2 = NULL, const char *dirpath = NULL) {
+  sysref = sys;
+  _TheSubsystemList.initSubsystem(sys, path1, path2, dirpath, NULL);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -149,95 +137,77 @@ const Char *g_csfFile = "data\\%s\\Generals.csf";
 // strtrim ====================================================================
 /** Trim leading and trailing whitespace from a character string (in place). */
 //=============================================================================
-static char* strtrim(char* buffer)
-{
-	if (buffer != NULL) {
-		//	Strip leading white space from the string.
-		char * source = buffer;
-		while ((*source != 0) && ((unsigned char)*source <= 32))
-		{
-			source++;
-		}
+static char *strtrim(char *buffer) {
+  if (buffer != NULL) {
+    //	Strip leading white space from the string.
+    char *source = buffer;
+    while ((*source != 0) && ((unsigned char)*source <= 32)) {
+      source++;
+    }
 
-		if (source != buffer)
-		{
-			strcpy(buffer, source);
-		}
+    if (source != buffer) {
+      strcpy(buffer, source);
+    }
 
-		//	Clip trailing white space from the string.
-		for (int index = strlen(buffer)-1; index >= 0; index--)
-		{
-			if ((*source != 0) && ((unsigned char)buffer[index] <= 32))
-			{
-				buffer[index] = '\0';
-			}
-			else
-			{
-				break;
-			}
-		}
-	}
+    //	Clip trailing white space from the string.
+    for (int index = strlen(buffer) - 1; index >= 0; index--) {
+      if ((*source != 0) && ((unsigned char)buffer[index] <= 32)) {
+        buffer[index] = '\0';
+      } else {
+        break;
+      }
+    }
+  }
 
-	return buffer;
+  return buffer;
 }
 
-static char *nextParam(char *newSource, char *seps)
-{
-	static char *source = NULL;
-	if (newSource)
-	{
-		source = newSource;
-	}
-	if (!source)
-	{
-		return NULL;
-	}
+static char *nextParam(char *newSource, char *seps) {
+  static char *source = NULL;
+  if (newSource) {
+    source = newSource;
+  }
+  if (!source) {
+    return NULL;
+  }
 
-	// find first separator
-	char *first = source;//strpbrk(source, seps);
-	if (first)
-	{
-		// go past initial spaces
-		char *firstNonSpace = first;
-		while (*firstNonSpace == ' ')
-			++firstNonSpace;
-		first = firstNonSpace;
+  // find first separator
+  char *first = source;  // strpbrk(source, seps);
+  if (first) {
+    // go past initial spaces
+    char *firstNonSpace = first;
+    while (*firstNonSpace == ' ') ++firstNonSpace;
+    first = firstNonSpace;
 
-		// go past separator
-		char *firstSep = strpbrk(first, seps);
-		char firstChar[2] = {0,0};
-		if (firstSep == first)
-		{
-			firstChar[0] = *first;
-			while (*first == firstChar[0]) first++;
-		}
+    // go past separator
+    char *firstSep = strpbrk(first, seps);
+    char firstChar[2] = {0, 0};
+    if (firstSep == first) {
+      firstChar[0] = *first;
+      while (*first == firstChar[0]) first++;
+    }
 
-		// find end
-		char *end;
-		if (firstChar[0])
-			end = strpbrk(first, firstChar);
-		else
-			end = strpbrk(first, seps);
+    // find end
+    char *end;
+    if (firstChar[0])
+      end = strpbrk(first, firstChar);
+    else
+      end = strpbrk(first, seps);
 
-		// trim string & save next start pos
-		if (end)
-		{
-			source = end+1;
-			*end = 0;
+    // trim string & save next start pos
+    if (end) {
+      source = end + 1;
+      *end = 0;
 
-			if (!*source)
-				source = NULL;
-		}
-		else
-		{
-			source = NULL;
-		}
+      if (!*source) source = NULL;
+    } else {
+      source = NULL;
+    }
 
-		if (first && !*first)
-			first = NULL;
-	}
+    if (first && !*first) first = NULL;
+  }
 
-	return first;
+  return first;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -247,128 +217,147 @@ static char *nextParam(char *newSource, char *seps)
 // WinMain ====================================================================
 /** Application entry point */
 //=============================================================================
-Int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                      LPSTR lpCmdLine, Int nCmdShow )
-{
+Int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                     LPSTR lpCmdLine, Int nCmdShow) {
+  // start the log
+  DEBUG_INIT(DEBUG_FLAGS_DEFAULT);
+  initMemoryManager();
 
-	// start the log
-	DEBUG_INIT(DEBUG_FLAGS_DEFAULT);
-	initMemoryManager();
+  try {
+    // save application instance
+    ApplicationHInstance = hInstance;
 
-	try
-	{
+    // Set the current directory to the app directory.
+    char buf[_MAX_PATH];
+    GetModuleFileName(NULL, buf, sizeof(buf));
+    char *pEnd = buf + strlen(buf);
+    while (pEnd != buf) {
+      if (*pEnd == '\\') {
+        *pEnd = 0;
+        break;
+      }
+      pEnd--;
+    }
+    ::SetCurrentDirectory(buf);
 
-	// save application instance
-	ApplicationHInstance = hInstance;
+    /*
+    ** Convert WinMain arguments to simple main argc and argv
+    */
+    std::list<std::string> argvSet;
+    char *token;
+    token = nextParam(lpCmdLine, "\" ");
+    while (token != NULL) {
+      char *str = strtrim(token);
+      argvSet.push_back(str);
+      DEBUG_LOG(("Adding '%s'\n", str));
+      token = nextParam(NULL, "\" ");
+    }
 
+    // not part of the subsystem list, because it should normally never be
+    // reset!
+    TheNameKeyGenerator = new NameKeyGenerator;
+    TheNameKeyGenerator->init();
 
-	// Set the current directory to the app directory.
-	char buf[_MAX_PATH];
-	GetModuleFileName(NULL, buf, sizeof(buf));
-	char *pEnd = buf + strlen(buf);
-	while (pEnd != buf) {
-		if (*pEnd == '\\') {
-			*pEnd = 0;
-			break;
-		}
-		pEnd--;
-	}
-	::SetCurrentDirectory(buf);
+    TheFileSystem = new FileSystem;
 
-	/*
-	** Convert WinMain arguments to simple main argc and argv
-	*/
-	std::list<std::string> argvSet;
-	char *token;
-	token = nextParam(lpCmdLine, "\" ");
-	while (token != NULL) {
-		char * str = strtrim(token);
-		argvSet.push_back(str);
-		DEBUG_LOG(("Adding '%s'\n", str));
-		token = nextParam(NULL, "\" ");	   
-	}
+    initSubsystem(TheLocalFileSystem,
+                  (LocalFileSystem *)new Win32LocalFileSystem);
+    initSubsystem(TheArchiveFileSystem,
+                  (ArchiveFileSystem *)new Win32BIGFileSystem);
+    INI ini;
+    initSubsystem(TheWritableGlobalData, new GlobalData(),
+                  "Data\\INI\\Default\\GameData.ini",
+                  "Data\\INI\\GameData.ini");
+    initSubsystem(TheGameText, CreateGameTextInterface());
+    initSubsystem(TheScienceStore, new ScienceStore(),
+                  "Data\\INI\\Default\\Science.ini", "Data\\INI\\Science.ini");
+    initSubsystem(TheMultiplayerSettings, new MultiplayerSettings(),
+                  "Data\\INI\\Default\\Multiplayer.ini",
+                  "Data\\INI\\Multiplayer.ini");
+    initSubsystem(TheTerrainTypes, new TerrainTypeCollection(),
+                  "Data\\INI\\Default\\Terrain.ini", "Data\\INI\\Terrain.ini");
+    initSubsystem(TheTerrainRoads, new TerrainRoadCollection(),
+                  "Data\\INI\\Default\\Roads.ini", "Data\\INI\\Roads.ini");
+    initSubsystem(TheScriptEngine, (ScriptEngine *)(new ScriptEngine()));
+    initSubsystem(TheAudio, (AudioManager *)new MilesAudioManager());
+    initSubsystem(TheVideoPlayer, (VideoPlayerInterface *)(new VideoPlayer()));
+    initSubsystem(TheModuleFactory, (ModuleFactory *)(new W3DModuleFactory()));
+    initSubsystem(TheSidesList, new SidesList());
+    initSubsystem(TheCaveSystem, new CaveSystem());
+    initSubsystem(TheRankInfoStore, new RankInfoStore(), NULL,
+                  "Data\\INI\\Rank.ini");
+    initSubsystem(ThePlayerTemplateStore, new PlayerTemplateStore(),
+                  "Data\\INI\\Default\\PlayerTemplate.ini",
+                  "Data\\INI\\PlayerTemplate.ini");
+    initSubsystem(TheSpecialPowerStore, new SpecialPowerStore(),
+                  "Data\\INI\\Default\\SpecialPower.ini",
+                  "Data\\INI\\SpecialPower.ini");
+    initSubsystem(TheParticleSystemManager,
+                  (ParticleSystemManager *)(new W3DParticleSystemManager()));
+    initSubsystem(TheFXListStore, new FXListStore(),
+                  "Data\\INI\\Default\\FXList.ini", "Data\\INI\\FXList.ini");
+    initSubsystem(TheWeaponStore, new WeaponStore(), NULL,
+                  "Data\\INI\\Weapon.ini");
+    initSubsystem(TheObjectCreationListStore, new ObjectCreationListStore(),
+                  "Data\\INI\\Default\\ObjectCreationList.ini",
+                  "Data\\INI\\ObjectCreationList.ini");
+    initSubsystem(TheLocomotorStore, new LocomotorStore(), NULL,
+                  "Data\\INI\\Locomotor.ini");
+    initSubsystem(TheDamageFXStore, new DamageFXStore(), NULL,
+                  "Data\\INI\\DamageFX.ini");
+    initSubsystem(TheArmorStore, new ArmorStore(), NULL,
+                  "Data\\INI\\Armor.ini");
+    initSubsystem(TheThingFactory, new ThingFactory(),
+                  "Data\\INI\\Default\\Object.ini", NULL, "Data\\INI\\Object");
+    initSubsystem(TheCrateSystem, new CrateSystem(),
+                  "Data\\INI\\Default\\Crate.ini", "Data\\INI\\Crate.ini");
+    initSubsystem(TheUpgradeCenter, new UpgradeCenter,
+                  "Data\\INI\\Default\\Upgrade.ini", "Data\\INI\\Upgrade.ini");
+    initSubsystem(TheAnim2DCollection, new Anim2DCollection);  // Init's itself.
 
-	// not part of the subsystem list, because it should normally never be reset!
-	TheNameKeyGenerator = new NameKeyGenerator;
-	TheNameKeyGenerator->init();
+    _TheSubsystemList.postProcessLoadAll();
 
-	TheFileSystem = new FileSystem;
+    TheWritableGlobalData->m_buildMapCache = TRUE;
 
-	initSubsystem(TheLocalFileSystem, (LocalFileSystem*)new Win32LocalFileSystem);
-	initSubsystem(TheArchiveFileSystem, (ArchiveFileSystem*)new Win32BIGFileSystem);
-	INI ini;
-	initSubsystem(TheWritableGlobalData, new GlobalData(), "Data\\INI\\Default\\GameData.ini", "Data\\INI\\GameData.ini");
-	initSubsystem(TheGameText, CreateGameTextInterface());
-	initSubsystem(TheScienceStore, new ScienceStore(), "Data\\INI\\Default\\Science.ini", "Data\\INI\\Science.ini");
-	initSubsystem(TheMultiplayerSettings, new MultiplayerSettings(), "Data\\INI\\Default\\Multiplayer.ini", "Data\\INI\\Multiplayer.ini");
-	initSubsystem(TheTerrainTypes, new TerrainTypeCollection(), "Data\\INI\\Default\\Terrain.ini", "Data\\INI\\Terrain.ini");
-	initSubsystem(TheTerrainRoads, new TerrainRoadCollection(), "Data\\INI\\Default\\Roads.ini", "Data\\INI\\Roads.ini");
-	initSubsystem(TheScriptEngine, (ScriptEngine*)(new ScriptEngine()));
-	initSubsystem(TheAudio, (AudioManager*)new MilesAudioManager());
-	initSubsystem(TheVideoPlayer, (VideoPlayerInterface*)(new VideoPlayer()));
-	initSubsystem(TheModuleFactory, (ModuleFactory*)(new W3DModuleFactory()));
-	initSubsystem(TheSidesList, new SidesList());
-	initSubsystem(TheCaveSystem, new CaveSystem());
-	initSubsystem(TheRankInfoStore, new RankInfoStore(), NULL, "Data\\INI\\Rank.ini");
-	initSubsystem(ThePlayerTemplateStore, new PlayerTemplateStore(), "Data\\INI\\Default\\PlayerTemplate.ini", "Data\\INI\\PlayerTemplate.ini");
-	initSubsystem(TheSpecialPowerStore, new SpecialPowerStore(), "Data\\INI\\Default\\SpecialPower.ini", "Data\\INI\\SpecialPower.ini" );
-	initSubsystem(TheParticleSystemManager, (ParticleSystemManager*)(new W3DParticleSystemManager()));
-	initSubsystem(TheFXListStore, new FXListStore(), "Data\\INI\\Default\\FXList.ini", "Data\\INI\\FXList.ini");
-	initSubsystem(TheWeaponStore, new WeaponStore(), NULL, "Data\\INI\\Weapon.ini");
-	initSubsystem(TheObjectCreationListStore, new ObjectCreationListStore(), "Data\\INI\\Default\\ObjectCreationList.ini", "Data\\INI\\ObjectCreationList.ini");
-	initSubsystem(TheLocomotorStore, new LocomotorStore(), NULL, "Data\\INI\\Locomotor.ini");
-	initSubsystem(TheDamageFXStore, new DamageFXStore(), NULL, "Data\\INI\\DamageFX.ini");
-	initSubsystem(TheArmorStore, new ArmorStore(), NULL, "Data\\INI\\Armor.ini");
-	initSubsystem(TheThingFactory, new ThingFactory(), "Data\\INI\\Default\\Object.ini", NULL, "Data\\INI\\Object");
-	initSubsystem(TheCrateSystem, new CrateSystem(), "Data\\INI\\Default\\Crate.ini", "Data\\INI\\Crate.ini");
-	initSubsystem(TheUpgradeCenter, new UpgradeCenter, "Data\\INI\\Default\\Upgrade.ini", "Data\\INI\\Upgrade.ini");
-	initSubsystem(TheAnim2DCollection, new Anim2DCollection ); //Init's itself.
+    TheMapCache = new MapCache;
 
-	_TheSubsystemList.postProcessLoadAll();
+    // add in allowed maps
+    for (std::list<std::string>::const_iterator cit = argvSet.begin();
+         cit != argvSet.end(); ++cit) {
+      DEBUG_LOG(("Adding shipping map: '%s'\n", cit->c_str()));
+      TheMapCache->addShippingMap((*cit).c_str());
+    }
 
-	TheWritableGlobalData->m_buildMapCache = TRUE;
+    TheMapCache->updateCache();
 
-	TheMapCache = new MapCache;
+    delete TheMapCache;
+    TheMapCache = NULL;
 
-	// add in allowed maps
-	for (std::list<std::string>::const_iterator cit = argvSet.begin(); cit != argvSet.end(); ++cit)
-	{
-		DEBUG_LOG(("Adding shipping map: '%s'\n", cit->c_str()));
-		TheMapCache->addShippingMap((*cit).c_str());
-	}
+    // load the dialog box
+    // DialogBox( hInstance, (LPCTSTR)IMAGE_PACKER_DIALOG,
+    //					 NULL, (DLGPROC)ImagePackerProc );
 
-	TheMapCache->updateCache();
+    // delete TheGlobalData
+    // delete TheGlobalData;
+    // TheGlobalData = NULL;
 
-	delete TheMapCache;
-	TheMapCache = NULL;
+    _TheSubsystemList.shutdownAll();
 
-	// load the dialog box
-	//DialogBox( hInstance, (LPCTSTR)IMAGE_PACKER_DIALOG, 
-	//					 NULL, (DLGPROC)ImagePackerProc );
+    delete TheFileSystem;
+    TheFileSystem = NULL;
 
-	// delete TheGlobalData
-	//delete TheGlobalData;
-	//TheGlobalData = NULL;
+    delete TheNameKeyGenerator;
+    TheNameKeyGenerator = NULL;
 
-	_TheSubsystemList.shutdownAll();
+  } catch (...) {
+    DEBUG_CRASH(("Munkee munkee!"));
+  }
 
-	delete TheFileSystem;
-	TheFileSystem = NULL;
+  // close the log
+  shutdownMemoryManager();
+  DEBUG_SHUTDOWN();
 
-	delete TheNameKeyGenerator;
-	TheNameKeyGenerator = NULL;
-
-	}
-	catch (...)
-	{
-		DEBUG_CRASH(("Munkee munkee!"));
-	}
-
-	// close the log
-	shutdownMemoryManager();
-	DEBUG_SHUTDOWN();
-
-	// all done
-	return 0;
+  // all done
+  return 0;
 
 }  // end WinMain

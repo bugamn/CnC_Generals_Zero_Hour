@@ -17,12 +17,12 @@
 */
 
 //----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright(C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright(C) 2001 - All Rights Reserved
+//
 //----------------------------------------------------------------------------
 //
 // Project:   WSYS Library
@@ -36,87 +36,69 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//         Includes                                                      
+//         Includes
 //----------------------------------------------------------------------------
 
 #include "wsys_StdFileSystem.h"
+
 #include "wsys_StdFile.h"
 
 //----------------------------------------------------------------------------
-//         Externals                                                     
+//         Externals
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Defines                                                         
+//         Defines
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Types                                                     
+//         Private Types
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Data                                                     
+//         Private Data
 //----------------------------------------------------------------------------
 
-
 //----------------------------------------------------------------------------
-//         Public Data                                                      
-//----------------------------------------------------------------------------
-
-
-
-//----------------------------------------------------------------------------
-//         Private Prototypes                                               
+//         Public Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Functions                                               
+//         Private Prototypes
 //----------------------------------------------------------------------------
 
-
+//----------------------------------------------------------------------------
+//         Private Functions
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//         Public Functions                                                
+//         Public Functions
 //----------------------------------------------------------------------------
 
 //=================================================================
-// StdFileSystem::~StdFileSystem 
+// StdFileSystem::~StdFileSystem
 //=================================================================
 
-StdFileSystem::~StdFileSystem()
-{
-
-}
+StdFileSystem::~StdFileSystem() {}
 
 //=================================================================
-// StdFileSystem::open 
+// StdFileSystem::open
 //=================================================================
 /**
-  * This simply creates a StdFile object and calls its open function.
-	*/
+ * This simply creates a StdFile object and calls its open function.
+ */
 //=================================================================
 
-File* StdFileSystem::open( const Char *filename, Int access )
-{
-	StdFile *file = new StdFile();
+File *StdFileSystem::open(const Char *filename, Int access) {
+  StdFile *file = new StdFile();
 
-	if( file->open( filename, access ))
-	{
-		file->deleteOnClose(); // File object not created by the user so delete it when the user is finished with it
-	}
-	else
-	{
-		delete file;
-		file = NULL;
-	}
+  if (file->open(filename, access)) {
+    file->deleteOnClose();  // File object not created by the user so delete it
+                            // when the user is finished with it
+  } else {
+    delete file;
+    file = NULL;
+  }
 
-	return (File*) file;
+  return (File *)file;
 }

@@ -18,39 +18,35 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// DisabledTypes.cpp /////////////////////////////////////////////////////////////////////////////////////
+// DisabledTypes.cpp
+// /////////////////////////////////////////////////////////////////////////////////////
 // Kris Morness, September 2002
 
+#include "Common/DisabledTypes.h"
+
+#include "Common/BitFlagsIO.h"
 #include "PreRTS.h"
 
-#include "Common/DisabledTypes.h"
-#include "Common/BitFlagsIO.h"
+const char* DisabledMaskType::s_bitNameList[] = {"DEFAULT",
+                                                 "DISABLED_HACKED",
+                                                 "DISABLED_EMP",
+                                                 "DISABLED_HELD",
+                                                 "DISABLED_PARALYZED",
+                                                 "DISABLED_UNMANNED",
+                                                 "DISABLED_UNDERPOWERED",
+                                                 "DISABLED_FREEFALL",
 
-const char* DisabledMaskType::s_bitNameList[] = 
-{
-	"DEFAULT",
-	"DISABLED_HACKED",
-	"DISABLED_EMP",
-	"DISABLED_HELD",
-	"DISABLED_PARALYZED",
-	"DISABLED_UNMANNED",
-	"DISABLED_UNDERPOWERED",
-	"DISABLED_FREEFALL",
-	
-	"DISABLED_SCRIPT_DISABLED",
-	"DISABLED_SCRIPT_UNDERPOWERED",
+                                                 "DISABLED_SCRIPT_DISABLED",
+                                                 "DISABLED_SCRIPT_UNDERPOWERED",
 
-	NULL
-};
+                                                 NULL};
 
-DisabledMaskType DISABLEDMASK_NONE;	// inits to all zeroes
+DisabledMaskType DISABLEDMASK_NONE;  // inits to all zeroes
 DisabledMaskType DISABLEDMASK_ALL;
 
-void initDisabledMasks()
-{
-	SET_ALL_DISABLEDMASK_BITS( DISABLEDMASK_ALL );
-}
+void initDisabledMasks() { SET_ALL_DISABLEDMASK_BITS(DISABLEDMASK_ALL); }

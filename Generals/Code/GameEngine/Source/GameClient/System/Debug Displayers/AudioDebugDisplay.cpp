@@ -18,17 +18,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 //----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //----------------------------------------------------------------------------
 //
 // Project:   Generals
@@ -42,73 +43,55 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//         Includes                                                      
+//         Includes
 //----------------------------------------------------------------------------
 
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
-#include "GameClient/DebugDisplay.h"
 #include "Common/GameAudio.h"
+#include "GameClient/DebugDisplay.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //----------------------------------------------------------------------------
-//         Externals                                                     
+//         Externals
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Defines                                                         
+//         Defines
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Types                                                     
+//         Private Types
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Data                                                     
+//         Private Data
 //----------------------------------------------------------------------------
 
 static DebugDisplayInterface *debugDisplay;
 
 //----------------------------------------------------------------------------
-//         Public Data                                                      
+//         Public Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Prototypes                                               
+//         Private Prototypes
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Functions                                               
+//         Private Functions
 //----------------------------------------------------------------------------
 
-
-static void printFunc( char *text )
-{
-	debugDisplay->printf( text );
-}
+static void printFunc(char *text) { debugDisplay->printf(text); }
 
 //----------------------------------------------------------------------------
-//         Public Functions                                                
+//         Public Functions
 //----------------------------------------------------------------------------
-
 
 //============================================================================
-// AudioDebugDisplay 
+// AudioDebugDisplay
 //============================================================================
 
 #if defined(_DEBUG) || defined(_INTERNAL)
-void AudioDebugDisplay ( DebugDisplayInterface *dd, void *, FILE *fp = NULL )
-{
-	TheAudio->audioDebugDisplay( dd, NULL, fp );
+void AudioDebugDisplay(DebugDisplayInterface *dd, void *, FILE *fp = NULL) {
+  TheAudio->audioDebugDisplay(dd, NULL, fp);
 }
 #endif
-

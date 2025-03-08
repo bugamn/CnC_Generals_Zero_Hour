@@ -17,41 +17,43 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : Max2W3D                                                      *
+ *                 Project Name : Max2W3D *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/Tools/max2w3d/gennamesdialog.cpp             $*
+ *                     $Archive::
+ * /Commando/Code/Tools/max2w3d/gennamesdialog.cpp             $*
  *                                                                                             *
- *              Original Author:: Greg Hjelstrom                                               *
+ *              Original Author:: Greg Hjelstrom *
  *                                                                                             *
- *                      $Author:: Greg_h                                                      $*
+ *                      $Author:: Greg_h $*
  *                                                                                             *
- *                     $Modtime:: 12/06/00 3:24p                                              $*
+ *                     $Modtime:: 12/06/00 3:24p $*
  *                                                                                             *
- *                    $Revision:: 2                                                           $*
+ *                    $Revision:: 2 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- *   GenNamesDialogClass::GenNamesDialogClass -- Constructor                                   *
- *   GenNamesDialogClass::~GenNamesDialogClass -- Destructor                                   *
- *   GenNamesDialogClass::Get_Options -- Get_Options                                           *
- *   GenNamesDialogClass::Ok_To_Exit -- verifies that the input is valid                       *
- *   GenNamesDialogClass::Toggle_Name_Assignment -- toggles the controls related to name assig *
- *   GenNamesDialogClass::Toggle_Collision_Bits_Assignment -- toggles the controls related to  *
- *   GenNamesDialogClass::Dialog_Proc -- windows dialog proc                                   *
- *   _gen_names_dialog_proc -- dialog proc that "thunks" to the class's dialog proc            *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+ * Functions: * GenNamesDialogClass::GenNamesDialogClass -- Constructor *
+ *   GenNamesDialogClass::~GenNamesDialogClass -- Destructor *
+ *   GenNamesDialogClass::Get_Options -- Get_Options *
+ *   GenNamesDialogClass::Ok_To_Exit -- verifies that the input is valid *
+ *   GenNamesDialogClass::Toggle_Name_Assignment -- toggles the controls related
+ *to name assig * GenNamesDialogClass::Toggle_Collision_Bits_Assignment --
+ *toggles the controls related to  * GenNamesDialogClass::Dialog_Proc -- windows
+ *dialog proc                                   * _gen_names_dialog_proc --
+ *dialog proc that "thunks" to the class's dialog proc            *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "gennamesdialog.h"
+
 #include "dllmain.h"
 #include "resource.h"
 
-
-static BOOL CALLBACK _gen_names_dialog_proc(HWND Hwnd,UINT message,WPARAM wParam,LPARAM lParam);
-
+static BOOL CALLBACK _gen_names_dialog_proc(HWND Hwnd, UINT message,
+                                            WPARAM wParam, LPARAM lParam);
 
 /**********************************************************************************************
 **
@@ -59,299 +61,294 @@ static BOOL CALLBACK _gen_names_dialog_proc(HWND Hwnd,UINT message,WPARAM wParam
 **
 **********************************************************************************************/
 
+/***********************************************************************************************
+ * GenNamesDialogClass::GenNamesDialogClass -- Constructor *
+ *                                                                                             *
+ * INPUT: *
+ *                                                                                             *
+ * OUTPUT: *
+ *                                                                                             *
+ * WARNINGS: *
+ *                                                                                             *
+ * HISTORY: *
+ *=============================================================================================*/
+GenNamesDialogClass::GenNamesDialogClass(Interface *maxinterface)
+    : Hwnd(NULL),
+      Options(NULL),
+      MaxInterface(maxinterface),
+      NameIndexSpin(NULL) {}
 
 /***********************************************************************************************
- * GenNamesDialogClass::GenNamesDialogClass -- Constructor                                     *
+ * GenNamesDialogClass::~GenNamesDialogClass -- Destructor *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-GenNamesDialogClass::GenNamesDialogClass(Interface * maxinterface) :
-	Hwnd(NULL),
-	Options(NULL),
-	MaxInterface(maxinterface),
-	NameIndexSpin(NULL)
-{
+GenNamesDialogClass::~GenNamesDialogClass(void) {
+  ReleaseISpinner(NameIndexSpin);
 }
-
 
 /***********************************************************************************************
- * GenNamesDialogClass::~GenNamesDialogClass -- Destructor                                     *
+ * GenNamesDialogClass::Get_Options -- Get_Options *
  *                                                                                             *
- * INPUT:                                                                                      *
+ *    presents the dialog to the user and records his selections into the
+ *passed-in options    * structure. *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * INPUT: * options - pointer to a OptionsStruct to store the users input in. *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * OUTPUT: * true - user pressed ok and entered valid input *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
+ * WARNINGS: *
+ *                                                                                             *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-GenNamesDialogClass::~GenNamesDialogClass(void)
-{
-	ReleaseISpinner(NameIndexSpin);
-}
+bool GenNamesDialogClass::Get_Options(OptionsStruct *options) {
+  Options = options;
 
+  // Put up the options dialog box.
+  BOOL result =
+      DialogBoxParam(AppInstance, MAKEINTRESOURCE(IDD_GENERATE_NAMES_DIALOG),
+                     MaxInterface->GetMAXHWnd(),
+                     (DLGPROC)_gen_names_dialog_proc, (LPARAM)this);
+
+  if (result == TRUE) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 /***********************************************************************************************
- * GenNamesDialogClass::Get_Options -- Get_Options                                             *
+ * GenNamesDialogClass::Ok_To_Exit -- verifies that the input is valid *
  *                                                                                             *
- *    presents the dialog to the user and records his selections into the passed-in options    *
- *    structure.                                                                               *
+ * INPUT: *
  *                                                                                             *
- * INPUT:                                                                                      *
- * options - pointer to a OptionsStruct to store the users input in.                           *
+ * OUTPUT: * true - dialog contains valid input *
  *                                                                                             *
- * OUTPUT:                                                                                     *
- * true - user pressed ok and entered valid input                                              *
+ * WARNINGS: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-bool GenNamesDialogClass::Get_Options(OptionsStruct * options)
-{
-	Options = options;
+bool GenNamesDialogClass::Ok_To_Exit(void) {
+  if (IsDlgButtonChecked(Hwnd, IDC_ASSIGN_NAMES_CHECK) == BST_CHECKED) {
+    // just check that the user entered a name
+    char buf[W3D_NAME_LEN];
+    GetWindowText(GetDlgItem(Hwnd, IDC_BASE_NAME_EDIT), buf, sizeof(buf));
 
-	// Put up the options dialog box.
-	BOOL result = DialogBoxParam
-						(
-							AppInstance,
-							MAKEINTRESOURCE (IDD_GENERATE_NAMES_DIALOG),
-							MaxInterface->GetMAXHWnd(),
-							(DLGPROC) _gen_names_dialog_proc,
-							(LPARAM) this
-						);
+    if (strlen(buf) == 0) {
+      MessageBox(Hwnd, "Please enter a root name to use.\n", "Error", MB_OK);
+      return false;
+    } else {
+      return true;
+    }
+  }
 
-	if (result == TRUE) {
-		return true;
-	} else {
-		return false;
-	}
+  return true;
 }
-
 
 /***********************************************************************************************
- * GenNamesDialogClass::Ok_To_Exit -- verifies that the input is valid                         *
+ * GenNamesDialogClass::Toggle_Name_Assignment -- toggles the controls related
+ *to name assignm *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
- * true - dialog contains valid input                                                          *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-bool GenNamesDialogClass::Ok_To_Exit(void)
-{
-	if (IsDlgButtonChecked(Hwnd,IDC_ASSIGN_NAMES_CHECK) == BST_CHECKED) {
-
-		// just check that the user entered a name
-		char buf[W3D_NAME_LEN];
-		GetWindowText(GetDlgItem(Hwnd,IDC_BASE_NAME_EDIT),buf,sizeof(buf));
-		
-		if (strlen(buf) == 0) {
-			MessageBox(Hwnd,"Please enter a root name to use.\n","Error",MB_OK);
-			return false;
-		} else {
-			return true;
-		}
-	} 
-
-	return true;
+void GenNamesDialogClass::Toggle_Name_Assignment(void) {
+  bool onoff =
+      (IsDlgButtonChecked(Hwnd, IDC_ASSIGN_NAMES_CHECK) == BST_CHECKED);
+  EnableWindow(GetDlgItem(Hwnd, IDC_BASE_NAME_EDIT), onoff);
+  EnableWindow(GetDlgItem(Hwnd, IDC_LOD_INDEX_EDIT), onoff);
+  EnableWindow(GetDlgItem(Hwnd, IDC_LOD_INDEX_SPIN), onoff);
+  EnableWindow(GetDlgItem(Hwnd, IDC_NAME_INDEX_EDIT), onoff);
+  EnableWindow(GetDlgItem(Hwnd, IDC_NAME_INDEX_SPIN), onoff);
 }
-
 
 /***********************************************************************************************
- * GenNamesDialogClass::Toggle_Name_Assignment -- toggles the controls related to name assignm *
+ * GenNamesDialogClass::Toggle_Collision_Bits_Assignment -- toggles the controls
+ *related to co *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-void GenNamesDialogClass::Toggle_Name_Assignment(void)
-{
-	bool onoff = (IsDlgButtonChecked(Hwnd,IDC_ASSIGN_NAMES_CHECK) == BST_CHECKED);
-	EnableWindow(GetDlgItem(Hwnd,IDC_BASE_NAME_EDIT),onoff);
-	EnableWindow(GetDlgItem(Hwnd,IDC_LOD_INDEX_EDIT),onoff);
-	EnableWindow(GetDlgItem(Hwnd,IDC_LOD_INDEX_SPIN),onoff);
-	EnableWindow(GetDlgItem(Hwnd,IDC_NAME_INDEX_EDIT),onoff);
-	EnableWindow(GetDlgItem(Hwnd,IDC_NAME_INDEX_SPIN),onoff);
+void GenNamesDialogClass::Toggle_Collision_Bits_Assignment(void) {
+  bool onoff = (IsDlgButtonChecked(Hwnd, IDC_ASSIGN_COLLISION_BITS_CHECK) ==
+                BST_CHECKED);
+  EnableWindow(GetDlgItem(Hwnd, IDC_COLLISION_PHYSICAL), onoff);
+  EnableWindow(GetDlgItem(Hwnd, IDC_COLLISION_PROJECTILE), onoff);
+  EnableWindow(GetDlgItem(Hwnd, IDC_COLLISION_VIS), onoff);
+  EnableWindow(GetDlgItem(Hwnd, IDC_COLLISION_CAMERA), onoff);
+  EnableWindow(GetDlgItem(Hwnd, IDC_COLLISION_VEHICLE), onoff);
 }
-
 
 /***********************************************************************************************
- * GenNamesDialogClass::Toggle_Collision_Bits_Assignment -- toggles the controls related to co *
+ * GenNamesDialogClass::Dialog_Proc -- windows dialog proc *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-void GenNamesDialogClass::Toggle_Collision_Bits_Assignment(void)
-{
-	bool onoff = (IsDlgButtonChecked(Hwnd,IDC_ASSIGN_COLLISION_BITS_CHECK) == BST_CHECKED);
-	EnableWindow(GetDlgItem(Hwnd,IDC_COLLISION_PHYSICAL),onoff);
-	EnableWindow(GetDlgItem(Hwnd,IDC_COLLISION_PROJECTILE),onoff);
-	EnableWindow(GetDlgItem(Hwnd,IDC_COLLISION_VIS),onoff);
-	EnableWindow(GetDlgItem(Hwnd,IDC_COLLISION_CAMERA),onoff);
-	EnableWindow(GetDlgItem(Hwnd,IDC_COLLISION_VEHICLE),onoff);
-}
+bool GenNamesDialogClass::Dialog_Proc(HWND hWnd, UINT message, WPARAM wParam,
+                                      LPARAM) {
+  switch (message) {
+    case WM_INITDIALOG:
 
+      NameIndexSpin =
+          SetupIntSpinner(Hwnd, IDC_NAME_INDEX_SPIN, IDC_NAME_INDEX_EDIT,
+                          MIN_NAME_INDEX, MAX_NAME_INDEX, INITIAL_NAME_INDEX);
+
+      // limit the base name edit box to 10 characters
+      SendDlgItemMessage(Hwnd, IDC_BASE_NAME_EDIT, EM_LIMITTEXT,
+                         MAX_ROOT_NAME_LEN, 0);
+
+      // limit the suffix and prefix edit boxes
+      SendDlgItemMessage(Hwnd, IDC_PREFIX_EDIT, EM_LIMITTEXT, MAX_PREFIX_LEN,
+                         0);
+      SendDlgItemMessage(Hwnd, IDC_SUFFIX_EDIT, EM_LIMITTEXT, MAX_SUFFIX_LEN,
+                         0);
+
+      // set initial name to root of the filename
+      char buf[_MAX_FNAME];
+      _splitpath(MaxInterface->GetCurFileName(), NULL, NULL, buf, NULL);
+      buf[MAX_ROOT_NAME_LEN + 1] = 0;
+      SetWindowText(GetDlgItem(Hwnd, IDC_BASE_NAME_EDIT), buf);
+
+      // init radio buttons
+      CheckDlgButton(Hwnd, IDC_AFFECT_ALL_RADIO, BST_UNCHECKED);
+      CheckDlgButton(Hwnd, IDC_AFFECT_SELECTED_RADIO, BST_CHECKED);
+
+      // init the check boxes
+      CheckDlgButton(Hwnd, IDC_ASSIGN_NAMES_CHECK, BST_CHECKED);
+      CheckDlgButton(Hwnd, IDC_ASSIGN_PREFIX_CHECK, BST_UNCHECKED);
+      CheckDlgButton(Hwnd, IDC_ASSIGN_SUFFIX_CHECK, BST_UNCHECKED);
+      CheckDlgButton(Hwnd, IDC_ASSIGN_COLLISION_BITS_CHECK, BST_CHECKED);
+      CheckDlgButton(Hwnd, IDC_COLLISION_PHYSICAL, BST_CHECKED);
+      CheckDlgButton(Hwnd, IDC_COLLISION_PROJECTILE, BST_CHECKED);
+      CheckDlgButton(Hwnd, IDC_COLLISION_VIS, BST_CHECKED);
+      CheckDlgButton(Hwnd, IDC_COLLISION_CAMERA, BST_CHECKED);
+      CheckDlgButton(Hwnd, IDC_COLLISION_VEHICLE, BST_CHECKED);
+      return 1;
+
+    case WM_COMMAND:
+
+      switch (LOWORD(wParam)) {
+        case IDOK:
+          if (Ok_To_Exit()) {
+            // general options
+            Options->AssignNames =
+                (IsDlgButtonChecked(Hwnd, IDC_ASSIGN_NAMES_CHECK) ==
+                 BST_CHECKED);
+            Options->AssignPrefix =
+                (IsDlgButtonChecked(Hwnd, IDC_ASSIGN_PREFIX_CHECK) ==
+                 BST_CHECKED);
+            Options->AssignSuffix =
+                (IsDlgButtonChecked(Hwnd, IDC_ASSIGN_SUFFIX_CHECK) ==
+                 BST_CHECKED);
+            Options->AssignCollisionBits =
+                (IsDlgButtonChecked(Hwnd, IDC_ASSIGN_COLLISION_BITS_CHECK) ==
+                 BST_CHECKED);
+            Options->OnlyAffectSelected =
+                (IsDlgButtonChecked(Hwnd, IDC_AFFECT_SELECTED_RADIO) ==
+                 BST_CHECKED);
+
+            // naming options
+            Options->NameIndex = NameIndexSpin->GetIVal();
+            GetWindowText(GetDlgItem(Hwnd, IDC_BASE_NAME_EDIT),
+                          Options->RootName, sizeof(Options->RootName));
+            GetWindowText(GetDlgItem(Hwnd, IDC_PREFIX_EDIT),
+                          Options->PrefixName, sizeof(Options->PrefixName));
+            GetWindowText(GetDlgItem(Hwnd, IDC_SUFFIX_EDIT),
+                          Options->SuffixName, sizeof(Options->SuffixName));
+
+            // collision options
+            Options->PhysicalCollision =
+                (IsDlgButtonChecked(Hwnd, IDC_COLLISION_PHYSICAL) ==
+                 BST_CHECKED);
+            Options->ProjectileCollision =
+                (IsDlgButtonChecked(Hwnd, IDC_COLLISION_PROJECTILE) ==
+                 BST_CHECKED);
+            Options->VisCollision =
+                (IsDlgButtonChecked(Hwnd, IDC_COLLISION_VIS) == BST_CHECKED);
+            Options->CameraCollision =
+                (IsDlgButtonChecked(Hwnd, IDC_COLLISION_CAMERA) == BST_CHECKED);
+            Options->VehicleCollision =
+                (IsDlgButtonChecked(Hwnd, IDC_COLLISION_VEHICLE) ==
+                 BST_CHECKED);
+            EndDialog(Hwnd, 1);
+          }
+          break;
+
+        case IDCANCEL:
+          EndDialog(Hwnd, 0);
+          break;
+
+        case IDC_ASSIGN_NAMES_CHECK:
+          Toggle_Name_Assignment();
+          break;
+
+        case IDC_ASSIGN_PREFIX_CHECK:
+          EnableWindow(GetDlgItem(Hwnd, IDC_PREFIX_EDIT),
+                       (IsDlgButtonChecked(Hwnd, IDC_ASSIGN_SUFFIX_CHECK) ==
+                        BST_CHECKED));
+          break;
+
+        case IDC_ASSIGN_SUFFIX_CHECK:
+          EnableWindow(GetDlgItem(Hwnd, IDC_SUFFIX_EDIT),
+                       (IsDlgButtonChecked(Hwnd, IDC_ASSIGN_SUFFIX_CHECK) ==
+                        BST_CHECKED));
+          break;
+
+        case IDC_ASSIGN_COLLISION_BITS_CHECK:
+          Toggle_Collision_Bits_Assignment();
+          break;
+      }
+      return 1;
+  }
+  return 0;
+}
 
 /***********************************************************************************************
- * GenNamesDialogClass::Dialog_Proc -- windows dialog proc                                     *
+ * _gen_names_dialog_proc -- dialog proc that "thunks" to the class's dialog
+ *proc              *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
+ * HISTORY: * 10/10/2000 gth : Created. *
  *=============================================================================================*/
-bool GenNamesDialogClass::Dialog_Proc(HWND hWnd,UINT message,WPARAM wParam,LPARAM)
-{
-	switch (message )	{
+static BOOL CALLBACK _gen_names_dialog_proc(HWND hwnd, UINT message,
+                                            WPARAM wparam, LPARAM lparam) {
+  static GenNamesDialogClass *dialog = NULL;
 
-		case WM_INITDIALOG:
+  if (message == WM_INITDIALOG) {
+    dialog = (GenNamesDialogClass *)lparam;
+    dialog->Hwnd = hwnd;
+  }
 
-			NameIndexSpin = SetupIntSpinner
-			(
-				Hwnd,
-				IDC_NAME_INDEX_SPIN,
-				IDC_NAME_INDEX_EDIT,
-				MIN_NAME_INDEX,MAX_NAME_INDEX,INITIAL_NAME_INDEX
-			);
-			
-			// limit the base name edit box to 10 characters
-			SendDlgItemMessage(Hwnd,IDC_BASE_NAME_EDIT,EM_LIMITTEXT,MAX_ROOT_NAME_LEN,0);
-
-			// limit the suffix and prefix edit boxes
-			SendDlgItemMessage(Hwnd,IDC_PREFIX_EDIT,EM_LIMITTEXT,MAX_PREFIX_LEN,0);
-			SendDlgItemMessage(Hwnd,IDC_SUFFIX_EDIT,EM_LIMITTEXT,MAX_SUFFIX_LEN,0);
-
-			// set initial name to root of the filename
-			char buf[_MAX_FNAME];
-			_splitpath(MaxInterface->GetCurFileName(),NULL,NULL,buf,NULL);
-			buf[MAX_ROOT_NAME_LEN+1] = 0;
-			SetWindowText(GetDlgItem(Hwnd,IDC_BASE_NAME_EDIT),buf);
-
-			// init radio buttons
-			CheckDlgButton(Hwnd,IDC_AFFECT_ALL_RADIO,BST_UNCHECKED);
-			CheckDlgButton(Hwnd,IDC_AFFECT_SELECTED_RADIO,BST_CHECKED);
-		
-			// init the check boxes
-			CheckDlgButton(Hwnd,IDC_ASSIGN_NAMES_CHECK,BST_CHECKED);
-			CheckDlgButton(Hwnd,IDC_ASSIGN_PREFIX_CHECK,BST_UNCHECKED);
-			CheckDlgButton(Hwnd,IDC_ASSIGN_SUFFIX_CHECK,BST_UNCHECKED);
-			CheckDlgButton(Hwnd,IDC_ASSIGN_COLLISION_BITS_CHECK,BST_CHECKED);
-			CheckDlgButton(Hwnd,IDC_COLLISION_PHYSICAL,BST_CHECKED);
-			CheckDlgButton(Hwnd,IDC_COLLISION_PROJECTILE,BST_CHECKED);
-			CheckDlgButton(Hwnd,IDC_COLLISION_VIS,BST_CHECKED);
-			CheckDlgButton(Hwnd,IDC_COLLISION_CAMERA,BST_CHECKED);
-			CheckDlgButton(Hwnd,IDC_COLLISION_VEHICLE,BST_CHECKED);
-			return 1;
-
-		case WM_COMMAND:
-
-			switch (LOWORD(wParam))
-			{
-				case IDOK:
-					if (Ok_To_Exit()) {
-						// general options
-						Options->AssignNames = (IsDlgButtonChecked(Hwnd,IDC_ASSIGN_NAMES_CHECK) == BST_CHECKED);
-						Options->AssignPrefix = (IsDlgButtonChecked(Hwnd,IDC_ASSIGN_PREFIX_CHECK) == BST_CHECKED);
-						Options->AssignSuffix = (IsDlgButtonChecked(Hwnd,IDC_ASSIGN_SUFFIX_CHECK) == BST_CHECKED);
-						Options->AssignCollisionBits = (IsDlgButtonChecked(Hwnd,IDC_ASSIGN_COLLISION_BITS_CHECK) == BST_CHECKED);
-						Options->OnlyAffectSelected = (IsDlgButtonChecked(Hwnd,IDC_AFFECT_SELECTED_RADIO) == BST_CHECKED);
-						
-						// naming options
-						Options->NameIndex = NameIndexSpin->GetIVal();
-						GetWindowText(GetDlgItem(Hwnd,IDC_BASE_NAME_EDIT),Options->RootName,sizeof(Options->RootName));
-						GetWindowText(GetDlgItem(Hwnd,IDC_PREFIX_EDIT),Options->PrefixName,sizeof(Options->PrefixName));
-						GetWindowText(GetDlgItem(Hwnd,IDC_SUFFIX_EDIT),Options->SuffixName,sizeof(Options->SuffixName));
-						
-						// collision options
-						Options->PhysicalCollision = (IsDlgButtonChecked(Hwnd,IDC_COLLISION_PHYSICAL) == BST_CHECKED);
-						Options->ProjectileCollision = (IsDlgButtonChecked(Hwnd,IDC_COLLISION_PROJECTILE) == BST_CHECKED);
-						Options->VisCollision = (IsDlgButtonChecked(Hwnd,IDC_COLLISION_VIS) == BST_CHECKED);
-						Options->CameraCollision = (IsDlgButtonChecked(Hwnd,IDC_COLLISION_CAMERA) == BST_CHECKED);
-						Options->VehicleCollision = (IsDlgButtonChecked(Hwnd,IDC_COLLISION_VEHICLE) == BST_CHECKED);
-						EndDialog(Hwnd, 1);
-					}
-					break;
-
-				case IDCANCEL:
-					EndDialog(Hwnd, 0);
-					break;
-
-				case IDC_ASSIGN_NAMES_CHECK:
-					Toggle_Name_Assignment();
-					break;
-
-				case IDC_ASSIGN_PREFIX_CHECK:
-					EnableWindow(GetDlgItem(Hwnd,IDC_PREFIX_EDIT),(IsDlgButtonChecked(Hwnd,IDC_ASSIGN_SUFFIX_CHECK) == BST_CHECKED));
-					break;
-
-				case IDC_ASSIGN_SUFFIX_CHECK:
-					EnableWindow(GetDlgItem(Hwnd,IDC_SUFFIX_EDIT),(IsDlgButtonChecked(Hwnd,IDC_ASSIGN_SUFFIX_CHECK) == BST_CHECKED));
-					break;
-
-				case IDC_ASSIGN_COLLISION_BITS_CHECK:
-					Toggle_Collision_Bits_Assignment();
-					break;
-			}
-			return 1;
-	}
-	return 0;
+  if (dialog) {
+    return dialog->Dialog_Proc(hwnd, message, wparam, lparam);
+  } else {
+    return FALSE;
+  }
 }
-
-
-/***********************************************************************************************
- * _gen_names_dialog_proc -- dialog proc that "thunks" to the class's dialog proc              *
- *                                                                                             *
- * INPUT:                                                                                      *
- *                                                                                             *
- * OUTPUT:                                                                                     *
- *                                                                                             *
- * WARNINGS:                                                                                   *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/10/2000 gth : Created.                                                                 *
- *=============================================================================================*/
-static BOOL CALLBACK _gen_names_dialog_proc(HWND hwnd,UINT message,WPARAM wparam,LPARAM lparam)
-{
-	static GenNamesDialogClass * dialog = NULL;
-
-	if (message == WM_INITDIALOG) {
-		dialog = (GenNamesDialogClass *)lparam;
-		dialog->Hwnd = hwnd;
-	}
-
-	if (dialog) {
-		return dialog->Dialog_Proc(hwnd, message, wparam, lparam);
-	} else {
-		return FALSE;
-	}
-}
-
-

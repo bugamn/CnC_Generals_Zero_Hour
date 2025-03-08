@@ -18,16 +18,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: DieModule.cpp ////////////////////////////////////////////////////////////////////////////
+// FILE: DieModule.cpp
+// ////////////////////////////////////////////////////////////////////////////
 // Author:
-// Desc:   
+// Desc:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 #define DEFINE_OBJECT_STATUS_NAMES
 #include "Common/Xfer.h"
@@ -37,94 +39,83 @@
 #include "GameLogic/Module/DieModule.h"
 #include "GameLogic/Object.h"
 
-
 #ifdef _INTERNAL
 // for occasional debugging...
-//#pragma optimize("", off)
-//#pragma MESSAGE("************************************** WARNING, optimization disabled for debugging purposes")
+// #pragma optimize("", off)
+// #pragma MESSAGE("************************************** WARNING, optimization
+// disabled for debugging purposes")
 #endif
 
-
+//-------------------------------------------------------------------------------------------------
+DieMuxData::DieMuxData()
+    : m_deathTypes(DEATH_TYPE_FLAGS_ALL),
+      m_veterancyLevels(VETERANCY_LEVEL_FLAGS_ALL),
+      m_exemptStatus(OBJECT_STATUS_NONE),
+      m_requiredStatus(OBJECT_STATUS_NONE) {}
 
 //-------------------------------------------------------------------------------------------------
-DieMuxData::DieMuxData() :
-	m_deathTypes(DEATH_TYPE_FLAGS_ALL),
-	m_veterancyLevels(VETERANCY_LEVEL_FLAGS_ALL),
-	m_exemptStatus(OBJECT_STATUS_NONE),
-	m_requiredStatus(OBJECT_STATUS_NONE)
-{
-}
-
-//-------------------------------------------------------------------------------------------------
-const FieldParse* DieMuxData::getFieldParse() 
-{
-	static const FieldParse dataFieldParse[] = 
-	{
-		{ "DeathTypes", INI::parseDeathTypeFlags, NULL, offsetof( DieMuxData, m_deathTypes ) },
-		{ "VeterancyLevels", INI::parseVeterancyLevelFlags, NULL, offsetof( DieMuxData, m_veterancyLevels ) },
-		{ "ExemptStatus",	INI::parseBitString32,	TheObjectStatusBitNames,	offsetof( DieMuxData, m_exemptStatus ) },
-		{ "RequiredStatus",	INI::parseBitString32,	TheObjectStatusBitNames,	offsetof( DieMuxData, m_requiredStatus ) },
-		{ 0, 0, 0, 0 }
-	};
+const FieldParse *DieMuxData::getFieldParse() {
+  static const FieldParse dataFieldParse[] = {
+      {"DeathTypes", INI::parseDeathTypeFlags, NULL,
+       offsetof(DieMuxData, m_deathTypes)},
+      {"VeterancyLevels", INI::parseVeterancyLevelFlags, NULL,
+       offsetof(DieMuxData, m_veterancyLevels)},
+      {"ExemptStatus", INI::parseBitString32, TheObjectStatusBitNames,
+       offsetof(DieMuxData, m_exemptStatus)},
+      {"RequiredStatus", INI::parseBitString32, TheObjectStatusBitNames,
+       offsetof(DieMuxData, m_requiredStatus)},
+      {0, 0, 0, 0}};
   return dataFieldParse;
 }
 
 //-------------------------------------------------------------------------------------------------
-Bool DieMuxData::isDieApplicable(const Object* obj, const DamageInfo *damageInfo) const
-{
-	// wrong death type? punt
-	if (!getDeathTypeFlag(m_deathTypes, damageInfo->in.m_deathType))
-		return false;
+Bool DieMuxData::isDieApplicable(const Object *obj,
+                                 const DamageInfo *damageInfo) const {
+  // wrong death type? punt
+  if (!getDeathTypeFlag(m_deathTypes, damageInfo->in.m_deathType)) return false;
 
-	// wrong vet level? punt
-	if (!getVeterancyLevelFlag(m_veterancyLevels, obj->getVeterancyLevel()))
-		return false;
+  // wrong vet level? punt
+  if (!getVeterancyLevelFlag(m_veterancyLevels, obj->getVeterancyLevel()))
+    return false;
 
-	// all 'exempt' bits must be clear for us to run.
-	if ((obj->getStatusBits() & m_exemptStatus) != 0)
-		return false;
+  // all 'exempt' bits must be clear for us to run.
+  if ((obj->getStatusBits() & m_exemptStatus) != 0) return false;
 
-	// all 'required' bits must be set for us to run.
-	if ((obj->getStatusBits() & m_requiredStatus) != m_requiredStatus)
-		return false;
+  // all 'required' bits must be set for us to run.
+  if ((obj->getStatusBits() & m_requiredStatus) != m_requiredStatus)
+    return false;
 
-	return true;
+  return true;
 }
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void DieModule::crc( Xfer *xfer )
-{
-
-	// extend base class
-	BehaviorModule::crc( xfer );
+void DieModule::crc(Xfer *xfer) {
+  // extend base class
+  BehaviorModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer Method */
 // ------------------------------------------------------------------------------------------------
-void DieModule::xfer( Xfer *xfer )
-{
+void DieModule::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// call base class
-	BehaviorModule::xfer( xfer );
+  // call base class
+  BehaviorModule::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void DieModule::loadPostProcess( void )
-{
-
-	// call base class
-	BehaviorModule::loadPostProcess();
+void DieModule::loadPostProcess(void) {
+  // call base class
+  BehaviorModule::loadPostProcess();
 
 }  // end loadPostProcess

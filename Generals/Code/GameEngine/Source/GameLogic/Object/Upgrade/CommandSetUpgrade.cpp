@@ -18,93 +18,85 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: CommandSetUpgrade.cpp /////////////////////////////////////////////////////////////////////////////
+// FILE: CommandSetUpgrade.cpp
+// /////////////////////////////////////////////////////////////////////////////
 // Author: Graham Smallwood, September 2002
-// Desc:	 UpgradeModule that sets a new override string for Command Set look ups
+// Desc:	 UpgradeModule that sets a new override string for Command Set
+// look ups
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+#include "GameLogic/Module/CommandSetUpgrade.h"
 
 #include "Common/Xfer.h"
 #include "GameClient/ControlBar.h"
-#include "GameLogic/Module/CommandSetUpgrade.h"
 #include "GameLogic/Object.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-void CommandSetUpgradeModuleData::buildFieldParse(MultiIniFieldParse& p) 
-{
+void CommandSetUpgradeModuleData::buildFieldParse(MultiIniFieldParse &p) {
   UpgradeModuleData::buildFieldParse(p);
 
-	static const FieldParse dataFieldParse[] = 
-	{
-		{ "CommandSet",	INI::parseAsciiString,	NULL, offsetof( CommandSetUpgradeModuleData, m_newCommandSet ) },
-		{ 0, 0, 0, 0 }
-	};
+  static const FieldParse dataFieldParse[] = {
+      {"CommandSet", INI::parseAsciiString, NULL,
+       offsetof(CommandSetUpgradeModuleData, m_newCommandSet)},
+      {0, 0, 0, 0}};
   p.add(dataFieldParse);
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-CommandSetUpgrade::CommandSetUpgrade( Thing *thing, const ModuleData* moduleData ) : UpgradeModule( thing, moduleData )
-{
-}
+CommandSetUpgrade::CommandSetUpgrade(Thing *thing, const ModuleData *moduleData)
+    : UpgradeModule(thing, moduleData) {}
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-CommandSetUpgrade::~CommandSetUpgrade( void )
-{
-}
+CommandSetUpgrade::~CommandSetUpgrade(void) {}
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-void CommandSetUpgrade::upgradeImplementation( )
-{
-	Object *obj = getObject();	
-	obj->setCommandSetStringOverride( getCommandSetUpgradeModuleData()->m_newCommandSet );
+void CommandSetUpgrade::upgradeImplementation() {
+  Object *obj = getObject();
+  obj->setCommandSetStringOverride(
+      getCommandSetUpgradeModuleData()->m_newCommandSet);
 
-	TheControlBar->markUIDirty();// Refresh the UI in case we are selected
+  TheControlBar->markUIDirty();  // Refresh the UI in case we are selected
 }
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void CommandSetUpgrade::crc( Xfer *xfer )
-{
-
-	// extend base class
-	UpgradeModule::crc( xfer );
+void CommandSetUpgrade::crc(Xfer *xfer) {
+  // extend base class
+  UpgradeModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void CommandSetUpgrade::xfer( Xfer *xfer )
-{
+void CommandSetUpgrade::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// extend base class
-	UpgradeModule::xfer( xfer );
+  // extend base class
+  UpgradeModule::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void CommandSetUpgrade::loadPostProcess( void )
-{
-
-	// extend base class
-	UpgradeModule::loadPostProcess();
+void CommandSetUpgrade::loadPostProcess(void) {
+  // extend base class
+  UpgradeModule::loadPostProcess();
 
 }  // end loadPostProcess

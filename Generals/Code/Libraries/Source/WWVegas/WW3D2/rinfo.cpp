@@ -17,105 +17,97 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WW3D                                                         *
+ *                 Project Name : WW3D *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/ww3d2/rinfo.cpp                              $*
+ *                     $Archive:: /Commando/Code/ww3d2/rinfo.cpp $*
  *                                                                                             *
- *                       Author:: Greg Hjelstrom                                               *
+ *                       Author:: Greg Hjelstrom *
  *                                                                                             *
- *                     $Modtime:: 8/24/01 3:31p                                               $*
+ *                     $Modtime:: 8/24/01 3:31p $*
  *                                                                                             *
- *                    $Revision:: 13                                                          $*
+ *                    $Revision:: 13 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "rinfo.h"
+
 #include "camera.h"
 #include "matpass.h"
-
 
 /***********************************************************************************************
 **
 ** RenderInfoClass Implementation
 **
 ***********************************************************************************************/
-RenderInfoClass::RenderInfoClass(CameraClass & cam) :
-	Camera(cam), 
-	fog_start(0.0f),
-	fog_end(0.0f),
-	fog_scale(0.0f),
-	light_environment(0),
-	AdditionalMaterialPassCount(0),
-	OverrideFlagLevel(0),
-	alphaOverride(1.0f),
-	materialPassAlphaOverride(1.0f),
-	materialPassEmissiveOverride(1.0f)
-{ 
-	// Need to have one entry in the override flags stack, initialize it to default values.
-	OverrideFlag[OverrideFlagLevel]=RINFO_OVERRIDE_DEFAULT;
+RenderInfoClass::RenderInfoClass(CameraClass& cam)
+    : Camera(cam),
+      fog_start(0.0f),
+      fog_end(0.0f),
+      fog_scale(0.0f),
+      light_environment(0),
+      AdditionalMaterialPassCount(0),
+      OverrideFlagLevel(0),
+      alphaOverride(1.0f),
+      materialPassAlphaOverride(1.0f),
+      materialPassEmissiveOverride(1.0f) {
+  // Need to have one entry in the override flags stack, initialize it to
+  // default values.
+  OverrideFlag[OverrideFlagLevel] = RINFO_OVERRIDE_DEFAULT;
 }
 
-RenderInfoClass::~RenderInfoClass(void)
-{
+RenderInfoClass::~RenderInfoClass(void) {}
+
+void RenderInfoClass::Push_Material_Pass(MaterialPassClass* matpass) {
+  // add to the end of the array
+  if (matpass) {
+    matpass->Add_Ref();
+  }
+  WWASSERT(AdditionalMaterialPassCount < MAX_ADDITIONAL_MATERIAL_PASSES);
+  AdditionalMaterialPassArray[AdditionalMaterialPassCount++] = matpass;
 }
 
-void RenderInfoClass::Push_Material_Pass(MaterialPassClass * matpass)
-{
-	// add to the end of the array
-	if (matpass) {
-		matpass->Add_Ref();
-	}
-	WWASSERT(AdditionalMaterialPassCount<MAX_ADDITIONAL_MATERIAL_PASSES);
-	AdditionalMaterialPassArray[AdditionalMaterialPassCount++]=matpass;
+void RenderInfoClass::Pop_Material_Pass(void) {
+  // remove from the end of the array
+  WWASSERT(AdditionalMaterialPassCount > 0);
+  AdditionalMaterialPassCount--;
+  MaterialPassClass* mpass =
+      AdditionalMaterialPassArray[AdditionalMaterialPassCount];
+  if (mpass != NULL) {
+    mpass->Release_Ref();
+  }
 }
 
-void RenderInfoClass::Pop_Material_Pass(void)
-{
-	// remove from the end of the array
-	WWASSERT(AdditionalMaterialPassCount>0);
-	AdditionalMaterialPassCount--;
-	MaterialPassClass * mpass = AdditionalMaterialPassArray[AdditionalMaterialPassCount];
-	if (mpass != NULL) {
-		mpass->Release_Ref();
-	}
+int RenderInfoClass::Additional_Pass_Count(void) {
+  return AdditionalMaterialPassCount;
 }
 
-int RenderInfoClass::Additional_Pass_Count(void)
-{
-	return AdditionalMaterialPassCount;
+MaterialPassClass* RenderInfoClass::Peek_Additional_Pass(int i) {
+  return AdditionalMaterialPassArray[i];
 }
 
-MaterialPassClass * RenderInfoClass::Peek_Additional_Pass(int i)
-{
-	return AdditionalMaterialPassArray[i];
+void RenderInfoClass::Push_Override_Flags(RINFO_OVERRIDE_FLAGS flg) {
+  // copy to the end of the array
+  WWASSERT(OverrideFlagLevel < MAX_OVERRIDE_FLAG_LEVEL);
+  OverrideFlagLevel++;
+  OverrideFlag[OverrideFlagLevel] = flg;
 }
 
-void RenderInfoClass::Push_Override_Flags(RINFO_OVERRIDE_FLAGS flg)
-{
-	// copy to the end of the array
-	WWASSERT(OverrideFlagLevel<MAX_OVERRIDE_FLAG_LEVEL);
-	OverrideFlagLevel++;
-	OverrideFlag[OverrideFlagLevel]=flg;
+void RenderInfoClass::Pop_Override_Flags(void) {
+  WWASSERT(OverrideFlagLevel > 0);
+  OverrideFlagLevel--;
 }
 
-void RenderInfoClass::Pop_Override_Flags(void)
-{
-	WWASSERT(OverrideFlagLevel>0);
-	OverrideFlagLevel--;
+RenderInfoClass::RINFO_OVERRIDE_FLAGS& RenderInfoClass::Current_Override_Flags(
+    void) {
+  return OverrideFlag[OverrideFlagLevel];
 }
-
-RenderInfoClass::RINFO_OVERRIDE_FLAGS & RenderInfoClass::Current_Override_Flags(void)
-{
-	return OverrideFlag[OverrideFlagLevel];
-}
-
-
 
 /***********************************************************************************************
 **
@@ -123,15 +115,11 @@ RenderInfoClass::RINFO_OVERRIDE_FLAGS & RenderInfoClass::Current_Override_Flags(
 **
 ***********************************************************************************************/
 
-SpecialRenderInfoClass::SpecialRenderInfoClass(CameraClass & cam,int render_type) :
-	RenderInfoClass(cam),
-	RenderType(render_type),
-	VisRasterizer(NULL),
-	BWRenderer(NULL)
-{
-}
+SpecialRenderInfoClass::SpecialRenderInfoClass(CameraClass& cam,
+                                               int render_type)
+    : RenderInfoClass(cam),
+      RenderType(render_type),
+      VisRasterizer(NULL),
+      BWRenderer(NULL) {}
 
-SpecialRenderInfoClass::~SpecialRenderInfoClass(void)
-{
-}
-
+SpecialRenderInfoClass::~SpecialRenderInfoClass(void) {}

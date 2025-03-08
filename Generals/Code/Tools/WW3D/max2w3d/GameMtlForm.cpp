@@ -17,148 +17,124 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : Max2W3d                                                      *
+ *                 Project Name : Max2W3d *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/Tools/max2w3d/GameMtlForm.cpp                $*
+ *                     $Archive:: /Commando/Code/Tools/max2w3d/GameMtlForm.cpp
+ *$*
  *                                                                                             *
- *                       Author:: Greg Hjelstrom                                               *
+ *                       Author:: Greg Hjelstrom *
  *                                                                                             *
- *                     $Modtime:: 11/23/98 6:21p                                              $*
+ *                     $Modtime:: 11/23/98 6:21p $*
  *                                                                                             *
- *                    $Revision:: 3                                                           $*
+ *                    $Revision:: 3 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- *   GameMtlFormClass::GameMtlFormClass -- constructor                                         *
- *   GameMtlFormClass::SetThing -- Set the material being edited by this form                  *
- *   GameMtlFormClass::GetThing -- get the material being edited by this form                  *
- *   GameMtlFormClass::DeleteThis -- delete myself                                             *
- *   GameMtlFormClass::ClassID -- returns the classID of the object being edited               *
- *   GameMtlFormClass::SetTime -- set the current time                                         *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+ * Functions: * GameMtlFormClass::GameMtlFormClass -- constructor *
+ *   GameMtlFormClass::SetThing -- Set the material being edited by this form *
+ *   GameMtlFormClass::GetThing -- get the material being edited by this form *
+ *   GameMtlFormClass::DeleteThis -- delete myself * GameMtlFormClass::ClassID
+ *-- returns the classID of the object being edited               *
+ *   GameMtlFormClass::SetTime -- set the current time *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "GameMtlForm.h"
+
 #include "GameMtl.h"
 
-
 /***********************************************************************************************
- * GameMtlFormClass::GameMtlFormClass -- constructor                                           *
+ * GameMtlFormClass::GameMtlFormClass -- constructor *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   11/23/98   GTH : Created.                                                                 *
+ * HISTORY: * 11/23/98   GTH : Created. *
  *=============================================================================================*/
-GameMtlFormClass::GameMtlFormClass
-(
-	IMtlParams *	imtl_params, 
-	GameMtl *		mtl,
-	int				pass
-)
-{
-	IParams = imtl_params;
-	TheMtl = mtl;
-	PassIndex = pass;
+GameMtlFormClass::GameMtlFormClass(IMtlParams *imtl_params, GameMtl *mtl,
+                                   int pass) {
+  IParams = imtl_params;
+  TheMtl = mtl;
+  PassIndex = pass;
 }
 
-
 /***********************************************************************************************
- * GameMtlFormClass::SetThing -- Set the material being edited by this form                    *
+ * GameMtlFormClass::SetThing -- Set the material being edited by this form *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   11/23/98   GTH : Created.                                                                 *
+ * HISTORY: * 11/23/98   GTH : Created. *
  *=============================================================================================*/
-void GameMtlFormClass::SetThing(ReferenceTarget * target)
-{
-	assert (target->SuperClassID()==MATERIAL_CLASS_ID);
-	assert (target->ClassID()==GameMaterialClassID);
+void GameMtlFormClass::SetThing(ReferenceTarget *target) {
+  assert(target->SuperClassID() == MATERIAL_CLASS_ID);
+  assert(target->ClassID() == GameMaterialClassID);
 
-	TheMtl = (GameMtl *)target;
+  TheMtl = (GameMtl *)target;
 }
 
-
 /***********************************************************************************************
- * GameMtlFormClass::GetThing -- get the material being edited by this form                    *
+ * GameMtlFormClass::GetThing -- get the material being edited by this form *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   11/23/98   GTH : Created.                                                                 *
+ * HISTORY: * 11/23/98   GTH : Created. *
  *=============================================================================================*/
-ReferenceTarget * GameMtlFormClass::GetThing(void) 
-{ 
-	return (ReferenceTarget*)TheMtl; 
+ReferenceTarget *GameMtlFormClass::GetThing(void) {
+  return (ReferenceTarget *)TheMtl;
 }
 
+/***********************************************************************************************
+ * GameMtlFormClass::DeleteThis -- delete myself *
+ *                                                                                             *
+ * INPUT: *
+ *                                                                                             *
+ * OUTPUT: *
+ *                                                                                             *
+ * WARNINGS: *
+ *                                                                                             *
+ * HISTORY: * 11/23/98   GTH : Created. *
+ *=============================================================================================*/
+void GameMtlFormClass::DeleteThis(void) { delete this; }
 
 /***********************************************************************************************
- * GameMtlFormClass::DeleteThis -- delete myself                                               *
+ * GameMtlFormClass::ClassID -- returns the classID of the object being edited *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   11/23/98   GTH : Created.                                                                 *
+ * HISTORY: * 11/23/98   GTH : Created. *
  *=============================================================================================*/
-void GameMtlFormClass::DeleteThis(void)
-{
-	delete this;
-}
-
+Class_ID GameMtlFormClass::ClassID() { return GameMaterialClassID; }
 
 /***********************************************************************************************
- * GameMtlFormClass::ClassID -- returns the classID of the object being edited                 *
+ * GameMtlFormClass::SetTime -- set the current time *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   11/23/98   GTH : Created.                                                                 *
+ * HISTORY: * 11/23/98   GTH : Created. *
  *=============================================================================================*/
-Class_ID	GameMtlFormClass::ClassID()
-{
-	return GameMaterialClassID;  
-}
-
-
-/***********************************************************************************************
- * GameMtlFormClass::SetTime -- set the current time                                           *
- *                                                                                             *
- * INPUT:                                                                                      *
- *                                                                                             *
- * OUTPUT:                                                                                     *
- *                                                                                             *
- * WARNINGS:                                                                                   *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *   11/23/98   GTH : Created.                                                                 *
- *=============================================================================================*/
-void GameMtlFormClass::SetTime(TimeValue t)
-{
-	// child dialog classes don't have to support
-	// the SetTime function.
+void GameMtlFormClass::SetTime(TimeValue t) {
+  // child dialog classes don't have to support
+  // the SetTime function.
 }

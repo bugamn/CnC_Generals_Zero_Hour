@@ -18,18 +18,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: ProgressBar.cpp //////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 // Project:   RTS3
@@ -44,12 +45,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
 #include "Common/Language.h"
-#include "GameClient/GameWindow.h"
 #include "GameClient/Gadget.h"
+#include "GameClient/GameWindow.h"
 #include "GameClient/GameWindowManager.h"
 
 // DEFINES ////////////////////////////////////////////////////////////////////
@@ -69,44 +70,38 @@
 // GadgetProgressBarSystem ====================================================
 /** Handle system messages for Progress Bar */
 //=============================================================================
-WindowMsgHandledType GadgetProgressBarSystem( GameWindow *window, UnsignedInt msg,
-									            WindowMsgData mData1, WindowMsgData mData2 )
-{
+WindowMsgHandledType GadgetProgressBarSystem(GameWindow *window,
+                                             UnsignedInt msg,
+                                             WindowMsgData mData1,
+                                             WindowMsgData mData2) {
+  switch (msg) {
+      // ------------------------------------------------------------------------
+    case GPM_SET_PROGRESS: {
+      Int newPos = (Int)mData1;
 
-  switch( msg )
-	{
+      if (newPos < 0 || newPos > 100) break;
 
-		// ------------------------------------------------------------------------
-    case GPM_SET_PROGRESS:
-    {
-      Int newPos = (Int)mData1; 
+      window->winSetUserData((void *)newPos);
 
-      if (newPos < 0 || newPos > 100)
-        break;
-
-      window->winSetUserData( (void *)newPos );
-
-			break;
+      break;
 
     }  // end set progress
-		
-		// ------------------------------------------------------------------------
-		default:
-			return MSG_IGNORED;
 
-	}  // end switch
+    // ------------------------------------------------------------------------
+    default:
+      return MSG_IGNORED;
 
-	return MSG_HANDLED;
+  }  // end switch
+
+  return MSG_HANDLED;
 
 }  // end GadgetProgressBarSystem
 
 // GadgetProgressBarSetProgress ===============================================
 /** send progress system message to Progress Bar */
 //=============================================================================
-void GadgetProgressBarSetProgress( GameWindow *g, Int progress )
-{
-	if(!g)
-		return;
+void GadgetProgressBarSetProgress(GameWindow *g, Int progress) {
+  if (!g) return;
 
-	TheWindowManager->winSendSystemMsg( g, GPM_SET_PROGRESS, progress, 0);
-} // end GadgetProgressBarSetProgress
+  TheWindowManager->winSendSystemMsg(g, GPM_SET_PROGRESS, progress, 0);
+}  // end GadgetProgressBarSetProgress

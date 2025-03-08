@@ -19,98 +19,90 @@
 // TerrainSwatches.cpp : implementation file
 //
 
-#include "stdafx.h"
-#include "resource.h"
 #include "TerrainSwatches.h"
+
 #include "TerrainMaterial.h"
-#include "WorldBuilderDoc.h"
 #include "WHeightMapEdit.h"
+#include "WorldBuilderDoc.h"
+#include "resource.h"
+#include "stdafx.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // TerrainSwatches
 
-TerrainSwatches::TerrainSwatches()
-{
-}
+TerrainSwatches::TerrainSwatches() {}
 
-TerrainSwatches::~TerrainSwatches()
-{
-}
-
+TerrainSwatches::~TerrainSwatches() {}
 
 BEGIN_MESSAGE_MAP(TerrainSwatches, CWnd)
-	//{{AFX_MSG_MAP(TerrainSwatches)
-	ON_WM_PAINT()
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(TerrainSwatches)
+ON_WM_PAINT()
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 #define SWATCH_OFFSET 20
 /////////////////////////////////////////////////////////////////////////////
 // TerrainSwatches message handlers
 
-void TerrainSwatches::OnPaint() 
-{
-	CPaintDC dc(this); // device context for painting
-	
-	CRect clientRect;
-	GetClientRect(&clientRect);
+void TerrainSwatches::OnPaint() {
+  CPaintDC dc(this);  // device context for painting
 
-	CRect bgRect;
-	bgRect = clientRect;
-	bgRect.top = bgRect.bottom-TILE_PIXEL_EXTENT;
-	bgRect.left = bgRect.right-TILE_PIXEL_EXTENT;
+  CRect clientRect;
+  GetClientRect(&clientRect);
 
-	CRect fgRect = clientRect;
-	fgRect.bottom = fgRect.top+TILE_PIXEL_EXTENT;
-	fgRect.right = fgRect.left+TILE_PIXEL_EXTENT;
+  CRect bgRect;
+  bgRect = clientRect;
+  bgRect.top = bgRect.bottom - TILE_PIXEL_EXTENT;
+  bgRect.left = bgRect.right - TILE_PIXEL_EXTENT;
 
-	CBrush brush;
-	brush.CreateSolidBrush(RGB(0,0,0));
+  CRect fgRect = clientRect;
+  fgRect.bottom = fgRect.top + TILE_PIXEL_EXTENT;
+  fgRect.right = fgRect.left + TILE_PIXEL_EXTENT;
 
-	Int fgTexClass = TerrainMaterial::getFgTexClass();
-	Int bgTexClass = TerrainMaterial::getBgTexClass();
-	UnsignedByte *pData;
-	pData = WorldHeightMapEdit::getPointerToClassTileData(bgTexClass);
-	if (pData) {
-		DrawMyTexture(&dc, bgRect.top, bgRect.left, TILE_PIXEL_EXTENT, pData);
-	} else {
-		dc.FillSolidRect(&bgRect, RGB(0,128,0));
-	}
-	dc.FrameRect(&bgRect, &brush);
-	pData = WorldHeightMapEdit::getPointerToClassTileData(fgTexClass);
-	if (pData) {
-		DrawMyTexture(&dc, fgRect.top, fgRect.left, TILE_PIXEL_EXTENT, pData);
-	} else {
-		dc.FillSolidRect(&fgRect, RGB(128,0,0));
-	}
-	dc.FrameRect(&fgRect, &brush);
+  CBrush brush;
+  brush.CreateSolidBrush(RGB(0, 0, 0));
 
-
+  Int fgTexClass = TerrainMaterial::getFgTexClass();
+  Int bgTexClass = TerrainMaterial::getBgTexClass();
+  UnsignedByte *pData;
+  pData = WorldHeightMapEdit::getPointerToClassTileData(bgTexClass);
+  if (pData) {
+    DrawMyTexture(&dc, bgRect.top, bgRect.left, TILE_PIXEL_EXTENT, pData);
+  } else {
+    dc.FillSolidRect(&bgRect, RGB(0, 128, 0));
+  }
+  dc.FrameRect(&bgRect, &brush);
+  pData = WorldHeightMapEdit::getPointerToClassTileData(fgTexClass);
+  if (pData) {
+    DrawMyTexture(&dc, fgRect.top, fgRect.left, TILE_PIXEL_EXTENT, pData);
+  } else {
+    dc.FillSolidRect(&fgRect, RGB(128, 0, 0));
+  }
+  dc.FrameRect(&fgRect, &brush);
 }
 
-void TerrainSwatches::DrawMyTexture(CDC *pDc, int top, int left, Int width, UnsignedByte *rgbData)
-{
-	// Just blast about some dib bits.
-	
-	LPBITMAPINFO pBI;
-//	long bytes = sizeof(BITMAPINFO);
- 	pBI = new BITMAPINFO;
-	pBI->bmiHeader.biSize = sizeof(pBI->bmiHeader);
-	pBI->bmiHeader.biWidth = width;
-	pBI->bmiHeader.biHeight = width; /* match display top left == 0,0 */
-	pBI->bmiHeader.biPlanes = 1;
-	pBI->bmiHeader.biBitCount = 32;
-	pBI->bmiHeader.biCompression = BI_RGB;
-	pBI->bmiHeader.biSizeImage = (width*width)*(pBI->bmiHeader.biBitCount/8);
-	pBI->bmiHeader.biXPelsPerMeter = 1000;
-	pBI->bmiHeader.biYPelsPerMeter = 1000;
-	pBI->bmiHeader.biClrUsed = 0;
-	pBI->bmiHeader.biClrImportant = 0;
+void TerrainSwatches::DrawMyTexture(CDC *pDc, int top, int left, Int width,
+                                    UnsignedByte *rgbData) {
+  // Just blast about some dib bits.
 
-	//::Sleep(10);
-	/*int val=*/::StretchDIBits(pDc->m_hDC, left, top, width, width, 0, 0, width, width, rgbData, pBI, 
-		DIB_RGB_COLORS, SRCCOPY);
-	delete(pBI);
+  LPBITMAPINFO pBI;
+  //	long bytes = sizeof(BITMAPINFO);
+  pBI = new BITMAPINFO;
+  pBI->bmiHeader.biSize = sizeof(pBI->bmiHeader);
+  pBI->bmiHeader.biWidth = width;
+  pBI->bmiHeader.biHeight = width; /* match display top left == 0,0 */
+  pBI->bmiHeader.biPlanes = 1;
+  pBI->bmiHeader.biBitCount = 32;
+  pBI->bmiHeader.biCompression = BI_RGB;
+  pBI->bmiHeader.biSizeImage =
+      (width * width) * (pBI->bmiHeader.biBitCount / 8);
+  pBI->bmiHeader.biXPelsPerMeter = 1000;
+  pBI->bmiHeader.biYPelsPerMeter = 1000;
+  pBI->bmiHeader.biClrUsed = 0;
+  pBI->bmiHeader.biClrImportant = 0;
+
+  //::Sleep(10);
+  /*int val=*/::StretchDIBits(pDc->m_hDC, left, top, width, width, 0, 0, width,
+                              width, rgbData, pBI, DIB_RGB_COLORS, SRCCOPY);
+  delete (pBI);
 }
-
-

@@ -18,54 +18,52 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: CollideModule.cpp ////////////////////////////////////////////////////////////////////////
+// FILE: CollideModule.cpp
+// ////////////////////////////////////////////////////////////////////////
 // Author: Colin Day, September 2002
 // Desc:   Collide module base class implementations
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INLCUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"
-#include "Common/Xfer.h"
+// INLCUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
 #include "GameLogic/Module/CollideModule.h"
+
+#include "Common/Xfer.h"
+#include "PreRTS.h"
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void CollideModule::crc( Xfer *xfer )
-{
-
-	// extend base class
-	BehaviorModule::crc( xfer );
+void CollideModule::crc(Xfer *xfer) {
+  // extend base class
+  BehaviorModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer Method */
 // ------------------------------------------------------------------------------------------------
-void CollideModule::xfer( Xfer *xfer )
-{
+void CollideModule::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// call base class
-	BehaviorModule::xfer( xfer );
+  // call base class
+  BehaviorModule::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void CollideModule::loadPostProcess( void )
-{
-
-	// call base class
-	BehaviorModule::loadPostProcess();
+void CollideModule::loadPostProcess(void) {
+  // call base class
+  BehaviorModule::loadPostProcess();
 
 }  // end loadPostProcess

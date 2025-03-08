@@ -17,31 +17,33 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : Westwood Library                                             *
+ *                 Project Name : Westwood Library *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/wwlib/refcount.cpp                           $*
+ *                     $Archive:: /Commando/Code/wwlib/refcount.cpp $*
  *                                                                                             *
- *                      $Author:: Greg_h                                                      $*
+ *                      $Author:: Greg_h $*
  *                                                                                             *
- *                     $Modtime:: 8/28/01 9:24a                                               $*
+ *                     $Modtime:: 8/28/01 9:24a $*
  *                                                                                             *
- *                    $Revision:: 17                                                          $*
+ *                    $Revision:: 17 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- *   RefCountClass::Add_Active_Ref -- add a new referenced object to the list                   *
- *   RefCountClass::Set_Ref_Owner -- update the owner file/line for the given object            *
- *   RefCountClass::Remove_Active_Ref -- remove an object from the active refs list             *
- *   RefCountClass::Validate_Active_Ref -- Confirm a pointer has a node in the active ref list  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+ * Functions: * RefCountClass::Add_Active_Ref -- add a new referenced object to
+ *the list                   * RefCountClass::Set_Ref_Owner -- update the owner
+ *file/line for the given object            * RefCountClass::Remove_Active_Ref
+ *-- remove an object from the active refs list             *
+ *   RefCountClass::Validate_Active_Ref -- Confirm a pointer has a node in the
+ *active ref list  *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "refcount.h"
-#include <windows.h>
 
+#include <windows.h>
 
 #ifndef NDEBUG
 
@@ -50,163 +52,147 @@
 /*
 ** Static variables for the reference counting system
 */
-int							RefCountClass::TotalRefs = 0;
-RefCountListClass			RefCountClass::ActiveRefList;
-
-
+int RefCountClass::TotalRefs = 0;
+RefCountListClass RefCountClass::ActiveRefList;
 
 /***********************************************************************************************
- * RefCountClass::Add_Active_Ref -- add a new referenced object to the list                     *
+ * RefCountClass::Add_Active_Ref -- add a new referenced object to the list *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   3/16/98    GTH : Created.                                                                 *
+ * HISTORY: * 3/16/98    GTH : Created. *
  *=============================================================================================*/
-RefCountClass *	RefCountClass::Add_Active_Ref(RefCountClass *obj) 
-{ 
-	ActiveRefList.Add_Head(&(obj->ActiveRefNode)); 
-	obj->ActiveRefInfo.File = NULL;	// default to no debug information added.
-	obj->ActiveRefInfo.Line = 0;
-	return obj;
+RefCountClass *RefCountClass::Add_Active_Ref(RefCountClass *obj) {
+  ActiveRefList.Add_Head(&(obj->ActiveRefNode));
+  obj->ActiveRefInfo.File = NULL;  // default to no debug information added.
+  obj->ActiveRefInfo.Line = 0;
+  return obj;
 }
 
 /***********************************************************************************************
- * RefCountClass::Set_Ref_Owner -- update the owner file/line for the given object              *
+ * RefCountClass::Set_Ref_Owner -- update the owner file/line for the given
+ *object              *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   3/16/98    GTH : Created.                                                                 *
+ * HISTORY: * 3/16/98    GTH : Created. *
  *=============================================================================================*/
-RefCountClass *	RefCountClass::Set_Ref_Owner(RefCountClass *obj,char * file,int line) 
-{ 
-//	static RefCountClass *hunt = (RefCountClass *)0x06558890;
-	static RefCountClass *hunt = (RefCountClass *)0x0;
-	if (obj == hunt) {
-		assert(0);
-	}
-	obj->ActiveRefInfo.File = file; 
-	obj->ActiveRefInfo.Line = line; 
-	return obj;
+RefCountClass *RefCountClass::Set_Ref_Owner(RefCountClass *obj, char *file,
+                                            int line) {
+  //	static RefCountClass *hunt = (RefCountClass *)0x06558890;
+  static RefCountClass *hunt = (RefCountClass *)0x0;
+  if (obj == hunt) {
+    assert(0);
+  }
+  obj->ActiveRefInfo.File = file;
+  obj->ActiveRefInfo.Line = line;
+  return obj;
 }
 
-
 /***********************************************************************************************
- * RefCountClass::Remove_Active_Ref -- remove an object from the active refs list               *
+ * RefCountClass::Remove_Active_Ref -- remove an object from the active refs
+ *list               *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   3/16/98    GTH : Created.                                                                 *
+ * HISTORY: * 3/16/98    GTH : Created. *
  *=============================================================================================*/
-void RefCountClass::Remove_Active_Ref(RefCountClass * obj) 
-{ 
+void RefCountClass::Remove_Active_Ref(RefCountClass *obj) {
 #ifdef PARANOID_REFCOUNTS
-	assert(Validate_Active_Ref(obj));
+  assert(Validate_Active_Ref(obj));
 #endif
-	obj->ActiveRefNode.Unlink(); 
+  obj->ActiveRefNode.Unlink();
 }
 
 /***********************************************************************************************
- * RefCountClass::Validate_Active_Ref -- Confirm a pointer has a node in the active ref list    *
+ * RefCountClass::Validate_Active_Ref -- Confirm a pointer has a node in the
+ *active ref list    *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   2/06/99    EHC: Created.                                                                 *
+ * HISTORY: * 2/06/99    EHC: Created. *
  *=============================================================================================*/
-bool RefCountClass::Validate_Active_Ref(RefCountClass * obj)
-{
-	RefCountNodeClass *node = ActiveRefList.First();
-	while (node) {
-		if (node->Get() == obj) return true;
-		node = node->Next();
-	}
-	return false;
+bool RefCountClass::Validate_Active_Ref(RefCountClass *obj) {
+  RefCountNodeClass *node = ActiveRefList.First();
+  while (node) {
+    if (node->Get() == obj) return true;
+    node = node->Next();
+  }
+  return false;
 }
 
 /***********************************************************************************************
- * RefCountClass::Inc_Total_Refs -- increments the total reference count                        *
+ * RefCountClass::Inc_Total_Refs -- increments the total reference count *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   2/06/99    EHC: Created.                                                                 *
+ * HISTORY: * 2/06/99    EHC: Created. *
  *=============================================================================================*/
-void	RefCountClass::Inc_Total_Refs(RefCountClass * obj)
-{
+void RefCountClass::Inc_Total_Refs(RefCountClass *obj) {
 #ifdef PARANOID_REFCOUNTS
-	assert(Validate_Active_Ref(obj));
+  assert(Validate_Active_Ref(obj));
 #endif
-	TotalRefs++;
-
+  TotalRefs++;
 }
 
 // SKB 7/21/99 Set BreakOnRefernce to a pointer and it will break when called.
-//					This is used for debugging, please do not deleted.
-RefCountClass* BreakOnReference = 0;
+//					This is used for debugging, please do
+//not deleted.
+RefCountClass *BreakOnReference = 0;
 
 #ifndef NDEBUG
-void RefCountClass::Add_Ref(void)								
-{ 
-	NumRefs++;  	  
+void RefCountClass::Add_Ref(void) {
+  NumRefs++;
 
-	// See if programmer set break on for a specific address.
-	if (this == BreakOnReference) {
-		DebugBreak();  // trigger the debugger
-	}
-	Inc_Total_Refs(this);
+  // See if programmer set break on for a specific address.
+  if (this == BreakOnReference) {
+    DebugBreak();  // trigger the debugger
+  }
+  Inc_Total_Refs(this);
 }
-#endif																		
+#endif
 
 /***********************************************************************************************
- * RefCountClass::Validate_Active_Ref -- decrements the total reference count                   *
+ * RefCountClass::Validate_Active_Ref -- decrements the total reference count *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   2/06/99    EHC: Created.                                                                 *
+ * HISTORY: * 2/06/99    EHC: Created. *
  *=============================================================================================*/
-void	RefCountClass::Dec_Total_Refs(RefCountClass * obj)
-{
+void RefCountClass::Dec_Total_Refs(RefCountClass *obj) {
 #ifdef PARANOID_REFCOUNTS
-	assert(Validate_Active_Ref(obj));
+  assert(Validate_Active_Ref(obj));
 #endif
-	TotalRefs--;
+  TotalRefs--;
 
-	// See if programmer set break on for a specific address.
-	if (obj == BreakOnReference) {
-		 DebugBreak();  // trigger the debugger
-	}
+  // See if programmer set break on for a specific address.
+  if (obj == BreakOnReference) {
+    DebugBreak();  // trigger the debugger
+  }
 }
 
-
-
 #endif
-
-

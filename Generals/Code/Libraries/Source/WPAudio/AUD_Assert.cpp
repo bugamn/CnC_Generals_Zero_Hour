@@ -20,7 +20,8 @@
 **                                                                          **
 **                       Westwood Studios Pacific.                          **
 **                                                                          **
-**                       Confidential Information					                  **
+**                       Confidential Information
+***
 **                Copyright (C) 2000 - All Rights Reserved                  **
 **                                                                          **
 ******************************************************************************
@@ -43,56 +44,46 @@
 **            Includes                                                      **
 *****************************************************************************/
 
-#include <string.h>
-#include <stdarg.h>
 #include <assert.h>
-//#include <windows.h>
+#include <stdarg.h>
+#include <string.h>
+// #include <windows.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <time.h>
-#include <stdarg.h>
-
 #include <wpaudio/altypes.h>
-
 
 /*****************************************************************************
 **          Externals                                                       **
 *****************************************************************************/
 
-extern void	WindowsDebugPrint( const char * lpOutputString );
+extern void WindowsDebugPrint(const char *lpOutputString);
 
 /*****************************************************************************
 **           Defines                                                        **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **        Private Types                                                     **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **         Private Data                                                     **
 *****************************************************************************/
 
-char					*DBG_type_struct_is_dead = "Invalid structure";
-char					assert_msg_buf[10*1024];
-static FILE		*err_file = NULL;
-static int		total_errors;
-static char		_msg_buf[sizeof(assert_msg_buf)*2];
+char *DBG_type_struct_is_dead = "Invalid structure";
+char assert_msg_buf[10 * 1024];
+static FILE *err_file = NULL;
+static int total_errors;
+static char _msg_buf[sizeof(assert_msg_buf) * 2];
 
 /*****************************************************************************
 **         Public Data                                                      **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **         Private Prototypes                                               **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **          Private Functions                                               **
@@ -104,14 +95,12 @@ static char		_msg_buf[sizeof(assert_msg_buf)*2];
 /*                                                                */
 /******************************************************************/
 
-void __cdecl _assert_printf ( const char *format, ...)
-{
+void __cdecl _assert_printf(const char *format, ...) {
+  va_list args;
+  va_start(args, format); /* Initialize variable arguments. */
 
-   va_list args;
-   va_start( args, format );     /* Initialize variable arguments. */
-
-   vsprintf ( assert_msg_buf, format, args );
-   va_end( args );
+  vsprintf(assert_msg_buf, format, args);
+  va_end(args);
 }
 
 /******************************************************************/
@@ -119,15 +108,14 @@ void __cdecl _assert_printf ( const char *format, ...)
 /*                                                                */
 /******************************************************************/
 
-void __cdecl _aud_debug_printf ( const char *format, ...)
-{
-   va_list args;
-   va_start( args, format );     /* Initialize variable arguments. */
+void __cdecl _aud_debug_printf(const char *format, ...) {
+  va_list args;
+  va_start(args, format); /* Initialize variable arguments. */
 
-   vsprintf ( _msg_buf, format, args );
-   va_end( args );
+  vsprintf(_msg_buf, format, args);
+  va_end(args);
 
-	WindowsDebugPrint ( _msg_buf );
+  WindowsDebugPrint(_msg_buf);
 }
 
 /******************************************************************/
@@ -135,11 +123,10 @@ void __cdecl _aud_debug_printf ( const char *format, ...)
 /*                                                                */
 /******************************************************************/
 
-void _aud_assert ( const char *, const char *file, int line, const char *reason )
-{
-	sprintf ( _msg_buf, "%s(%d) : Error : ASSERT - %s\n", file, line, reason );
-	WindowsDebugPrint ( _msg_buf );
-	_assert ( _msg_buf, (void *) file, line );
+void _aud_assert(const char *, const char *file, int line, const char *reason) {
+  sprintf(_msg_buf, "%s(%d) : Error : ASSERT - %s\n", file, line, reason);
+  WindowsDebugPrint(_msg_buf);
+  _assert(_msg_buf, (void *)file, line);
 }
 
 #endif
@@ -147,4 +134,3 @@ void _aud_assert ( const char *, const char *file, int line, const char *reason 
 /*****************************************************************************
 **          Public Functions                                                **
 *****************************************************************************/
-

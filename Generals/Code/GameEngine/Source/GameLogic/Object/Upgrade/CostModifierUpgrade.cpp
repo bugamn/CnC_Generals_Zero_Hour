@@ -18,18 +18,20 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: CostModifierUpgrade.cpp /////////////////////////////////////////////////
+// FILE: CostModifierUpgrade.cpp
+// /////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Electronic Arts Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2002 - All Rights Reserved                  
-//                                                                          
+//
+//                       Electronic Arts Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2002 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 //	created:	Aug 2002
@@ -37,7 +39,7 @@
 //	Filename: 	CostModifierUpgrade.cpp
 //
 //	author:		Chris Huybregts
-//	
+//
 //	purpose:	Upgrade that modifies the cost by a certain percentage
 //
 //-----------------------------------------------------------------------------
@@ -50,13 +52,13 @@
 //-----------------------------------------------------------------------------
 // USER INCLUDES //////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
-#include "Common/player.h"
-#include "Common/Xfer.h"
 #include "GameLogic/Module/CostModifierUpgrade.h"
-#include "GameLogic/Object.h"
+
 #include "Common/BitFlagsIO.h"
+#include "Common/Xfer.h"
+#include "Common/player.h"
+#include "GameLogic/Object.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 //-----------------------------------------------------------------------------
 // DEFINES ////////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
@@ -69,30 +71,27 @@
 // PRIVATE FUNCTIONS //////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 
-
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-CostModifierUpgradeModuleData::CostModifierUpgradeModuleData( void )
-{
-
-	m_kindOf = KINDOFMASK_NONE;
-	m_percentage = 0;
+CostModifierUpgradeModuleData::CostModifierUpgradeModuleData(void) {
+  m_kindOf = KINDOFMASK_NONE;
+  m_percentage = 0;
 
 }  // end CostModifierUpgradeModuleData
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-/* static */ void CostModifierUpgradeModuleData::buildFieldParse(MultiIniFieldParse& p)
-{
-	UpgradeModuleData::buildFieldParse( p );
+/* static */ void CostModifierUpgradeModuleData::buildFieldParse(
+    MultiIniFieldParse &p) {
+  UpgradeModuleData::buildFieldParse(p);
 
-	static const FieldParse dataFieldParse[] = 
-	{
-		{ "EffectKindOf",		KindOfMaskType::parseFromINI, NULL, offsetof( CostModifierUpgradeModuleData, m_kindOf ) },
-		{ "Percentage",			INI::parsePercentToReal, NULL, offsetof( CostModifierUpgradeModuleData, m_percentage ) },
-		{ 0, 0, 0, 0 } 
-	};
-	p.add(dataFieldParse);
+  static const FieldParse dataFieldParse[] = {
+      {"EffectKindOf", KindOfMaskType::parseFromINI, NULL,
+       offsetof(CostModifierUpgradeModuleData, m_kindOf)},
+      {"Percentage", INI::parsePercentToReal, NULL,
+       offsetof(CostModifierUpgradeModuleData, m_percentage)},
+      {0, 0, 0, 0}};
+  p.add(dataFieldParse);
 
 }  // end buildFieldParse
 
@@ -102,112 +101,98 @@ CostModifierUpgradeModuleData::CostModifierUpgradeModuleData( void )
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-CostModifierUpgrade::CostModifierUpgrade( Thing *thing, const ModuleData* moduleData ) : 
-							UpgradeModule( thing, moduleData )
-{
-
-}  // end CostModifierUpgrade
+CostModifierUpgrade::CostModifierUpgrade(Thing *thing,
+                                         const ModuleData *moduleData)
+    : UpgradeModule(thing, moduleData) {}  // end CostModifierUpgrade
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-CostModifierUpgrade::~CostModifierUpgrade( void )
-{
-
-}  // end ~CostModifierUpgrade
+CostModifierUpgrade::~CostModifierUpgrade(void) {}  // end ~CostModifierUpgrade
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-void CostModifierUpgrade::onDelete( void )
-{
+void CostModifierUpgrade::onDelete(void) {
+  // if we haven't been upgraded there is nothing to clean up
+  if (isAlreadyUpgraded() == FALSE) return;
 
-	// if we haven't been upgraded there is nothing to clean up
-	if( isAlreadyUpgraded() == FALSE )
-		return;
+  // remove the radar from the player
+  Player *player = getObject()->getControllingPlayer();
+  if (player)
+    player->removeKindOfProductionCostChange(
+        getCostModifierUpgradeModuleData()->m_kindOf,
+        getCostModifierUpgradeModuleData()->m_percentage);
 
-	// remove the radar from the player
-	Player *player = getObject()->getControllingPlayer();
-	if( player )
-		player->removeKindOfProductionCostChange(getCostModifierUpgradeModuleData()->m_kindOf,getCostModifierUpgradeModuleData()->m_percentage );
-
-	// this upgrade module is now "not upgraded"
-	setUpgradeExecuted(FALSE);
+  // this upgrade module is now "not upgraded"
+  setUpgradeExecuted(FALSE);
 
 }  // end onDelete
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-void CostModifierUpgrade::onCapture( Player *oldOwner, Player *newOwner )
-{
+void CostModifierUpgrade::onCapture(Player *oldOwner, Player *newOwner) {
+  // do nothing if we haven't upgraded yet
+  if (isAlreadyUpgraded() == FALSE) return;
 
-	// do nothing if we haven't upgraded yet
-	if( isAlreadyUpgraded() == FALSE )
-		return;
+  // remove radar from old player and add to new player
+  if (oldOwner) {
+    oldOwner->removeKindOfProductionCostChange(
+        getCostModifierUpgradeModuleData()->m_kindOf,
+        getCostModifierUpgradeModuleData()->m_percentage);
+    setUpgradeExecuted(FALSE);
 
-	// remove radar from old player and add to new player
-	if( oldOwner )
-	{
+  }  // end if
+  if (newOwner) {
+    newOwner->addKindOfProductionCostChange(
+        getCostModifierUpgradeModuleData()->m_kindOf,
+        getCostModifierUpgradeModuleData()->m_percentage);
+    setUpgradeExecuted(TRUE);
 
-		oldOwner->removeKindOfProductionCostChange(getCostModifierUpgradeModuleData()->m_kindOf,getCostModifierUpgradeModuleData()->m_percentage );
-		setUpgradeExecuted(FALSE);
-
-	}  // end if
-	if( newOwner )
-	{
-
-		newOwner->addKindOfProductionCostChange(getCostModifierUpgradeModuleData()->m_kindOf,getCostModifierUpgradeModuleData()->m_percentage );
-		setUpgradeExecuted(TRUE);
-
-	}  // end if
+  }  // end if
 
 }  // end onCapture
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-void CostModifierUpgrade::upgradeImplementation( void )
-{
-	Player *player = getObject()->getControllingPlayer();
+void CostModifierUpgrade::upgradeImplementation(void) {
+  Player *player = getObject()->getControllingPlayer();
 
-	// update the player with another TypeOfProductionCostChange
-	player->addKindOfProductionCostChange(getCostModifierUpgradeModuleData()->m_kindOf,getCostModifierUpgradeModuleData()->m_percentage );
+  // update the player with another TypeOfProductionCostChange
+  player->addKindOfProductionCostChange(
+      getCostModifierUpgradeModuleData()->m_kindOf,
+      getCostModifierUpgradeModuleData()->m_percentage);
 
 }  // end upgradeImplementation
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void CostModifierUpgrade::crc( Xfer *xfer )
-{
-
-	// extend base class
-	UpgradeModule::crc( xfer );
+void CostModifierUpgrade::crc(Xfer *xfer) {
+  // extend base class
+  UpgradeModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void CostModifierUpgrade::xfer( Xfer *xfer )
-{
+void CostModifierUpgrade::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// extend base class
-	UpgradeModule::xfer( xfer );
+  // extend base class
+  UpgradeModule::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void CostModifierUpgrade::loadPostProcess( void )
-{
-
-	// extend base class
-	UpgradeModule::loadPostProcess();
+void CostModifierUpgrade::loadPostProcess(void) {
+  // extend base class
+  UpgradeModule::loadPostProcess();
 
 }  // end loadPostProcess

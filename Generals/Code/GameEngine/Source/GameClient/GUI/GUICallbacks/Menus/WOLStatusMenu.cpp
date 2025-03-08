@@ -18,7 +18,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -28,28 +29,29 @@
 // Description: Lan Lobby Menu
 ///////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
 #include "Common/GameEngine.h"
-#include "GameClient/WindowLayout.h"
 #include "GameClient/Gadget.h"
-#include "GameClient/Shell.h"
-#include "GameClient/KeyDefs.h"
-#include "GameClient/GameWindowManager.h"
 #include "GameClient/GadgetListBox.h"
 #include "GameClient/GadgetTextEntry.h"
-//#include "GameNetwork/WOL.h"
-//#include "GameNetwork/WOLmenus.h"
+#include "GameClient/GameWindowManager.h"
+#include "GameClient/KeyDefs.h"
+#include "GameClient/Shell.h"
+#include "GameClient/WindowLayout.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
+// #include "GameNetwork/WOL.h"
+// #include "GameNetwork/WOLmenus.h"
 
-
-
-// PRIVATE DATA ///////////////////////////////////////////////////////////////////////////////////
-// window ids ------------------------------------------------------------------------------
+// PRIVATE DATA
+// ///////////////////////////////////////////////////////////////////////////////////
+// window ids
+// ------------------------------------------------------------------------------
 static NameKeyType parentWOLStatusID = NAMEKEY_INVALID;
 static NameKeyType buttonDisconnectID = NAMEKEY_INVALID;
 
-// Window Pointers ------------------------------------------------------------------------
+// Window Pointers
+// ------------------------------------------------------------------------
 static GameWindow *parentWOLStatus = NULL;
 static GameWindow *buttonDisconnect = NULL;
 GameWindow *progressTextWindow = NULL;
@@ -57,160 +59,145 @@ GameWindow *progressTextWindow = NULL;
 //-------------------------------------------------------------------------------------------------
 /** Initialize the WOL Status Menu */
 //-------------------------------------------------------------------------------------------------
-void WOLStatusMenuInit( WindowLayout *layout, void *userData )
-{
-	parentWOLStatusID = TheNameKeyGenerator->nameToKey( AsciiString( "WOLStatusMenu.wnd:WOLStatusMenuParent" ) );
-	buttonDisconnectID = TheNameKeyGenerator->nameToKey( AsciiString( "WOLStatusMenu.wnd:ButtonDisconnect" ) );
-	parentWOLStatus = TheWindowManager->winGetWindowFromId( NULL, parentWOLStatusID );
-	buttonDisconnect = TheWindowManager->winGetWindowFromId( NULL,  buttonDisconnectID);
+void WOLStatusMenuInit(WindowLayout *layout, void *userData) {
+  parentWOLStatusID = TheNameKeyGenerator->nameToKey(
+      AsciiString("WOLStatusMenu.wnd:WOLStatusMenuParent"));
+  buttonDisconnectID = TheNameKeyGenerator->nameToKey(
+      AsciiString("WOLStatusMenu.wnd:ButtonDisconnect"));
+  parentWOLStatus =
+      TheWindowManager->winGetWindowFromId(NULL, parentWOLStatusID);
+  buttonDisconnect =
+      TheWindowManager->winGetWindowFromId(NULL, buttonDisconnectID);
 
-	progressTextWindow = TheWindowManager->winGetWindowFromId( NULL,
-		TheNameKeyGenerator->nameToKey( AsciiString( "WOLStatusMenu.wnd:ListboxStatus" ) ) );
-	
-	// Show Menu
-	layout->hide( FALSE );
+  progressTextWindow = TheWindowManager->winGetWindowFromId(
+      NULL, TheNameKeyGenerator->nameToKey(
+                AsciiString("WOLStatusMenu.wnd:ListboxStatus")));
 
-	// Set Keyboard to Main Parent
-	TheWindowManager->winSetFocus( parentWOLStatus );
+  // Show Menu
+  layout->hide(FALSE);
 
-	//progressLayout = TheShell->top();
+  // Set Keyboard to Main Parent
+  TheWindowManager->winSetFocus(parentWOLStatus);
 
-	//WOL::raiseWOLMessageBox();
-} // WOLStatusMenuInit
+  // progressLayout = TheShell->top();
+
+  // WOL::raiseWOLMessageBox();
+}  // WOLStatusMenuInit
 
 //-------------------------------------------------------------------------------------------------
 /** WOL Status Menu shutdown method */
 //-------------------------------------------------------------------------------------------------
-void WOLStatusMenuShutdown( WindowLayout *layout, void *userData )
-{
+void WOLStatusMenuShutdown(WindowLayout *layout, void *userData) {
+  // hide menu
+  layout->hide(TRUE);
 
-	// hide menu
-	layout->hide( TRUE );
+  // our shutdown is complete
+  TheShell->shutdownComplete(layout);
 
-	// our shutdown is complete
-	TheShell->shutdownComplete( layout );
+  // progressLayout = NULL;
 
-	//progressLayout = NULL;
-
-	//WOL::raiseWOLMessageBox();
+  // WOL::raiseWOLMessageBox();
 }  // WOLStatusMenuShutdown
-
 
 //-------------------------------------------------------------------------------------------------
 /** WOL Status Menu update method */
 //-------------------------------------------------------------------------------------------------
-void WOLStatusMenuUpdate( WindowLayout * layout, void *userData)
-{
-	//if (WOL::TheWOL)
-		//WOL::TheWOL->update();
-}// WOLStatusMenuUpdate
+void WOLStatusMenuUpdate(WindowLayout *layout, void *userData) {
+  // if (WOL::TheWOL)
+  // WOL::TheWOL->update();
+}  // WOLStatusMenuUpdate
 
 //-------------------------------------------------------------------------------------------------
 /** WOL Status Menu input callback */
 //-------------------------------------------------------------------------------------------------
-WindowMsgHandledType WOLStatusMenuInput( GameWindow *window, UnsignedInt msg,
-																			 WindowMsgData mData1, WindowMsgData mData2 )
-{
-	switch( msg ) 
-	{
+WindowMsgHandledType WOLStatusMenuInput(GameWindow *window, UnsignedInt msg,
+                                        WindowMsgData mData1,
+                                        WindowMsgData mData2) {
+  switch (msg) {
+    // --------------------------------------------------------------------------------------------
+    case GWM_CHAR: {
+      UnsignedByte key = mData1;
+      UnsignedByte state = mData2;
 
-		// --------------------------------------------------------------------------------------------
-		case GWM_CHAR:
-		{
-			UnsignedByte key = mData1;
-			UnsignedByte state = mData2;
+      switch (key) {
+        // ----------------------------------------------------------------------------------------
+        case KEY_ESC: {
+          //
+          // send a simulated selected event to the parent window of the
+          // back/exit button
+          //
+          if (BitTest(state, KEY_STATE_UP)) {
+            TheWindowManager->winSendSystemMsg(window, GBM_SELECTED,
+                                               (WindowMsgData)buttonDisconnect,
+                                               buttonDisconnectID);
 
-			switch( key )
-			{
+          }  // end if
 
-				// ----------------------------------------------------------------------------------------
-				case KEY_ESC:
-				{
-					
-					//
-					// send a simulated selected event to the parent window of the
-					// back/exit button
-					//
-					if( BitTest( state, KEY_STATE_UP ) )
-					{
-						TheWindowManager->winSendSystemMsg( window, GBM_SELECTED, 
-																							(WindowMsgData)buttonDisconnect, buttonDisconnectID );
+          // don't let key fall through anywhere else
+          return MSG_HANDLED;
 
-					}  // end if
+        }  // end escape
 
-					// don't let key fall through anywhere else
-					return MSG_HANDLED;
+      }  // end switch( key )
 
-				}  // end escape
+    }  // end char
 
-			}  // end switch( key )
+  }  // end switch( msg )
 
-		}  // end char
-
-	}  // end switch( msg )
-
-	return MSG_IGNORED;
-}// WOLStatusMenuInput
+  return MSG_IGNORED;
+}  // WOLStatusMenuInput
 
 //-------------------------------------------------------------------------------------------------
 /** WOL Status Menu window system callback */
 //-------------------------------------------------------------------------------------------------
-WindowMsgHandledType WOLStatusMenuSystem( GameWindow *window, UnsignedInt msg, 
-														 WindowMsgData mData1, WindowMsgData mData2 )
-{
-	UnicodeString txtInput;
+WindowMsgHandledType WOLStatusMenuSystem(GameWindow *window, UnsignedInt msg,
+                                         WindowMsgData mData1,
+                                         WindowMsgData mData2) {
+  UnicodeString txtInput;
 
-	switch( msg )
-	{
-		
-		
-		case GWM_CREATE:
-			{
-				
-				break;
-			} // case GWM_DESTROY:
+  switch (msg) {
+    case GWM_CREATE: {
+      break;
+    }  // case GWM_DESTROY:
 
-		case GWM_DESTROY:
-			{
-				break;
-			} // case GWM_DESTROY:
+    case GWM_DESTROY: {
+      break;
+    }  // case GWM_DESTROY:
 
-		case GWM_INPUT_FOCUS:
-			{	
-				// if we're givin the opportunity to take the keyboard focus we must say we want it
-				if( mData1 == TRUE )
-					*(Bool *)mData2 = TRUE;
+    case GWM_INPUT_FOCUS: {
+      // if we're givin the opportunity to take the keyboard focus we must say
+      // we want it
+      if (mData1 == TRUE) *(Bool *)mData2 = TRUE;
 
-				return MSG_HANDLED;
-			}//case GWM_INPUT_FOCUS:
+      return MSG_HANDLED;
+    }  // case GWM_INPUT_FOCUS:
 
-		case GBM_SELECTED:
-			{
-				/*
-				GameWindow *control = (GameWindow *)mData1;
-				Int controlID = control->winGetWindowId();
+    case GBM_SELECTED: {
+      /*
+      GameWindow *control = (GameWindow *)mData1;
+      Int controlID = control->winGetWindowId();
 
-				if ( controlID == buttonDisconnectID )
-				{
-					//TheShell->pop();
-					if (WOL::TheWOL->setState( WOL::WOLAPI_FATAL_ERROR ))
-					{
-						WOL::TheWOL->addCommand( WOL::WOLCOMMAND_RESET );  // don't display an error, log out, or anything
-					}
+      if ( controlID == buttonDisconnectID )
+      {
+              //TheShell->pop();
+              if (WOL::TheWOL->setState( WOL::WOLAPI_FATAL_ERROR ))
+              {
+                      WOL::TheWOL->addCommand( WOL::WOLCOMMAND_RESET );  //
+      don't display an error, log out, or anything
+              }
 
-				} //if ( controlID == buttonDisconnect )
-				*/
-				break;
-			}// case GBM_SELECTED:
-	
-		case GEM_EDIT_DONE:
-			{
-				break;
-			}
-		default:
-			return MSG_IGNORED;
+      } //if ( controlID == buttonDisconnect )
+      */
+      break;
+    }  // case GBM_SELECTED:
 
-	}//Switch
+    case GEM_EDIT_DONE: {
+      break;
+    }
+    default:
+      return MSG_IGNORED;
 
-	return MSG_HANDLED;
-}// WOLStatusMenuSystem
+  }  // Switch
+
+  return MSG_HANDLED;
+}  // WOLStatusMenuSystem

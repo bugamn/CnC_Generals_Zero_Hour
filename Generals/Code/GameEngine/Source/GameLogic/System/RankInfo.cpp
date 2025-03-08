@@ -18,144 +18,129 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: RankInfo.cpp /////////////////////////////////////////////////////////
 // Created:   Steven Johnson, Sep 2002
-// Desc:      
+// Desc:
 //-----------------------------------------------------------------------------
 
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+#include "GameLogic/RankInfo.h"
 
 #include "Common/INI.h"
 #include "Common/Player.h"
-#include "GameLogic/RankInfo.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 RankInfoStore* TheRankInfoStore = NULL;
 
 #ifdef _INTERNAL
 // for occasional debugging...
-//#pragma optimize("", off)
-//#pragma MESSAGE("************************************** WARNING, optimization disabled for debugging purposes")
+// #pragma optimize("", off)
+// #pragma MESSAGE("************************************** WARNING, optimization
+// disabled for debugging purposes")
 #endif
 
 //-----------------------------------------------------------------------------
-void RankInfoStore::init()
-{
-	DEBUG_ASSERTCRASH(m_rankInfos.empty(), ("Hmm"));
-	m_rankInfos.clear();
+void RankInfoStore::init() {
+  DEBUG_ASSERTCRASH(m_rankInfos.empty(), ("Hmm"));
+  m_rankInfos.clear();
 }
 
 //-----------------------------------------------------------------------------
-void RankInfoStore::reset()
-{
-	// nope.
-	//m_rankInfos.clear();
+void RankInfoStore::reset() {
+  // nope.
+  // m_rankInfos.clear();
 
-	for (RankInfoVec::iterator it = m_rankInfos.begin(); it != m_rankInfos.end(); /*++it*/)
-	{
-		RankInfo* ri = *it;
-		if (ri)
-		{
-			Overridable* temp = ri->deleteOverrides();
-			if (!temp)
-			{
-				DEBUG_CRASH(("hmm, should not be possible for RankInfo"));
-				it = m_rankInfos.erase(it);
-			}
-			else
-			{
-				++it;
-			}
-		}
-	}
+  for (RankInfoVec::iterator it = m_rankInfos.begin(); it != m_rankInfos.end();
+       /*++it*/) {
+    RankInfo* ri = *it;
+    if (ri) {
+      Overridable* temp = ri->deleteOverrides();
+      if (!temp) {
+        DEBUG_CRASH(("hmm, should not be possible for RankInfo"));
+        it = m_rankInfos.erase(it);
+      } else {
+        ++it;
+      }
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-Int RankInfoStore::getRankLevelCount() const
-{ 
-	return m_rankInfos.size(); 
-}
+Int RankInfoStore::getRankLevelCount() const { return m_rankInfos.size(); }
 
 //-----------------------------------------------------------------------------
 // note that level is 1...n, NOT 0...n-1
-const RankInfo* RankInfoStore::getRankInfo(Int level) const 
-{ 
-	if (level >= 1 && level <= getRankLevelCount())
-	{
-		const RankInfo* ri = m_rankInfos[level-1];
-		if (ri)
-		{
-			return (const RankInfo*)ri->getFinalOverride();
-		}
-	}
-	return NULL;
+const RankInfo* RankInfoStore::getRankInfo(Int level) const {
+  if (level >= 1 && level <= getRankLevelCount()) {
+    const RankInfo* ri = m_rankInfos[level - 1];
+    if (ri) {
+      return (const RankInfo*)ri->getFinalOverride();
+    }
+  }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
-void RankInfoStore::friend_parseRankDefinition( INI* ini )
-{
-	if (TheRankInfoStore)
-	{
-		Int rank = INI::scanInt(ini->getNextToken());
+void RankInfoStore::friend_parseRankDefinition(INI* ini) {
+  if (TheRankInfoStore) {
+    Int rank = INI::scanInt(ini->getNextToken());
 
-		static const FieldParse myFieldParse[] = 
-		{
-			{ "RankName", INI::parseAndTranslateLabel, NULL, offsetof( RankInfo, m_rankName ) },
-			{ "SkillPointsNeeded", INI::parseInt, NULL, offsetof( RankInfo, m_skillPointsNeeded ) },
-			{ "SciencesGranted", INI::parseScienceVector, NULL, offsetof( RankInfo, m_sciencesGranted ) },
-			{ "SciencePurchasePointsGranted", INI::parseUnsignedInt, NULL, offsetof( RankInfo, m_sciencePurchasePointsGranted ) },
-			{ 0, 0, 0, 0 }
-		};
+    static const FieldParse myFieldParse[] = {
+        {"RankName", INI::parseAndTranslateLabel, NULL,
+         offsetof(RankInfo, m_rankName)},
+        {"SkillPointsNeeded", INI::parseInt, NULL,
+         offsetof(RankInfo, m_skillPointsNeeded)},
+        {"SciencesGranted", INI::parseScienceVector, NULL,
+         offsetof(RankInfo, m_sciencesGranted)},
+        {"SciencePurchasePointsGranted", INI::parseUnsignedInt, NULL,
+         offsetof(RankInfo, m_sciencePurchasePointsGranted)},
+        {0, 0, 0, 0}};
 
-		if (ini->getLoadType() == INI_LOAD_CREATE_OVERRIDES) 
-		{
-			// we aren't allowed to add ranks in overrides, only to override existing ones.
-			if (rank < 1 || rank > TheRankInfoStore->m_rankInfos.size())
-			{
-				DEBUG_CRASH(("Rank not found in map.ini"));
-				throw INI_INVALID_DATA;
-			}
-			
-			RankInfo* info = TheRankInfoStore->m_rankInfos[rank-1];
-			if (!info)
-			{
-				DEBUG_CRASH(("Rank not found in map.ini"));
-				throw INI_INVALID_DATA;
-			}
+    if (ini->getLoadType() == INI_LOAD_CREATE_OVERRIDES) {
+      // we aren't allowed to add ranks in overrides, only to override existing
+      // ones.
+      if (rank < 1 || rank > TheRankInfoStore->m_rankInfos.size()) {
+        DEBUG_CRASH(("Rank not found in map.ini"));
+        throw INI_INVALID_DATA;
+      }
 
-			RankInfo* newInfo = newInstance(RankInfo);
-			
-			// copy data from final override to 'newInfo' as a set of initial default values
-			info = (RankInfo*)(info->friend_getFinalOverride());
+      RankInfo* info = TheRankInfoStore->m_rankInfos[rank - 1];
+      if (!info) {
+        DEBUG_CRASH(("Rank not found in map.ini"));
+        throw INI_INVALID_DATA;
+      }
 
-			*newInfo = *info;
-			info->setNextOverride(newInfo);
-			newInfo->markAsOverride();	// must do AFTER the copy
+      RankInfo* newInfo = newInstance(RankInfo);
 
-			ini->initFromINI(newInfo, myFieldParse);
-			//TheRankInfoStore->m_rankInfos.push_back(newInfo);	// NO, BAD, WRONG -- don't add in this case.
+      // copy data from final override to 'newInfo' as a set of initial default
+      // values
+      info = (RankInfo*)(info->friend_getFinalOverride());
 
-		} 
-		else
-		{
-			if (rank != TheRankInfoStore->m_rankInfos.size() + 1)
-			{
-				DEBUG_CRASH(("Ranks must increase monotonically"));
-				throw INI_INVALID_DATA;
-			}
-			RankInfo* info = newInstance(RankInfo);
-			ini->initFromINI(info, myFieldParse);
-			TheRankInfoStore->m_rankInfos.push_back(info);
-		}
-	}
+      *newInfo = *info;
+      info->setNextOverride(newInfo);
+      newInfo->markAsOverride();  // must do AFTER the copy
+
+      ini->initFromINI(newInfo, myFieldParse);
+      // TheRankInfoStore->m_rankInfos.push_back(newInfo);	// NO, BAD,
+      // WRONG -- don't add in this case.
+
+    } else {
+      if (rank != TheRankInfoStore->m_rankInfos.size() + 1) {
+        DEBUG_CRASH(("Ranks must increase monotonically"));
+        throw INI_INVALID_DATA;
+      }
+      RankInfo* info = newInstance(RankInfo);
+      ini->initFromINI(info, myFieldParse);
+      TheRankInfoStore->m_rankInfos.push_back(info);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void INI::parseRankDefinition( INI* ini )
-{
-	RankInfoStore::friend_parseRankDefinition(ini);
+void INI::parseRankDefinition(INI* ini) {
+  RankInfoStore::friend_parseRankDefinition(ini);
 }
-

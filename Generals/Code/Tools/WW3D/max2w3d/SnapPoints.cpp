@@ -17,82 +17,73 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : Max2W3d                                                      *
+ *                 Project Name : Max2W3d *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/Tools/max2w3d/SnapPoints.cpp                 $*
+ *                     $Archive:: /Commando/Code/Tools/max2w3d/SnapPoints.cpp $*
  *                                                                                             *
- *                       Author:: Greg Hjelstrom                                               *
+ *                       Author:: Greg Hjelstrom *
  *                                                                                             *
- *                     $Modtime:: 11/23/98 11:05a                                             $*
+ *                     $Modtime:: 11/23/98 11:05a $*
  *                                                                                             *
- *                    $Revision:: 3                                                           $*
+ *                    $Revision:: 3 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #if defined(_MSC_VER)
 #pragma once
 #endif
 
 #include "SnapPoints.h"
-#include "chunkio.h"
+
 #include "Max.h"
+#include "chunkio.h"
 #include "nodelist.h"
 #include "w3d_file.h"
 
+class PointFilterClass : public INodeFilterClass {
+ public:
+  PointFilterClass(void) {}
 
-class PointFilterClass : public INodeFilterClass
-{
-public:
-	PointFilterClass(void) { }
+  virtual BOOL Accept_Node(INode* node, TimeValue time) {
+    if (node == NULL) return FALSE;
+    Object* obj = node->EvalWorldState(time).obj;
+    if (obj == NULL) return FALSE;
 
-	virtual BOOL Accept_Node(INode * node, TimeValue time)
-	{
-		if (node == NULL) return FALSE;
-		Object * obj = node->EvalWorldState(time).obj;
-		if (obj == NULL) return FALSE;
-		
-		if 
-		(
-			obj->ClassID() == Class_ID(POINTHELP_CLASS_ID,0) &&
-			!node->IsHidden()
-		) 
-		{
-			return TRUE;
-		} else {
-			return FALSE;
-		} 
-	}
+    if (obj->ClassID() == Class_ID(POINTHELP_CLASS_ID, 0) &&
+        !node->IsHidden()) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
 };
 
+void SnapPointsClass::Export_Points(INode* scene_root, TimeValue time,
+                                    ChunkSaveClass& csave) {
+  if (scene_root == NULL) return;
 
-void SnapPointsClass::Export_Points(INode * scene_root,TimeValue time,ChunkSaveClass & csave)
-{
-	if (scene_root == NULL) return;
-	
-	PointFilterClass pointfilter;
-	INodeListClass pointlist(scene_root,time,&pointfilter);
+  PointFilterClass pointfilter;
+  INodeListClass pointlist(scene_root, time, &pointfilter);
 
-	if (pointlist.Num_Nodes() > 0) {
+  if (pointlist.Num_Nodes() > 0) {
+    csave.Begin_Chunk(W3D_CHUNK_POINTS);
 
-		csave.Begin_Chunk(W3D_CHUNK_POINTS);
+    for (unsigned int ci = 0; ci < pointlist.Num_Nodes(); ci++) {
+      W3dVectorStruct vect;
+      Point3 pos = pointlist[ci]->GetNodeTM(time).GetTrans();
+      vect.X = pos.x;
+      vect.Y = pos.y;
+      vect.Z = pos.z;
+      csave.Write(&vect, sizeof(vect));
+    }
 
-		for (unsigned int ci=0; ci<pointlist.Num_Nodes(); ci++) {
-
-			W3dVectorStruct vect;
-			Point3 pos = pointlist[ci]->GetNodeTM(time).GetTrans();
-			vect.X = pos.x;
-			vect.Y = pos.y;
-			vect.Z = pos.z;
-			csave.Write(&vect,sizeof(vect));
-
-		}
-
-		csave.End_Chunk();
-	}
+    csave.End_Chunk();
+  }
 }

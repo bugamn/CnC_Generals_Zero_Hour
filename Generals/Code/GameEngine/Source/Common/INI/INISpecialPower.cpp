@@ -18,27 +18,25 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: INISpecialPower.cpp //////////////////////////////////////////////////////////////////////
+// FILE: INISpecialPower.cpp
+// //////////////////////////////////////////////////////////////////////
 // Author: Colin Day, April 2002
 // Desc:   Special Power INI database
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// USER INCLUDES //////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
+// USER INCLUDES
+// //////////////////////////////////////////////////////////////////////////////////
 #include "Common/INI.h"
 #include "Common/SpecialPower.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-void INI::parseSpecialPowerDefinition( INI *ini )
-{
-	SpecialPowerStore::parseSpecialPowerDefinition(ini);
+void INI::parseSpecialPowerDefinition(INI *ini) {
+  SpecialPowerStore::parseSpecialPowerDefinition(ini);
 }
-
-
-

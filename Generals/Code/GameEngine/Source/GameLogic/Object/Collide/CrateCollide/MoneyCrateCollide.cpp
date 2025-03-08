@@ -18,90 +18,82 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: MoneyCrateCollide.cpp ///////////////////////////////////////////////////////////////////////
+// FILE: MoneyCrateCollide.cpp
+// ///////////////////////////////////////////////////////////////////////
 // Author: Graham Smallwood, March 2002
 // Desc:   A crate that gives x money to the collider
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
+#include "GameLogic/Module/MoneyCrateCollide.h"
+
 #include "Common/AudioEventRTS.h"
 #include "Common/MiscAudio.h"
 #include "Common/Player.h"
 #include "Common/Xfer.h"
 #include "GameLogic/Object.h"
-#include "GameLogic/Module/MoneyCrateCollide.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-MoneyCrateCollide::MoneyCrateCollide( Thing *thing, const ModuleData* moduleData ) : CrateCollide( thing, moduleData )
-{
-
-} 
+MoneyCrateCollide::MoneyCrateCollide(Thing *thing, const ModuleData *moduleData)
+    : CrateCollide(thing, moduleData) {}
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-MoneyCrateCollide::~MoneyCrateCollide( void )
-{
-
-}  
+MoneyCrateCollide::~MoneyCrateCollide(void) {}
 
 //-------------------------------------------------------------------------------------------------
-Bool MoneyCrateCollide::executeCrateBehavior( Object *other )
-{
-	UnsignedInt money = getMoneyCrateCollideModuleData()->m_moneyProvided;
+Bool MoneyCrateCollide::executeCrateBehavior(Object *other) {
+  UnsignedInt money = getMoneyCrateCollideModuleData()->m_moneyProvided;
 
-	other->getControllingPlayer()->getMoney()->deposit( money );
-	other->getControllingPlayer()->getScoreKeeper()->addMoneyEarned( money );
+  other->getControllingPlayer()->getMoney()->deposit(money);
+  other->getControllingPlayer()->getScoreKeeper()->addMoneyEarned(money);
 
-	//Play a crate pickup sound.
-	AudioEventRTS soundToPlay = TheAudio->getMiscAudio()->m_crateMoney;
-	soundToPlay.setObjectID( other->getID() );
-	TheAudio->addAudioEvent(&soundToPlay);
-	
-	return TRUE;
+  // Play a crate pickup sound.
+  AudioEventRTS soundToPlay = TheAudio->getMiscAudio()->m_crateMoney;
+  soundToPlay.setObjectID(other->getID());
+  TheAudio->addAudioEvent(&soundToPlay);
+
+  return TRUE;
 }
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void MoneyCrateCollide::crc( Xfer *xfer )
-{
-
-	// extend base class
-	CrateCollide::crc( xfer );
+void MoneyCrateCollide::crc(Xfer *xfer) {
+  // extend base class
+  CrateCollide::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void MoneyCrateCollide::xfer( Xfer *xfer )
-{
+void MoneyCrateCollide::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// extend base class
-	CrateCollide::xfer( xfer );
+  // extend base class
+  CrateCollide::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void MoneyCrateCollide::loadPostProcess( void )
-{
-
-	// extend base class
-	CrateCollide::loadPostProcess();
+void MoneyCrateCollide::loadPostProcess(void) {
+  // extend base class
+  CrateCollide::loadPostProcess();
 
 }  // end loadPostProcess

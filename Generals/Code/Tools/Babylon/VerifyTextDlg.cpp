@@ -19,9 +19,10 @@
 // VerifyTextDlg.cpp : implementation file
 //
 
-#include "stdafx.h"
-#include "noxstring.h"
 #include "VerifyTextDlg.h"
+
+#include "noxstring.h"
+#include "stdafx.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -32,60 +33,43 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CVerifyTextDlg dialog
 
+CVerifyTextDlg::CVerifyTextDlg(char* trans, char* orig, CWnd* pParent /*=NULL*/)
+    : CDialog(CVerifyTextDlg::IDD, pParent) {
+  //{{AFX_DATA_INIT(CVerifyTextDlg)
+  // NOTE: the ClassWizard will add member initialization here
+  //}}AFX_DATA_INIT
 
-CVerifyTextDlg::CVerifyTextDlg( char *trans, char *orig, CWnd* pParent /*=NULL*/)
-	: CDialog(CVerifyTextDlg::IDD, pParent)
-{
-	//{{AFX_DATA_INIT(CVerifyTextDlg)
-		// NOTE: the ClassWizard will add member initialization here
-	//}}AFX_DATA_INIT
-
-	m_trans = trans;
-	m_orig = orig;
+  m_trans = trans;
+  m_orig = orig;
 }
 
-
-void CVerifyTextDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CVerifyTextDlg)
-		// NOTE: the ClassWizard will add DDX and DDV calls here
-	//}}AFX_DATA_MAP
+void CVerifyTextDlg::DoDataExchange(CDataExchange* pDX) {
+  CDialog::DoDataExchange(pDX);
+  //{{AFX_DATA_MAP(CVerifyTextDlg)
+  // NOTE: the ClassWizard will add DDX and DDV calls here
+  //}}AFX_DATA_MAP
 }
-
 
 BEGIN_MESSAGE_MAP(CVerifyTextDlg, CDialog)
-	//{{AFX_MSG_MAP(CVerifyTextDlg)
-	ON_BN_CLICKED(IDC_NOMATCH, OnNomatch)
-	ON_BN_CLICKED(IDC_MATCH, OnMatch)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CVerifyTextDlg)
+ON_BN_CLICKED(IDC_NOMATCH, OnNomatch)
+ON_BN_CLICKED(IDC_MATCH, OnMatch)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CVerifyTextDlg message handlers
 
-void CVerifyTextDlg::OnNomatch() 
-{
+void CVerifyTextDlg::OnNomatch() { EndDialog(IDNO); }
 
-	EndDialog ( IDNO );
-	
-}
+void CVerifyTextDlg::OnMatch() { EndDialog(IDYES); }
 
-void CVerifyTextDlg::OnMatch() 
-{
+BOOL CVerifyTextDlg::OnInitDialog() {
+  CDialog::OnInitDialog();
 
-	EndDialog ( IDYES );
-	
-}
+  SetDlgItemText(IDC_TRANS, m_trans);
+  SetDlgItemText(IDC_ORIG, m_orig);
 
-BOOL CVerifyTextDlg::OnInitDialog() 
-{
-	CDialog::OnInitDialog();
-
-	SetDlgItemText ( IDC_TRANS, m_trans );
-	SetDlgItemText ( IDC_ORIG, m_orig );
-		
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+  return TRUE;  // return TRUE unless you set the focus to a control
+                // EXCEPTION: OCX Property Pages should return FALSE
 }

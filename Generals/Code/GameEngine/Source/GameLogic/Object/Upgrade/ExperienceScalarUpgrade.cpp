@@ -18,42 +18,42 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: ExperienceScalarUpgrade.cpp /////////////////////////////////////////////////////////////////////////////
+// FILE: ExperienceScalarUpgrade.cpp
+// /////////////////////////////////////////////////////////////////////////////
 // Author: Kris Morness, September 2002
-// Desc:	 UpgradeModule that adds a scalar to the object's experience gain.
+// Desc:	 UpgradeModule that adds a scalar to the object's experience
+// gain.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
-#include "Common/Xfer.h"
-#include "GameLogic/Object.h"
-#include "GameLogic/ExperienceTracker.h"
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
 #include "GameLogic/Module/ExperienceScalarUpgrade.h"
 
+#include "Common/Xfer.h"
+#include "GameLogic/ExperienceTracker.h"
+#include "GameLogic/Object.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
+
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-ExperienceScalarUpgradeModuleData::ExperienceScalarUpgradeModuleData( void )
-{
-	m_addXPScalar = 0.0f;
+ExperienceScalarUpgradeModuleData::ExperienceScalarUpgradeModuleData(void) {
+  m_addXPScalar = 0.0f;
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-void ExperienceScalarUpgradeModuleData::buildFieldParse(MultiIniFieldParse& p) 
-{
+void ExperienceScalarUpgradeModuleData::buildFieldParse(MultiIniFieldParse &p) {
+  UpgradeModuleData::buildFieldParse(p);
 
-  UpgradeModuleData::buildFieldParse( p );
-
-	static const FieldParse dataFieldParse[] = 
-	{
-		{ "AddXPScalar",	INI::parseReal,		NULL, offsetof( ExperienceScalarUpgradeModuleData, m_addXPScalar ) },
-		{ 0, 0, 0, 0 }
-	};
+  static const FieldParse dataFieldParse[] = {
+      {"AddXPScalar", INI::parseReal, NULL,
+       offsetof(ExperienceScalarUpgradeModuleData, m_addXPScalar)},
+      {0, 0, 0, 0}};
 
   p.add(dataFieldParse);
 
@@ -61,67 +61,59 @@ void ExperienceScalarUpgradeModuleData::buildFieldParse(MultiIniFieldParse& p)
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-ExperienceScalarUpgrade::ExperienceScalarUpgrade( Thing *thing, const ModuleData* moduleData ) : UpgradeModule( thing, moduleData )
-{
-}
+ExperienceScalarUpgrade::ExperienceScalarUpgrade(Thing *thing,
+                                                 const ModuleData *moduleData)
+    : UpgradeModule(thing, moduleData) {}
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-ExperienceScalarUpgrade::~ExperienceScalarUpgrade( void )
-{
-}
+ExperienceScalarUpgrade::~ExperienceScalarUpgrade(void) {}
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-void ExperienceScalarUpgrade::upgradeImplementation( )
-{
-	const ExperienceScalarUpgradeModuleData *data = getExperienceScalarUpgradeModuleData();
+void ExperienceScalarUpgrade::upgradeImplementation() {
+  const ExperienceScalarUpgradeModuleData *data =
+      getExperienceScalarUpgradeModuleData();
 
-	//Simply add the xp scalar to the xp tracker!
-	Object *obj = getObject();
-	ExperienceTracker *xpTracker = obj->getExperienceTracker();
-	if( xpTracker )
-	{
-		xpTracker->setExperienceScalar( xpTracker->getExperienceScalar() + data->m_addXPScalar );
-	}
+  // Simply add the xp scalar to the xp tracker!
+  Object *obj = getObject();
+  ExperienceTracker *xpTracker = obj->getExperienceTracker();
+  if (xpTracker) {
+    xpTracker->setExperienceScalar(xpTracker->getExperienceScalar() +
+                                   data->m_addXPScalar);
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void ExperienceScalarUpgrade::crc( Xfer *xfer )
-{
-
-	// extend base class
-	UpgradeModule::crc( xfer );
+void ExperienceScalarUpgrade::crc(Xfer *xfer) {
+  // extend base class
+  UpgradeModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void ExperienceScalarUpgrade::xfer( Xfer *xfer )
-{
+void ExperienceScalarUpgrade::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// extend base class
-	UpgradeModule::xfer( xfer );
+  // extend base class
+  UpgradeModule::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void ExperienceScalarUpgrade::loadPostProcess( void )
-{
-
-	// extend base class
-	UpgradeModule::loadPostProcess();
+void ExperienceScalarUpgrade::loadPostProcess(void) {
+  // extend base class
+  UpgradeModule::loadPostProcess();
 
 }  // end loadPostProcess

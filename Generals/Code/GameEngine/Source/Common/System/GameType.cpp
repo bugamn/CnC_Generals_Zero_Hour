@@ -18,29 +18,20 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// GameType.cpp ///////////////////////////////////////////////////////////////////////////////////
+// GameType.cpp
+// ///////////////////////////////////////////////////////////////////////////////////
 
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
-char *TimeOfDayNames[] = 
-{
-	"NONE",
-	"MORNING",
-	"AFTERNOON",
-	"EVENING",
-	"NIGHT",
+char *TimeOfDayNames[] = {"NONE", "MORNING", "AFTERNOON", "EVENING", "NIGHT",
 
-	NULL
-};
+                          NULL};
 
-char *WeatherNames[] = 
-{
-	"NORMAL",
-	"SNOWY",
+char *WeatherNames[] = {"NORMAL", "SNOWY",
 
-	NULL
-};
+                        NULL};

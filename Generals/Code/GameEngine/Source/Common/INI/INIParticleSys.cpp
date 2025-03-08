@@ -18,40 +18,39 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: INIParticleSys.cpp ///////////////////////////////////////////////////////////////////////////
+// FILE: INIParticleSys.cpp
+// ///////////////////////////////////////////////////////////////////////////
 // Author: Michael S. Booth, November 2001
 // Desc:   Parsing Particle System INI entries
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
 #include "Common/INI.h"
 #include "GameClient/ParticleSys.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
-
-/** 
- * Parse entry 
+/**
+ * Parse entry
  */
-void INI::parseParticleSystemDefinition( INI* ini )
-{
-	AsciiString name;
+void INI::parseParticleSystemDefinition(INI* ini) {
+  AsciiString name;
 
-	// read the name
-	const char* c = ini->getNextToken();
-	name.set( c );	
+  // read the name
+  const char* c = ini->getNextToken();
+  name.set(c);
 
-	// find existing item if present
-	ParticleSystemTemplate *sysTemplate = const_cast<ParticleSystemTemplate*>(TheParticleSystemManager->findTemplate( name ));
-	if (sysTemplate == NULL)
-	{
-		// no item is present, create a new one
-		sysTemplate = TheParticleSystemManager->newTemplate( name );
-	}
+  // find existing item if present
+  ParticleSystemTemplate* sysTemplate = const_cast<ParticleSystemTemplate*>(
+      TheParticleSystemManager->findTemplate(name));
+  if (sysTemplate == NULL) {
+    // no item is present, create a new one
+    sysTemplate = TheParticleSystemManager->newTemplate(name);
+  }
 
-	// parse the ini definition
-	ini->initFromINI( sysTemplate, sysTemplate->getFieldParse() );
+  // parse the ini definition
+  ini->initFromINI(sysTemplate, sysTemplate->getFieldParse());
 }

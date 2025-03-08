@@ -18,59 +18,57 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: BodyModule.cpp ///////////////////////////////////////////////////////////////////////////
+// FILE: BodyModule.cpp
+// ///////////////////////////////////////////////////////////////////////////
 // Author: Colin Day, September 2002
-// Desc:   BodyModule base class 
+// Desc:   BodyModule base class
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"
-#include "Common/Xfer.h"
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
 #include "GameLogic/Module/BodyModule.h"
+
+#include "Common/Xfer.h"
+#include "PreRTS.h"
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void BodyModule::crc( Xfer *xfer )
-{
-
-	// call base class
-	BehaviorModule::crc( xfer );
+void BodyModule::crc(Xfer *xfer) {
+  // call base class
+  BehaviorModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer Method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void BodyModule::xfer( Xfer *xfer )
-{
+void BodyModule::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
+  // call base class
+  BehaviorModule::xfer(xfer);
 
-	// call base class
-	BehaviorModule::xfer( xfer ); 
-
-	// damage scalar
-	xfer->xferReal( &m_damageScalar );
+  // damage scalar
+  xfer->xferReal(&m_damageScalar);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void BodyModule::loadPostProcess( void )
-{
+void BodyModule::loadPostProcess(void) {
+  // call base class
+  BehaviorModule::loadPostProcess();
 
-	// call base class
-	BehaviorModule::loadPostProcess();
-	
 }  // end loadPostProcess

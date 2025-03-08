@@ -17,44 +17,39 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : wwaudio                                                      *
+ *                 Project Name : wwaudio *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/WWAudio/listenerhandle.cpp                   $*
+ *                     $Archive:: /Commando/Code/WWAudio/listenerhandle.cpp $*
  *                                                                                             *
- *                       Author:: Patrick Smith                                                *
+ *                       Author:: Patrick Smith *
  *                                                                                             *
- *                     $Modtime:: 8/13/01 11:54a                                              $*
+ *                     $Modtime:: 8/13/01 11:54a $*
  *                                                                                             *
- *                    $Revision:: 1                                                           $*
+ *                    $Revision:: 1 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "listenerhandle.h"
-#include "audiblesound.h"
 
+#include "audiblesound.h"
 
 //////////////////////////////////////////////////////////////////////
 //
 //	Sound3DHandleClass
 //
 //////////////////////////////////////////////////////////////////////
-ListenerHandleClass::ListenerHandleClass (void)
-{
-	return ;
-}
-
+ListenerHandleClass::ListenerHandleClass(void) { return; }
 
 //////////////////////////////////////////////////////////////////////
 //
 //	~ListenerHandleClass
 //
 //////////////////////////////////////////////////////////////////////
-ListenerHandleClass::~ListenerHandleClass (void)
-{
-	return ;
-}
+ListenerHandleClass::~ListenerHandleClass(void) { return; }

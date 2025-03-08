@@ -18,97 +18,89 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: DelayedUpgrade.cpp /////////////////////////////////////////////////////////////////////////////
+// FILE: DelayedUpgrade.cpp
+// /////////////////////////////////////////////////////////////////////////////
 // Author: Graham Smallwood, April 2002
-// Desc:	 An Upgrade that broadcasts to all DelayedUpgradeUpdates that maybe they should start 
+// Desc:	 An Upgrade that broadcasts to all DelayedUpgradeUpdates that
+// maybe they should start
 //					counting down to execution
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
+#include "GameLogic/Module/DelayedUpgrade.h"
 
 #include "Common/Xfer.h"
-#include "GameLogic/Object.h"
-#include "GameLogic/Module/DelayedUpgrade.h"
 #include "GameLogic/Module/UpdateModule.h"
+#include "GameLogic/Object.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-DelayedUpgrade::DelayedUpgrade( Thing *thing, const ModuleData* moduleData ) : UpgradeModule( thing, moduleData )
-{
-}
+DelayedUpgrade::DelayedUpgrade(Thing *thing, const ModuleData *moduleData)
+    : UpgradeModule(thing, moduleData) {}
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-DelayedUpgrade::~DelayedUpgrade( void )
-{
-}
+DelayedUpgrade::~DelayedUpgrade(void) {}
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-void DelayedUpgrade::upgradeImplementation( )
-{
-	UnsignedInt delay = getDelayedUpgradeModuleData()->m_delayTime;
-	DelayedUpgradeUpdateInterface *upgradeUpdate = NULL;
-	Object *me = getObject();
+void DelayedUpgrade::upgradeImplementation() {
+  UnsignedInt delay = getDelayedUpgradeModuleData()->m_delayTime;
+  DelayedUpgradeUpdateInterface *upgradeUpdate = NULL;
+  Object *me = getObject();
 
-	Int64 activation, conflicting;
-	getUpgradeActivationMasks(activation, conflicting);
+  Int64 activation, conflicting;
+  getUpgradeActivationMasks(activation, conflicting);
 
-	for (BehaviorModule** u = me->getBehaviorModules(); *u; ++u)
-	{
-		// Check all Upgradeupdate modules for firing
-		if ((upgradeUpdate = (*u)->getDelayedUpgradeUpdateInterface()) != NULL)
-		{
-			if( upgradeUpdate->isTriggeredBy( activation ) )
-			{
-				// My mask is valid because otherwise I myself would have never fired.  So okay to send it
-				upgradeUpdate->setDelay( delay );
-			}
-		}
-	}
+  for (BehaviorModule **u = me->getBehaviorModules(); *u; ++u) {
+    // Check all Upgradeupdate modules for firing
+    if ((upgradeUpdate = (*u)->getDelayedUpgradeUpdateInterface()) != NULL) {
+      if (upgradeUpdate->isTriggeredBy(activation)) {
+        // My mask is valid because otherwise I myself would have never fired.
+        // So okay to send it
+        upgradeUpdate->setDelay(delay);
+      }
+    }
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void DelayedUpgrade::crc( Xfer *xfer )
-{
-
-	// extend base class
-	UpgradeModule::crc( xfer );
+void DelayedUpgrade::crc(Xfer *xfer) {
+  // extend base class
+  UpgradeModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void DelayedUpgrade::xfer( Xfer *xfer )
-{
+void DelayedUpgrade::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// extend base class
-	UpgradeModule::xfer( xfer );
+  // extend base class
+  UpgradeModule::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void DelayedUpgrade::loadPostProcess( void )
-{
-
-	// extend base class
-	UpgradeModule::loadPostProcess();
+void DelayedUpgrade::loadPostProcess(void) {
+  // extend base class
+  UpgradeModule::loadPostProcess();
 
 }  // end loadPostProcess

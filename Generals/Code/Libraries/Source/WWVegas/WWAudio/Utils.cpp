@@ -17,26 +17,27 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WWAudio                                                      *
+ *                 Project Name : WWAudio *
  *                                                                                             *
  *                     $Archive:: /Commando/Code/WWAudio/Utils.cpp          $*
  *                                                                                             *
- *                       Author:: Patrick Smith                                                *
+ *                       Author:: Patrick Smith *
  *                                                                                             *
- *                     $Modtime:: 6/15/00 11:40a                                              $*
+ *                     $Modtime:: 6/15/00 11:40a $*
  *                                                                                             *
- *                    $Revision:: 2                                                           $*
+ *                    $Revision:: 2 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
-#pragma warning (disable : 4514)
+#pragma warning(disable : 4514)
 
 #include "Utils.H"
-
 
 CRITICAL_SECTION MMSLockClass::_MSSLockCriticalSection;

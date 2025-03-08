@@ -17,35 +17,38 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : Max2W3d                                                      *
+ *                 Project Name : Max2W3d *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/Tools/max2w3d/floaterdialog.cpp              $*
+ *                     $Archive:: /Commando/Code/Tools/max2w3d/floaterdialog.cpp
+ *$*
  *                                                                                             *
- *              Original Author:: Greg Hjelstrom                                               *
+ *              Original Author:: Greg Hjelstrom *
  *                                                                                             *
- *                      $Author:: Greg_h                                                      $*
+ *                      $Author:: Greg_h $*
  *                                                                                             *
- *                     $Modtime:: 10/30/00 2:58p                                              $*
+ *                     $Modtime:: 10/30/00 2:58p $*
  *                                                                                             *
- *                    $Revision:: 2                                                           $*
+ *                    $Revision:: 2 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- *   FloaterDialogClass::FloaterDialogClass -- Constructor                                     *
- *   FloaterDialogClass::~FloaterDialogClass -- Destructor                                     *
- *   FloaterDialogClass::Is_Created -- test whether the floater has already been created       *
- *   FloaterDialogClass::Create -- create the window                                           *
- *   FloaterDialogClass::Dialog_Proc -- Dialog Proc for the floater                            *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: * FloaterDialogClass::FloaterDialogClass -- Constructor *
+ *   FloaterDialogClass::~FloaterDialogClass -- Destructor *
+ *   FloaterDialogClass::Is_Created -- test whether the floater has already been
+ *created       * FloaterDialogClass::Create -- create the window *
+ *   FloaterDialogClass::Dialog_Proc -- Dialog Proc for the floater *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "floaterdialog.h"
-#include "dllmain.h"
-#include "resource.h"
+
 #include <Max.h>
 
+#include "dllmain.h"
+#include "resource.h"
 
 /**********************************************************************************************
 **
@@ -53,181 +56,157 @@
 **
 **********************************************************************************************/
 
-BOOL CALLBACK _floater_dialog_proc(HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
-{
-	if (message == WM_INITDIALOG) {
-		FloaterDialogClass * floater = (FloaterDialogClass *)lParam;
-		::SetProp(hwnd,"FloaterDialogClass",(HANDLE)floater);
-	}
+BOOL CALLBACK _floater_dialog_proc(HWND hwnd, UINT message, WPARAM wParam,
+                                   LPARAM lParam) {
+  if (message == WM_INITDIALOG) {
+    FloaterDialogClass *floater = (FloaterDialogClass *)lParam;
+    ::SetProp(hwnd, "FloaterDialogClass", (HANDLE)floater);
+  }
 
-	FloaterDialogClass * floater = (FloaterDialogClass *)::GetProp(hwnd,"FloaterDialogClass");
+  FloaterDialogClass *floater =
+      (FloaterDialogClass *)::GetProp(hwnd, "FloaterDialogClass");
 
-	if (message == WM_DESTROY) {
-		::RemoveProp(hwnd,"FloaterDialogClass");
-	}
+  if (message == WM_DESTROY) {
+    ::RemoveProp(hwnd, "FloaterDialogClass");
+  }
 
-
-	if (floater) {
-		return floater->Dialog_Proc(hwnd,message,wParam,lParam);
-	} else {
-		return FALSE;
-	}
+  if (floater) {
+    return floater->Dialog_Proc(hwnd, message, wParam, lParam);
+  } else {
+    return FALSE;
+  }
 }
 
+/***********************************************************************************************
+ * FloaterDialogClass::FloaterDialogClass -- Constructor *
+ *                                                                                             *
+ * INPUT: *
+ *                                                                                             *
+ * OUTPUT: *
+ *                                                                                             *
+ * WARNINGS: *
+ *                                                                                             *
+ * HISTORY: *
+ *=============================================================================================*/
+FloaterDialogClass::FloaterDialogClass(void)
+    : Hwnd(NULL), ChildDialogTemplateID(-1), ChildDialogProc(NULL) {}
 
 /***********************************************************************************************
- * FloaterDialogClass::FloaterDialogClass -- Constructor                                       *
+ * FloaterDialogClass::~FloaterDialogClass -- Destructor *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
+ * HISTORY: *
  *=============================================================================================*/
-FloaterDialogClass::FloaterDialogClass(void) :
-	Hwnd(NULL),
-	ChildDialogTemplateID(-1),
-	ChildDialogProc(NULL)
-{
+FloaterDialogClass::~FloaterDialogClass(void) {
+  if (Hwnd != NULL) {
+    ::DestroyWindow(Hwnd);
+  }
 }
 
+/***********************************************************************************************
+ * FloaterDialogClass::Is_Created -- test whether the floater has already been
+ *created         *
+ *                                                                                             *
+ * INPUT: *
+ *                                                                                             *
+ * OUTPUT: *
+ *                                                                                             *
+ * WARNINGS: *
+ *                                                                                             *
+ * HISTORY: * 10/11/2000 gth : Created. *
+ *=============================================================================================*/
+bool FloaterDialogClass::Is_Created(void) { return (Hwnd != NULL); }
 
 /***********************************************************************************************
- * FloaterDialogClass::~FloaterDialogClass -- Destructor                                       *
+ * FloaterDialogClass::Create -- create the window *
  *                                                                                             *
- * INPUT:                                                                                      *
+ *    This function will return automatically if the floater has been created
+ *already.         *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * INPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * OUTPUT: *
  *                                                                                             *
- * HISTORY:                                                                                    *
+ * WARNINGS: *
+ *                                                                                             *
+ * HISTORY: * 10/11/2000 gth : Created. *
  *=============================================================================================*/
-FloaterDialogClass::~FloaterDialogClass(void)
-{
-	if (Hwnd != NULL) {
-		::DestroyWindow(Hwnd);
-	}
+void FloaterDialogClass::Create(Interface *ip, int child_dlg_id,
+                                DLGPROC child_dlg_proc) {
+  /*
+  ** Don't create multiple ones
+  */
+  if (Is_Created()) {
+    return;
+  }
+
+  /*
+  ** Copy down the data needed to create the child window later
+  */
+  ChildDialogTemplateID = child_dlg_id;
+  ChildDialogProc = child_dlg_proc;
+
+  /*
+  ** Create the dialog box
+  */
+  Hwnd = CreateDialogParam(AppInstance,
+                           MAKEINTRESOURCE(IDD_W3DUTILITY_FLOATER_DIALOG),
+                           ::GetCOREInterface()->GetMAXHWnd(),
+                           (DLGPROC)_floater_dialog_proc, (LPARAM)this);
+  ::GetCOREInterface()->RegisterDlgWnd(Hwnd);
 }
 
-
 /***********************************************************************************************
- * FloaterDialogClass::Is_Created -- test whether the floater has already been created         *
+ * FloaterDialogClass::Dialog_Proc -- Dialog Proc for the floater *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * The only thing we need to do here is to create the child dialog and resize
+ *ourselves to     * contain it. *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * INPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * OUTPUT: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/11/2000 gth : Created.                                                                 *
+ * WARNINGS: *
+ *                                                                                             *
+ * HISTORY: * 10/11/2000 gth : Created. *
  *=============================================================================================*/
-bool FloaterDialogClass::Is_Created(void)
-{
-	return (Hwnd != NULL);
-}
+bool FloaterDialogClass::Dialog_Proc(HWND hWnd, UINT message, WPARAM wParam,
+                                     LPARAM) {
+  switch (message) {
+    case WM_INITDIALOG: {
+      HWND childhwnd =
+          CreateDialogParam(AppInstance, MAKEINTRESOURCE(ChildDialogTemplateID),
+                            hWnd, ChildDialogProc, 0);
+      if (childhwnd != NULL) {
+        RECT rect;
+        LONG style = ::GetWindowLong(hWnd, GWL_STYLE);
+        ::GetWindowRect(childhwnd, &rect);
+        ::AdjustWindowRect(&rect, style, FALSE);
+        ::SetWindowPos(hWnd, NULL, 0, 0, rect.right - rect.left,
+                       rect.bottom - rect.top, SWP_NOZORDER | SWP_NOMOVE);
+        ::SetWindowPos(childhwnd, NULL, 0, 0, 0, 0,
+                       SWP_NOZORDER | SWP_NOSIZE | SWP_SHOWWINDOW);
+      }
+    }
+      return 1;
 
+    case WM_COMMAND:
+      switch (LOWORD(wParam)) {
+        case IDCANCEL:
+          DestroyWindow(Hwnd);
+          break;
+      }
+      return 1;
 
-/***********************************************************************************************
- * FloaterDialogClass::Create -- create the window                                             *
- *                                                                                             *
- *    This function will return automatically if the floater has been created already.         *
- *                                                                                             *
- * INPUT:                                                                                      *
- *                                                                                             *
- * OUTPUT:                                                                                     *
- *                                                                                             *
- * WARNINGS:                                                                                   *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/11/2000 gth : Created.                                                                 *
- *=============================================================================================*/
-void FloaterDialogClass::Create(Interface * ip, int child_dlg_id, DLGPROC child_dlg_proc)
-{
-	/*
-	** Don't create multiple ones
-	*/
-	if (Is_Created()) {
-		return;
-	}
-
-	/*
-	** Copy down the data needed to create the child window later
-	*/
-	ChildDialogTemplateID = child_dlg_id;
-	ChildDialogProc = child_dlg_proc;
-
-
-	/*
-	** Create the dialog box
-	*/
-	Hwnd = CreateDialogParam(	
-										AppInstance,
-										MAKEINTRESOURCE(IDD_W3DUTILITY_FLOATER_DIALOG),
-										::GetCOREInterface()->GetMAXHWnd(),
-										(DLGPROC) _floater_dialog_proc,
-										(LPARAM) this 
-									);
-	::GetCOREInterface()->RegisterDlgWnd(Hwnd); 
-}
-	
-
-
-/***********************************************************************************************
- * FloaterDialogClass::Dialog_Proc -- Dialog Proc for the floater                              *
- *                                                                                             *
- * The only thing we need to do here is to create the child dialog and resize ourselves to     *
- * contain it.                                                                                 *
- *                                                                                             *
- * INPUT:                                                                                      *
- *                                                                                             *
- * OUTPUT:                                                                                     *
- *                                                                                             *
- * WARNINGS:                                                                                   *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/11/2000 gth : Created.                                                                 *
- *=============================================================================================*/
-bool FloaterDialogClass::Dialog_Proc(HWND hWnd,UINT message,WPARAM wParam,LPARAM)
-{
-	switch (message )	{
-
-		case WM_INITDIALOG:
-			{
-				HWND childhwnd = CreateDialogParam(	
-													AppInstance,
-													MAKEINTRESOURCE(ChildDialogTemplateID),
-													hWnd,
-													ChildDialogProc,
-													0
-												);
-				if (childhwnd!= NULL) {
-					RECT rect;
-					LONG style = ::GetWindowLong(hWnd,GWL_STYLE);
-					::GetWindowRect(childhwnd,&rect);
-					::AdjustWindowRect(&rect,style,FALSE);
-					::SetWindowPos(hWnd,NULL,0,0,rect.right - rect.left,rect.bottom - rect.top,SWP_NOZORDER|SWP_NOMOVE);
-					::SetWindowPos(childhwnd,NULL,0,0,0,0,SWP_NOZORDER|SWP_NOSIZE|SWP_SHOWWINDOW);
-				}
-			}
-			return 1;
-		
-		case WM_COMMAND:
-			switch (LOWORD(wParam))
-			{
-				case IDCANCEL:
-					DestroyWindow(Hwnd);
-					break;
-			}
-			return 1;
-
-		case WM_DESTROY:
-			::GetCOREInterface()->UnRegisterDlgWnd(Hwnd); 
-			Hwnd = NULL;
-			break;
-	}
-	return 0;
+    case WM_DESTROY:
+      ::GetCOREInterface()->UnRegisterDlgWnd(Hwnd);
+      Hwnd = NULL;
+      break;
+  }
+  return 0;
 }

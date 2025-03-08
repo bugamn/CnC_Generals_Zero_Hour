@@ -17,69 +17,57 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WW3D                                                         *
+ *                 Project Name : WW3D *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/ww3d2/polyinfo.cpp                           $*
+ *                     $Archive:: /Commando/Code/ww3d2/polyinfo.cpp $*
  *                                                                                             *
- *              Original Author:: Greg Hjelstrom                                               *
+ *              Original Author:: Greg Hjelstrom *
  *                                                                                             *
- *                      $Author:: Greg_h                                                      $*
+ *                      $Author:: Greg_h $*
  *                                                                                             *
- *                     $Modtime:: 2/07/01 12:50p                                              $*
+ *                     $Modtime:: 2/07/01 12:50p $*
  *                                                                                             *
- *                    $Revision:: 3                                                           $*
+ *                    $Revision:: 3 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "polyinfo.h"
+
+#include "shader.h"
 #include "texture.h"
 #include "vertmaterial.h"
-#include "shader.h"
 
-void PolygonInfoClass::Set_Texture(TextureClass *texture) 
-{
-	if(texture)
-		texture->Add_Ref();
-	if(Texture)
-		Texture->Release_Ref();
-	Texture = texture;
+void PolygonInfoClass::Set_Texture(TextureClass *texture) {
+  if (texture) texture->Add_Ref();
+  if (Texture) Texture->Release_Ref();
+  Texture = texture;
 }
-void PolygonInfoClass::Set_Vertex_Material(VertexMaterialClass *vertexMaterial) 
-{
-	if(vertexMaterial)
-		vertexMaterial->Add_Ref();
-	if(VertexMaterial)
-		VertexMaterial->Release_Ref();
+void PolygonInfoClass::Set_Vertex_Material(
+    VertexMaterialClass *vertexMaterial) {
+  if (vertexMaterial) vertexMaterial->Add_Ref();
+  if (VertexMaterial) VertexMaterial->Release_Ref();
 
-	VertexMaterial = vertexMaterial;
+  VertexMaterial = vertexMaterial;
 }
 
-void PolygonInfoClass::Set_Shader(ShaderClass *shader)
-{
-	if(Shader)
-		delete Shader;
+void PolygonInfoClass::Set_Shader(ShaderClass *shader) {
+  if (Shader) delete Shader;
 
-	// todo : update for refcounted shaders
-	Shader = W3DNEW ShaderClass(* shader);
+  // todo : update for refcounted shaders
+  Shader = W3DNEW ShaderClass(*shader);
 }
 
+PolygonInfoClass::~PolygonInfoClass() {
+  if (Texture) Texture->Release_Ref();
+  if (VertexMaterial) VertexMaterial->Release_Ref();
 
-PolygonInfoClass::~PolygonInfoClass()
-{
-	if(Texture)
-		Texture->Release_Ref();
-	if(VertexMaterial)
-		VertexMaterial->Release_Ref();
-
-	// todo : update for refcounted shaders	
-	if(Shader)
-		delete Shader;
+  // todo : update for refcounted shaders
+  if (Shader) delete Shader;
 }
-
-

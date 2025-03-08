@@ -17,12 +17,12 @@
 */
 
 //----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //----------------------------------------------------------------------------
 //
 // Project:   WPAudio
@@ -36,473 +36,405 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//         Includes                                                      
+//         Includes
 //----------------------------------------------------------------------------
 
 #define WIN32_LEAN_AND_MEAN
 
-#include <windows.h>
 #include <mmreg.h>
-
-#include <wpaudio/thread.h>
-#include <wpaudio/memory.h>
+#include <windows.h>
 #include <wpaudio/Source.h>
-#include <wsys/File.h>
 #include <wpaudio/device.h>
+#include <wpaudio/memory.h>
 #include <wpaudio/profiler.h>
+#include <wpaudio/thread.h>
 #include <wpaudio/win32.h>
+#include <wsys/File.h>
 
 // 'assignment within condition expression'.
 #pragma warning(disable : 4706)
 
-
 //----------------------------------------------------------------------------
-//         Externals                                                     
-//----------------------------------------------------------------------------
-
-
-
-//----------------------------------------------------------------------------
-//         Defines                                                         
+//         Externals
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Types                                                     
+//         Defines
 //----------------------------------------------------------------------------
 
-struct _aud_thread
-{
-	char										name[200];
-	volatile int						quit;				/* thread must quit */
-	volatile int						count;
-	volatile int						leaving;		/* thread is quiting */
-	volatile TimeStamp			interval;		/* itask interval */
-	volatile int						running;		/* thread is running */
-	HANDLE									handle;			/* threads handle (windows) */
-	void										*data;
-	AUD_ThreadCB						*code;
-	DWORD										id;					/* thread id (windows) */
-	CRITICAL_SECTION				access;
-	AudioServiceInfo				update;
-	ProfileCPU							cpu;
+//----------------------------------------------------------------------------
+//         Private Types
+//----------------------------------------------------------------------------
 
-	DBG_TYPE()
+struct _aud_thread {
+  char name[200];
+  volatile int quit; /* thread must quit */
+  volatile int count;
+  volatile int leaving;        /* thread is quiting */
+  volatile TimeStamp interval; /* itask interval */
+  volatile int running;        /* thread is running */
+  HANDLE handle;               /* threads handle (windows) */
+  void *data;
+  AUD_ThreadCB *code;
+  DWORD id; /* thread id (windows) */
+  CRITICAL_SECTION access;
+  AudioServiceInfo update;
+  ProfileCPU cpu;
+
+  DBG_TYPE()
 };
 
-DBG_DECLARE_TYPE ( AUD_Thread )
-
-
-//----------------------------------------------------------------------------
-//         Private Data                                                     
-//----------------------------------------------------------------------------
-
-
+DBG_DECLARE_TYPE(AUD_Thread)
 
 //----------------------------------------------------------------------------
-//         Public Data                                                      
+//         Private Data
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+//         Public Data
 //----------------------------------------------------------------------------
 
 static HWND audioMainWindowHandle = NULL;
 
 //----------------------------------------------------------------------------
-//         Private Prototypes                                               
+//         Private Prototypes
 //----------------------------------------------------------------------------
 
-static DWORD		WINAPI		AUD_service_thread ( VOID *data );
-
-
-//----------------------------------------------------------------------------
-//         Private Functions                                               
-//----------------------------------------------------------------------------
-
-static DWORD		WINAPI		AUD_service_thread ( VOID *data )
-{
-	AUD_Thread	*thread = (AUD_Thread *) data;
-
-	if ( !thread )
-	{
-		return 0;
-	}
-
-	AUD_ThreadBeginCriticalSection ( thread );
-
-	thread->running = TRUE;
-	thread->leaving = FALSE;
-
-	while ( !thread->quit )
-	{
-		if ( thread->code ( thread, thread->data ))
-		{
-			AUD_ThreadEndCriticalSection ( thread );
-			Sleep ( (unsigned long ) thread->interval );
-			AUD_ThreadBeginCriticalSection ( thread );
-		}
-		else
-		{
-			AUD_ThreadEndCriticalSection ( thread );
-			Sleep ( MSECONDS(5));
-			AUD_ThreadBeginCriticalSection ( thread );
-		}
-
-		thread->count++;
-	}
-
-	AUD_ThreadEndCriticalSection ( thread );
-	thread->leaving = TRUE;
-	return 0;
-}
-
+static DWORD WINAPI AUD_service_thread(VOID *data);
 
 //----------------------------------------------------------------------------
-//         Public Functions                                                
+//         Private Functions
 //----------------------------------------------------------------------------
 
-AUD_Thread*	AUD_ThreadCreate ( const char *name, AUD_ThreadPriority pri, AUD_ThreadCB *code )
-{
-	AUD_Thread *thread;
+static DWORD WINAPI AUD_service_thread(VOID *data) {
+  AUD_Thread *thread = (AUD_Thread *)data;
 
-	ALLOC_STRUCT ( thread, AUD_Thread );
+  if (!thread) {
+    return 0;
+  }
 
-	DBG_SET_TYPE ( thread, AUD_Thread );
+  AUD_ThreadBeginCriticalSection(thread);
 
-	if ( !name )
-	{
-		name = "no name given";
-	}
+  thread->running = TRUE;
+  thread->leaving = FALSE;
 
-	strncpy ( thread->name, name, ArrayLen(thread->name));
-	ArrayEnd(thread->name);
-	thread->quit = FALSE;
-	thread->leaving = FALSE;
-	thread->running = FALSE;
-	thread->count = 0;
-	thread->code = code;
-	AudioServiceInfoInit ( &thread->update );
-	ProfileCPUInit ( thread->cpu );
-	InitializeCriticalSection ( &thread->access );
+  while (!thread->quit) {
+    if (thread->code(thread, thread->data)) {
+      AUD_ThreadEndCriticalSection(thread);
+      Sleep((unsigned long)thread->interval);
+      AUD_ThreadBeginCriticalSection(thread);
+    } else {
+      AUD_ThreadEndCriticalSection(thread);
+      Sleep(MSECONDS(5));
+      AUD_ThreadBeginCriticalSection(thread);
+    }
 
+    thread->count++;
+  }
 
-	AUD_ThreadSetInterval ( thread, SECONDS(1)/30 );
+  AUD_ThreadEndCriticalSection(thread);
+  thread->leaving = TRUE;
+  return 0;
+}
 
-	if ( !(thread->handle = CreateThread ( NULL, 4*1024,  AUD_service_thread, thread, 0, &thread->id )))
-	{
-		DBGPRINTF (( "ERROR: Failed to create audio thread: '%s'\n", thread->name ));
-		return NULL;
-	}
+//----------------------------------------------------------------------------
+//         Public Functions
+//----------------------------------------------------------------------------
 
-	int set;
+AUD_Thread *AUD_ThreadCreate(const char *name, AUD_ThreadPriority pri,
+                             AUD_ThreadCB *code) {
+  AUD_Thread *thread;
 
-	switch (pri)
-	{
-		case AUD_THREAD_PRI_NORMAL:
-			set = TRUE;
-			break;
-		case AUD_THREAD_PRI_HIGH:
-			set = SetThreadPriority ( thread->handle, THREAD_PRIORITY_HIGHEST );
-			break;
-		case AUD_THREAD_PRI_REALTIME:
-			set = SetThreadPriority ( thread->handle, THREAD_PRIORITY_TIME_CRITICAL );
-			break;
-		default:
-			DBG_MSGASSERT ( FALSE, ("Illegal thread priority"));
-			set = TRUE;
-	}
+  ALLOC_STRUCT(thread, AUD_Thread);
 
-	if ( !set )
-	{
-		char buffer[1024];
+  DBG_SET_TYPE(thread, AUD_Thread);
 
-		FormatMessage ( FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0, buffer, sizeof(buffer), NULL);
-		DBGPRINTF (( "Unable to change the priority of the thread - %s\n", buffer ));
-		msg_assert ( FALSE, ( "Unable to change the priority of the thread - %s\n", buffer ));
-	}
+  if (!name) {
+    name = "no name given";
+  }
 
-	DBGPRINTF (( "Created audio thread: '%s'\n", thread->name ));
+  strncpy(thread->name, name, ArrayLen(thread->name));
+  ArrayEnd(thread->name);
+  thread->quit = FALSE;
+  thread->leaving = FALSE;
+  thread->running = FALSE;
+  thread->count = 0;
+  thread->code = code;
+  AudioServiceInfoInit(&thread->update);
+  ProfileCPUInit(thread->cpu);
+  InitializeCriticalSection(&thread->access);
 
-	return thread;
+  AUD_ThreadSetInterval(thread, SECONDS(1) / 30);
+
+  if (!(thread->handle = CreateThread(NULL, 4 * 1024, AUD_service_thread,
+                                      thread, 0, &thread->id))) {
+    DBGPRINTF(("ERROR: Failed to create audio thread: '%s'\n", thread->name));
+    return NULL;
+  }
+
+  int set;
+
+  switch (pri) {
+    case AUD_THREAD_PRI_NORMAL:
+      set = TRUE;
+      break;
+    case AUD_THREAD_PRI_HIGH:
+      set = SetThreadPriority(thread->handle, THREAD_PRIORITY_HIGHEST);
+      break;
+    case AUD_THREAD_PRI_REALTIME:
+      set = SetThreadPriority(thread->handle, THREAD_PRIORITY_TIME_CRITICAL);
+      break;
+    default:
+      DBG_MSGASSERT(FALSE, ("Illegal thread priority"));
+      set = TRUE;
+  }
+
+  if (!set) {
+    char buffer[1024];
+
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0, buffer,
+                  sizeof(buffer), NULL);
+    DBGPRINTF(("Unable to change the priority of the thread - %s\n", buffer));
+    msg_assert(FALSE,
+               ("Unable to change the priority of the thread - %s\n", buffer));
+  }
+
+  DBGPRINTF(("Created audio thread: '%s'\n", thread->name));
+
+  return thread;
 }
 
 //============================================================================
-// AUD_ThreadDestroy 
+// AUD_ThreadDestroy
 //============================================================================
 
-void				AUD_ThreadDestroy ( AUD_Thread *thread )
-{
-	DBG_ASSERT_TYPE ( thread, AUD_Thread );
+void AUD_ThreadDestroy(AUD_Thread *thread) {
+  DBG_ASSERT_TYPE(thread, AUD_Thread);
 
-	thread->quit = TRUE;
+  thread->quit = TRUE;
 
-	while ( !thread->leaving );
+  while (!thread->leaving);
 
-	WaitForSingleObject ( thread->handle, SECONDS(5));
-	CloseHandle ( thread->handle );
-	DeleteCriticalSection ( &thread->access );
-	DBGPRINTF (( "Removed audio thread: '%s'\n", thread->name ));
-	DBG_INVALIDATE_TYPE ( thread );
-	AudioMemFree ( thread );
+  WaitForSingleObject(thread->handle, SECONDS(5));
+  CloseHandle(thread->handle);
+  DeleteCriticalSection(&thread->access);
+  DBGPRINTF(("Removed audio thread: '%s'\n", thread->name));
+  DBG_INVALIDATE_TYPE(thread);
+  AudioMemFree(thread);
 }
 
 //============================================================================
-// AUD_ThreadBeginCriticalSection 
+// AUD_ThreadBeginCriticalSection
 //============================================================================
 
-void				AUD_ThreadBeginCriticalSection ( AUD_Thread *thread)
-{
-	DBG_ASSERT_TYPE ( thread, AUD_Thread );
-	EnterCriticalSection ( &thread->access );
+void AUD_ThreadBeginCriticalSection(AUD_Thread *thread) {
+  DBG_ASSERT_TYPE(thread, AUD_Thread);
+  EnterCriticalSection(&thread->access);
 }
 
 //============================================================================
-// AUD_ThreadEndCriticalSection 
+// AUD_ThreadEndCriticalSection
 //============================================================================
 
-void				AUD_ThreadEndCriticalSection ( AUD_Thread *thread )
-{
-	DBG_ASSERT_TYPE ( thread, AUD_Thread );
-	LeaveCriticalSection ( &thread->access );
+void AUD_ThreadEndCriticalSection(AUD_Thread *thread) {
+  DBG_ASSERT_TYPE(thread, AUD_Thread);
+  LeaveCriticalSection(&thread->access);
 }
 
 //============================================================================
-// AUD_ThreadSetData 
+// AUD_ThreadSetData
 //============================================================================
 
-void				AUD_ThreadSetData ( AUD_Thread *thread, void *data )
-{
-	DBG_ASSERT_TYPE ( thread, AUD_Thread );
-	AUD_ThreadBeginCriticalSection ( thread );
-	thread->data = data;
-	AUD_ThreadEndCriticalSection ( thread );
-
+void AUD_ThreadSetData(AUD_Thread *thread, void *data) {
+  DBG_ASSERT_TYPE(thread, AUD_Thread);
+  AUD_ThreadBeginCriticalSection(thread);
+  thread->data = data;
+  AUD_ThreadEndCriticalSection(thread);
 }
 
 //============================================================================
-// AUD_ThreadSetInterval 
+// AUD_ThreadSetInterval
 //============================================================================
 
-void				AUD_ThreadSetInterval ( AUD_Thread *thread, TimeStamp interval )
-{
-	DBG_ASSERT_TYPE ( thread, AUD_Thread );
-	AUD_ThreadBeginCriticalSection ( thread );
-	thread->interval = interval;
-	AudioServiceSetInterval ( &thread->update, thread->interval );
-	AudioServiceSetMustServiceInterval ( &thread->update, thread->interval*4 );
-	AudioServiceSetResetInterval ( &thread->update, thread->interval*4 );
-	AUD_ThreadEndCriticalSection ( thread );
-
+void AUD_ThreadSetInterval(AUD_Thread *thread, TimeStamp interval) {
+  DBG_ASSERT_TYPE(thread, AUD_Thread);
+  AUD_ThreadBeginCriticalSection(thread);
+  thread->interval = interval;
+  AudioServiceSetInterval(&thread->update, thread->interval);
+  AudioServiceSetMustServiceInterval(&thread->update, thread->interval * 4);
+  AudioServiceSetResetInterval(&thread->update, thread->interval * 4);
+  AUD_ThreadEndCriticalSection(thread);
 }
 
 //============================================================================
-// AUD_ThreadGetInterval 
+// AUD_ThreadGetInterval
 //============================================================================
 
-TimeStamp				AUD_ThreadGetInterval ( AUD_Thread *thread )
-{
-	DBG_ASSERT_TYPE ( thread, AUD_Thread );
+TimeStamp AUD_ThreadGetInterval(AUD_Thread *thread) {
+  DBG_ASSERT_TYPE(thread, AUD_Thread);
 
-	return thread->interval;
-
+  return thread->interval;
 }
 
 //============================================================================
 // AUD_ThreadName
 //============================================================================
 
-char*				AUD_ThreadName( AUD_Thread *thread )
-{
-	DBG_ASSERT_TYPE ( thread, AUD_Thread );
-	return thread->name;
+char *AUD_ThreadName(AUD_Thread *thread) {
+  DBG_ASSERT_TYPE(thread, AUD_Thread);
+  return thread->name;
 }
 
 //============================================================================
 // AUD_ThreadCPUProfile
 //============================================================================
 
-ProfileCPU*		AUD_ThreadCPUProfile( AUD_Thread *thread )
-{
-	DBG_ASSERT_TYPE ( thread, AUD_Thread );
-	return &thread->cpu;
+ProfileCPU *AUD_ThreadCPUProfile(AUD_Thread *thread) {
+  DBG_ASSERT_TYPE(thread, AUD_Thread);
+  return &thread->cpu;
 }
 
 //============================================================================
 // AUD_ThreadAudioServiceInfo
 //============================================================================
 
-AudioServiceInfo*		AUD_ThreadServiceInfo( AUD_Thread *thread )
-{
-	DBG_ASSERT_TYPE ( thread, AUD_Thread );
-	return &thread->update;
+AudioServiceInfo *AUD_ThreadServiceInfo(AUD_Thread *thread) {
+  DBG_ASSERT_TYPE(thread, AUD_Thread);
+  return &thread->update;
 }
 
 //============================================================================
-// AudioFormatReadWaveFile 
+// AudioFormatReadWaveFile
 //============================================================================
 
-int AudioFormatReadWaveFile ( File *file, AudioFormat *format, int *bytes )
-{
-	RIFF_HEADER rh;
-	RIFF_CHUNK	chunk;
-	WAVEFORMATEX *wformat = NULL;
-	int got_format = FALSE;
-	int result = FALSE;
-	//int mp3 = FALSE;
+int AudioFormatReadWaveFile(File *file, AudioFormat *format, int *bytes) {
+  RIFF_HEADER rh;
+  RIFF_CHUNK chunk;
+  WAVEFORMATEX *wformat = NULL;
+  int got_format = FALSE;
+  int result = FALSE;
+  // int mp3 = FALSE;
 
+  DBG_ASSERT_TYPE(format, AudioFormat);
 
-	DBG_ASSERT_TYPE ( format, AudioFormat );
+  if (bytes) {
+    *bytes = 0;
+  }
 
+  if (!file) {
+    goto done;
+  }
 
-	if ( bytes )
-	{
-		*bytes = 0;
-	}
+  file->seek(0, File::START);
 
-	if ( !file )
-	{
-		goto done;
-	}
+  /* read wav info */
+  if (file->read(&rh, sizeof(rh)) != sizeof(rh)) {
+    DBGPRINTF(("error: cannot read file\n"));
+    goto done;
+  }
 
+  if (rh.form != vRIFF || rh.type != vWAVE) {
+    file->seek(0, File::START);
+    result = AudioFormatReadMP3File(file, format, bytes);
+    goto done;
+  }
 
-	file->seek ( 0, File::START );
+  while (file->read(&chunk, sizeof(chunk)) == sizeof(chunk)) {
+    switch (chunk.type) {
+      case vFMT:
 
-	/* read wav info */
-	if (	file->read ( &rh, sizeof (rh)) != sizeof(rh) )
-	{
-		DBGPRINTF (( "error: cannot read file\n" ));
-		goto done;
-	}
+        if (chunk.length < sizeof(WAVEFORMATEX)) {
+          wformat = (WAVEFORMATEX *)malloc(sizeof(WAVEFORMATEX));
+          memset(wformat, 0, sizeof(WAVEFORMATEX));
+        } else {
+          wformat = (WAVEFORMATEX *)malloc(chunk.length);
+          memset(wformat, 0, chunk.length);
+        }
+        file->read(wformat, chunk.length);
+        wformat->cbSize = (ushort)chunk.length;
+        got_format = TRUE;
+        break;
+      case vDATA:
+        *bytes = chunk.length;
+        goto got_data;
+      default:
+        file->seek(chunk.length, File::CURRENT);
+        break;
+    }
+  }
 
-	if ( rh.form != vRIFF ||	rh.type != vWAVE )
-	{
-		file->seek ( 0, File::START );
-		result = AudioFormatReadMP3File ( file, format, bytes );
-		goto done;
-	}
+  DBGPRINTF(("no data chunk found\n"));
 
-	while (	file->read ( &chunk, sizeof (chunk) ) == sizeof(chunk) )
-	{
-		switch ( chunk.type )
-		{
-			case vFMT :
-
-					if ( chunk.length < sizeof ( WAVEFORMATEX ) )
-					{
-						wformat = (WAVEFORMATEX *) malloc ( sizeof(WAVEFORMATEX));
-						memset ( wformat, 0, sizeof ( WAVEFORMATEX) );
-					}
-					else
-					{
-						wformat = (WAVEFORMATEX *) malloc ( chunk.length );
-						memset ( wformat, 0, chunk.length );
-					}
-				file->read ( wformat, chunk.length  );
-				wformat->cbSize = (ushort) chunk.length;
-				got_format = TRUE;
-				break;
-			case vDATA:
-				*bytes = chunk.length;
-				goto got_data;
-			default: 
-				file->seek ( chunk.length, File::CURRENT );
-				break;
-		}
-	}
-
-	DBGPRINTF (( "no data chunk found\n" ));
-
-	goto done;
+  goto done;
 
 got_data:
 
-	if ( !wformat )
-	{
-		DBGPRINTF (( "no format chunk found\n" ));
-		goto done;
-	}
+  if (!wformat) {
+    DBGPRINTF(("no format chunk found\n"));
+    goto done;
+  }
 
+  format->SampleWidth = wformat->wBitsPerSample / 8;
 
-	format->SampleWidth = wformat->wBitsPerSample / 8;
+  if (wformat->wFormatTag == WAVE_FORMAT_IMA_ADPCM) {
+    format->cdata.adpcm.BlockSize = wformat->nBlockAlign;
+    format->Compression = AUDIO_COMPRESS_IMA_ADPCM;
+    format->SampleWidth = 2;
+  } else if (wformat->wFormatTag == WAVE_FORMAT_ADPCM) {
+    ADPCMWAVEFORMAT *aformat = (ADPCMWAVEFORMAT *)wformat;
 
-	if ( wformat->wFormatTag == WAVE_FORMAT_IMA_ADPCM )
-	{
-		format->cdata.adpcm.BlockSize = wformat->nBlockAlign;
-		format->Compression = AUDIO_COMPRESS_IMA_ADPCM;
-		format->SampleWidth = 2;
-	}
-	else if ( wformat->wFormatTag == WAVE_FORMAT_ADPCM )
-	{
-		ADPCMWAVEFORMAT *aformat = (ADPCMWAVEFORMAT *)wformat;
+    if (aformat->wNumCoef != 7 &&
+        memcmp(aformat->aCoef, MSADPCM_StdCoef, sizeof(MSADPCM_StdCoef))) {
+      // currently we only support MS ADPCM using the standard coef table
+      goto done;
+    }
+    format->cdata.adpcm.BlockSize = wformat->nBlockAlign;
+    format->Compression = AUDIO_COMPRESS_MS_ADPCM;
+    format->SampleWidth = 2;
 
-		if ( aformat->wNumCoef != 7 && memcmp ( aformat->aCoef, MSADPCM_StdCoef, sizeof ( MSADPCM_StdCoef )) )
-		{
-			//currently we only support MS ADPCM using the standard coef table
-			goto done;
-		}
-		format->cdata.adpcm.BlockSize = wformat->nBlockAlign;
-		format->Compression = AUDIO_COMPRESS_MS_ADPCM;
-		format->SampleWidth = 2;
+  } else if (wformat->wFormatTag == WAVE_FORMAT_PCM) {
+    format->Compression = AUDIO_COMPRESS_NONE;
+  } else if (wformat->wFormatTag == WAVE_FORMAT_MPEGLAYER3) {
+    result = AudioFormatReadMP3File(file, format, NULL);
+    goto done;
+  } else {
+    goto done;
+  }
 
-	}
-	else if ( wformat->wFormatTag == WAVE_FORMAT_PCM )
-	{
-		format->Compression = AUDIO_COMPRESS_NONE;
-	}
-	else if ( wformat->wFormatTag == WAVE_FORMAT_MPEGLAYER3 )
-	{
-		result =  AudioFormatReadMP3File ( file, format, NULL );
-		goto done;
-	}
-	else 
-	{
-		goto done;
-	}
+  format->Channels = wformat->nChannels;
+  format->BytesPerSecond = wformat->nAvgBytesPerSec;
+  format->Rate = wformat->nSamplesPerSec;
+  format->Flags = mAUDIO_FORMAT_PCM;
 
+  AudioFormatUpdate(format);
 
-	format->Channels = wformat->nChannels;
-	format->BytesPerSecond = wformat->nAvgBytesPerSec;
-	format->Rate = wformat->nSamplesPerSec;
-	format->Flags = mAUDIO_FORMAT_PCM;
-
-	AudioFormatUpdate ( format );
-
-	result = TRUE;
+  result = TRUE;
 
 done:
 
-	if ( wformat )
-	{
-		free ( wformat );
-	}
-		
-	return result;
+  if (wformat) {
+    free(wformat);
+  }
 
+  return result;
 }
 
 //============================================================================
 // WindowsDebugPrint
 //============================================================================
 
-void	WindowsDebugPrint( const char * lpOutputString )
-{
-	OutputDebugStringA ( lpOutputString );
+void WindowsDebugPrint(const char *lpOutputString) {
+  OutputDebugStringA(lpOutputString);
 }
 
 //============================================================================
-// AudioSetWindowsHandle 
+// AudioSetWindowsHandle
 //============================================================================
 
-void AudioSetWindowsHandle ( HWND hwnd )
-{
-	audioMainWindowHandle = hwnd;
-
-}
+void AudioSetWindowsHandle(HWND hwnd) { audioMainWindowHandle = hwnd; }
 
 //============================================================================
-// AudioGetWindowsHandle 
+// AudioGetWindowsHandle
 //============================================================================
 
-HWND AudioGetWindowsHandle ( void )
-{
-	return audioMainWindowHandle;
-
-}
+HWND AudioGetWindowsHandle(void) { return audioMainWindowHandle; }

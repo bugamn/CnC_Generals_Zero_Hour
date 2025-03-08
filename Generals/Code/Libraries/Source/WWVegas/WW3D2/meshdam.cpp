@@ -17,31 +17,32 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WW3D                                                         *
+ *                 Project Name : WW3D *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/ww3d2/meshdam.cpp                            $*
+ *                     $Archive:: /Commando/Code/ww3d2/meshdam.cpp $*
  *                                                                                             *
- *                       Author:: Greg_h                                                       *
+ *                       Author:: Greg_h *
  *                                                                                             *
- *                     $Modtime:: 1/08/01 10:04a                                              $*
+ *                     $Modtime:: 1/08/01 10:04a $*
  *                                                                                             *
- *                    $Revision:: 1                                                           $*
+ *                    $Revision:: 1 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #if 0
 
-
 #include "meshdam.h"
+
+#include "chunkio.h"
 #include "w3d_file.h"
 #include "w3derr.h"
-#include "chunkio.h"
 //#include <sr.hpp>
 
 
@@ -257,10 +258,9 @@ WW3DErrorType DamageClass::read_colors(ChunkLoadClass & cload,MeshModelClass * b
 		Colors[i].Color1.R = dc.NewColor.R;
 		Colors[i].Color1.G = dc.NewColor.G;
 		Colors[i].Color1.B = dc.NewColor.B;
-	}	
+	}
 #endif
 	return WW3D_ERROR_OK;
 }
 
-
-#endif //0
+#endif  // 0

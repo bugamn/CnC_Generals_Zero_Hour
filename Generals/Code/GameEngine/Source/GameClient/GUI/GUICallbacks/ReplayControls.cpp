@@ -18,57 +18,53 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: ReplayControls.cpp ///////////////////////////////////////////////////////////////////////
+// FILE: ReplayControls.cpp
+// ///////////////////////////////////////////////////////////////////////
 // Author: Bryan Cleveland - December 2001
 // Desc: GUI Control box for the playback controls
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
-#include "GameClient/GameWindow.h"
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
 #include "GameClient/Gadget.h"
 #include "GameClient/GameClient.h"
+#include "GameClient/GameWindow.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-------------------------------------------------------------------------------------------------
 /** Input procedure for the control bar */
 //-------------------------------------------------------------------------------------------------
-WindowMsgHandledType ReplayControlInput( GameWindow *window, UnsignedInt msg,
-																			WindowMsgData mData1, WindowMsgData mData2 )
-{
-
-	return MSG_IGNORED;
+WindowMsgHandledType ReplayControlInput(GameWindow *window, UnsignedInt msg,
+                                        WindowMsgData mData1,
+                                        WindowMsgData mData2) {
+  return MSG_IGNORED;
 
 }  // end MapSelectMenuInput
 
 //-------------------------------------------------------------------------------------------------
 /** System callback for the control bar parent */
 //-------------------------------------------------------------------------------------------------
-WindowMsgHandledType ReplayControlSystem( GameWindow *window, UnsignedInt msg, 
-																			 WindowMsgData mData1, WindowMsgData mData2 )
-{
-	switch( msg ) 
-	{
+WindowMsgHandledType ReplayControlSystem(GameWindow *window, UnsignedInt msg,
+                                         WindowMsgData mData1,
+                                         WindowMsgData mData2) {
+  switch (msg) {
+    //---------------------------------------------------------------------------------------------
+    case GBM_SELECTED: {
+      break;
 
-		//---------------------------------------------------------------------------------------------
-		case GBM_SELECTED:
-		{
+    }  // end button selected
 
-			break;
+    //---------------------------------------------------------------------------------------------
+    default:
+      return MSG_IGNORED;
 
-		}  // end button selected
+  }  // end switch( msg )
 
-		//---------------------------------------------------------------------------------------------
-		default:
-			return MSG_IGNORED;
-
-	}  // end switch( msg )
-
-	return MSG_HANDLED;
+  return MSG_HANDLED;
 
 }  // end ControlBarSystem
-

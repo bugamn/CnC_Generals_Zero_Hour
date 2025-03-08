@@ -17,68 +17,60 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : wwaudio                                                      *
+ *                 Project Name : wwaudio *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/WWAudio/soundhandle.cpp                      $*
+ *                     $Archive:: /Commando/Code/WWAudio/soundhandle.cpp $*
  *                                                                                             *
- *                       Author:: Patrick Smith                                                *
+ *                       Author:: Patrick Smith *
  *                                                                                             *
- *                     $Modtime:: 8/13/01 12:18p                                              $*
+ *                     $Modtime:: 8/13/01 12:18p $*
  *                                                                                             *
- *                    $Revision:: 1                                                           $*
+ *                    $Revision:: 1 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "soundhandle.h"
-#include "threads.h"
 
+#include "threads.h"
 
 //////////////////////////////////////////////////////////////////////
 //
 //	SoundHandleClass
 //
 //////////////////////////////////////////////////////////////////////
-SoundHandleClass::SoundHandleClass (void)	:
-	Buffer (NULL)
-{
-	return ;
-}
-
+SoundHandleClass::SoundHandleClass(void) : Buffer(NULL) { return; }
 
 //////////////////////////////////////////////////////////////////////
 //
 //	~SoundHandleClass
 //
 //////////////////////////////////////////////////////////////////////
-SoundHandleClass::~SoundHandleClass (void)
-{
-	//
-	//	Delay the release of the buffer (fixes a sync bug
-	// with Miles internals).
-	//
-	if (Buffer != NULL) {
-		WWAudioThreadsClass::Add_Delayed_Release_Object (Buffer);
-		Buffer = NULL;
-	}
+SoundHandleClass::~SoundHandleClass(void) {
+  //
+  //	Delay the release of the buffer (fixes a sync bug
+  // with Miles internals).
+  //
+  if (Buffer != NULL) {
+    WWAudioThreadsClass::Add_Delayed_Release_Object(Buffer);
+    Buffer = NULL;
+  }
 
-	return ;
+  return;
 }
-
 
 //////////////////////////////////////////////////////////////////////
 //
 //	Initialize
 //
 //////////////////////////////////////////////////////////////////////
-void
-SoundHandleClass::Initialize (SoundBufferClass *buffer)
-{
-	REF_PTR_SET (Buffer, buffer);
-	return ;
+void SoundHandleClass::Initialize(SoundBufferClass *buffer) {
+  REF_PTR_SET(Buffer, buffer);
+  return;
 }
-

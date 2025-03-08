@@ -18,26 +18,28 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: INICommandSet.cpp ////////////////////////////////////////////////////////////////////////
+// FILE: INICommandSet.cpp
+// ////////////////////////////////////////////////////////////////////////
 // Author: Colin Day, March 2002
-// Desc:   Command sets are a configurable set of CommandButtons, we will use the sets as
+// Desc:   Command sets are a configurable set of CommandButtons, we will use
+// the sets as
 //				 part of the context sensitive user interface
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// USER INCLUDES //////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
+// USER INCLUDES
+// //////////////////////////////////////////////////////////////////////////////////
 #include "Common/INI.h"
 #include "GameClient/ControlBar.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-------------------------------------------------------------------------------------------------
 /** Parse a command set */
 //-------------------------------------------------------------------------------------------------
-void INI::parseCommandSetDefinition( INI *ini )
-{
-	ControlBar::parseCommandSetDefinition(ini);
+void INI::parseCommandSetDefinition(INI *ini) {
+  ControlBar::parseCommandSetDefinition(ini);
 }  // end parseCommandSetDefinition

@@ -20,7 +20,8 @@
 **                                                                          **
 **                       Westwood Studios Pacific.                          **
 **                                                                          **
-**                       Confidential Information					                  **
+**                       Confidential Information
+***
 **                Copyright (C) 2000 - All Rights Reserved                  **
 **                                                                          **
 ******************************************************************************
@@ -43,53 +44,38 @@
 **            Includes                                                      **
 *****************************************************************************/
 
-
 #include <wpaudio/altypes.h>
 #include <wpaudio/lock.h>
 
-DBG_DECLARE_TYPE ( Lock )
+DBG_DECLARE_TYPE(Lock)
 
 /*****************************************************************************
 **          Externals                                                       **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **           Defines                                                        **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **        Private Types                                                     **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **         Private Data                                                     **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **         Public Data                                                      **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **         Private Prototypes                                               **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **          Private Functions                                               **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **          Public Functions                                                **
@@ -102,14 +88,12 @@ DBG_DECLARE_TYPE ( Lock )
 /*                                                                */
 /******************************************************************/
 
-void		LockInit ( volatile Lock *lock )
-{
+void LockInit(volatile Lock *lock) {
+  DBG_ASSERT(lock != NULL);
 
-	DBG_ASSERT ( lock != NULL);
+  LOCK_INIT(lock);
 
-	LOCK_INIT(lock);
-
-	DBG_SET_TYPE ( lock, Lock );
+  DBG_SET_TYPE(lock, Lock);
 }
 
 /******************************************************************/
@@ -117,13 +101,11 @@ void		LockInit ( volatile Lock *lock )
 /*                                                                */
 /******************************************************************/
 
-void		LockAcquire ( volatile Lock *lock)
-{
+void LockAcquire(volatile Lock *lock) {
+  DBG_ASSERT_TYPE(lock, Lock);
+  DBG_ASSERT(lock->count >= 0);
 
-	DBG_ASSERT_TYPE ( lock, Lock);
-	DBG_ASSERT ( lock->count >= 0 );
-
-	LOCK_ACQUIRE (lock);
+  LOCK_ACQUIRE(lock);
 }
 
 /******************************************************************/
@@ -131,13 +113,11 @@ void		LockAcquire ( volatile Lock *lock)
 /*                                                                */
 /******************************************************************/
 
-void		LockRelease ( volatile Lock *lock)
-{
+void LockRelease(volatile Lock *lock) {
+  DBG_ASSERT_TYPE(lock, Lock);
+  DBG_ASSERT(lock->count > 0);
 
-	DBG_ASSERT_TYPE ( lock, Lock);
-	DBG_ASSERT ( lock->count > 0 );
-
-	LOCK_RELEASE(lock);
+  LOCK_RELEASE(lock);
 }
 
 /******************************************************************/
@@ -145,14 +125,11 @@ void		LockRelease ( volatile Lock *lock)
 /*                                                                */
 /******************************************************************/
 
-int		Locked ( volatile Lock *lock)
-{
+int Locked(volatile Lock *lock) {
+  DBG_ASSERT_TYPE(lock, Lock);
+  DBG_ASSERT(lock->count >= 0);
 
-	DBG_ASSERT_TYPE ( lock, Lock);
-	DBG_ASSERT ( lock->count >= 0 );
-
-	return LOCKED(lock);
+  return LOCKED(lock);
 }
 
 #endif
-

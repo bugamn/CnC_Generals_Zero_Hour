@@ -17,48 +17,54 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : Max2W3d                                                      *
+ *                 Project Name : Max2W3d *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/Tools/max2w3d/maxworldinfo.cpp               $*
+ *                     $Archive:: /Commando/Code/Tools/max2w3d/maxworldinfo.cpp
+ *$*
  *                                                                                             *
- *              Original Author:: Patrick Smith                                                *
+ *              Original Author:: Patrick Smith *
  *                                                                                             *
- *                      $Author:: Greg_h                                                      $*
+ *                      $Author:: Greg_h $*
  *                                                                                             *
- *                     $Modtime:: 10/27/00 7:11p                                              $*
+ *                     $Modtime:: 10/27/00 7:11p $*
  *                                                                                             *
- *                    $Revision:: 2                                                           $*
+ *                    $Revision:: 2 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "maxworldinfo.h"
+
 #include "geometryexporttask.h"
 
 /*
 ** Get_Shared_Vertex_Normal
-** Loops through all the other meshes in the world and builds a vertex normal for
-** the verticies that share the same space and are part of the same smoothing group.
+** Loops through all the other meshes in the world and builds a vertex normal
+*for
+** the verticies that share the same space and are part of the same smoothing
+*group.
 */
-Vector3 MaxWorldInfoClass::Get_Shared_Vertex_Normal (Vector3 pos, int smgroup)
-{
-	Point3 normal(0,0,0);
-	Point3 world_pos = ExportTrans * Point3(pos.X,pos.Y,pos.Z);
+Vector3 MaxWorldInfoClass::Get_Shared_Vertex_Normal(Vector3 pos, int smgroup) {
+  Point3 normal(0, 0, 0);
+  Point3 world_pos = ExportTrans * Point3(pos.X, pos.Y, pos.Z);
 
-	//
-	//	Loop through all the meshes in the world and see which ones contain
-	// verticies that share the same space and are part of the same smoothing group.
-	//
-	for(unsigned int index = 0; index < MeshList.Count(); index ++) {
-		GeometryExportTaskClass * task = MeshList[index];
-		if (task != CurrentTask) {
-			normal += task->Get_Shared_Vertex_Normal(world_pos,smgroup);			
-		}
-	}
+  //
+  //	Loop through all the meshes in the world and see which ones contain
+  // verticies that share the same space and are part of the same smoothing
+  // group.
+  //
+  for (unsigned int index = 0; index < MeshList.Count(); index++) {
+    GeometryExportTaskClass* task = MeshList[index];
+    if (task != CurrentTask) {
+      normal += task->Get_Shared_Vertex_Normal(world_pos, smgroup);
+    }
+  }
 
-	return Vector3(normal.x,normal.y,normal.z);
+  return Vector3(normal.x, normal.y, normal.z);
 }

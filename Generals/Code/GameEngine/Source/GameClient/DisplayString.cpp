@@ -18,18 +18,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: DisplayString.cpp ////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 // Project:    RTS3
@@ -39,13 +40,14 @@
 // Created:    Colin Day, July 2001
 //
 // Desc:       Contstuct for holding double byte game string data and being
-//						 able to draw that text to the screen.
+//						 able to draw that text to the
+//screen.
 //
 //-----------------------------------------------------------------------------
 ///////////////////////////////////////////////////////////////////////////////
 
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
 #include "Common/Debug.h"
@@ -71,77 +73,67 @@
 // DisplayString::DisplayString ===============================================
 /** */
 //=============================================================================
-DisplayString::DisplayString( void )
-{
-	// m_textString = "";	// not necessary, done by default
-	m_font = NULL;
+DisplayString::DisplayString(void) {
+  // m_textString = "";	// not necessary, done by default
+  m_font = NULL;
 
-	m_next = NULL;
-	m_prev = NULL;
+  m_next = NULL;
+  m_prev = NULL;
 
 }  // end DisplayString
 
 // DisplayString::~DisplayString ==============================================
 /** */
 //=============================================================================
-DisplayString::~DisplayString( void )
-{
-
-	// free any data
-	reset();
+DisplayString::~DisplayString(void) {
+  // free any data
+  reset();
 
 }  // end ~DisplayString
 
 // DisplayString::setText =====================================================
 /** Copy the text to this instance */
 //=============================================================================
-void DisplayString::setText( UnicodeString text )
-{
-	if (text == m_textString) 
-		return;
+void DisplayString::setText(UnicodeString text) {
+  if (text == m_textString) return;
 
-	m_textString = text;
+  m_textString = text;
 
-	// our text has now changed
-	notifyTextChanged();
+  // our text has now changed
+  notifyTextChanged();
 
 }  // end setText
 
 // DisplayString::reset =======================================================
 /** Free and reset all the data for this string, effectively making this
-	* instance like brand new */
+ * instance like brand new */
 //=============================================================================
-void DisplayString::reset( void )
-{
+void DisplayString::reset(void) {
+  m_textString.clear();
 
-	m_textString.clear();
-
-	// no font
-	m_font = NULL;
+  // no font
+  m_font = NULL;
 
 }  // end reset
 
 // DisplayString::removeLastChar ==============================================
 /** Remove the last character from the string text */
 //=============================================================================
-void DisplayString::removeLastChar( void )
-{
-	m_textString.removeLastChar();
+void DisplayString::removeLastChar(void) {
+  m_textString.removeLastChar();
 
-	// our text has now changed
-	notifyTextChanged();
+  // our text has now changed
+  notifyTextChanged();
 
 }  // end removeLastChar
 
 // DisplayString::appendChar ==================================================
 /** Append character to the end of the string */
 //=============================================================================
-void DisplayString::appendChar( WideChar c )
-{
-	m_textString.concat(c);
+void DisplayString::appendChar(WideChar c) {
+  m_textString.concat(c);
 
-	// text has now changed
-	notifyTextChanged();
+  // text has now changed
+  notifyTextChanged();
 
 }  // end appendchar
-

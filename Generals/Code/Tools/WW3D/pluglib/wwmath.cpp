@@ -17,31 +17,32 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WWMath                                                       *
+ *                 Project Name : WWMath *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/wwmath/wwmath.cpp                            $*
+ *                     $Archive:: /Commando/Code/wwmath/wwmath.cpp $*
  *                                                                                             *
- *                       Author:: Eric_c                                                       *
+ *                       Author:: Eric_c *
  *                                                                                             *
- *                     $Modtime:: 3/18/99 10:39a                                              $*
+ *                     $Modtime:: 3/18/99 10:39a $*
  *                                                                                             *
- *                    $Revision:: 5                                                           $*
+ *                    $Revision:: 5 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "wwmath.h"
+
 #include <stdlib.h>
 
 /*
 **
 */
-float		WWMath::Random_Float(void) 
-{ 
-	return ((float)(rand() & 0xFFF)) / (float)(0xFFF); 
+float WWMath::Random_Float(void) {
+  return ((float)(rand() & 0xFFF)) / (float)(0xFFF);
 }

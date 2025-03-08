@@ -18,21 +18,24 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: W3DGameEngine.cpp ////////////////////////////////////////////////////////////////////////
+// FILE: W3DGameEngine.cpp
+// ////////////////////////////////////////////////////////////////////////
 // Author: Colin Day, April 2001
 // Description:
-//   Implementation of the Win32 game engine, this is the highest level of 
+//   Implementation of the Win32 game engine, this is the highest level of
 //   the game application, it creates all the devices we will use for the game
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <windows.h>
 #include "Win32Device/Common/Win32GameEngine.h"
-#include "Common/PerfTimer.h"
 
+#include <windows.h>
+
+#include "Common/PerfTimer.h"
 #include "GameNetwork/LANAPICallbacks.h"
 
 extern DWORD TheMessageTime;
@@ -40,124 +43,111 @@ extern DWORD TheMessageTime;
 //-------------------------------------------------------------------------------------------------
 /** Constructor for Win32GameEngine */
 //-------------------------------------------------------------------------------------------------
-Win32GameEngine::Win32GameEngine()
-{
-	// Stop blue screen
-	m_previousErrorMode = SetErrorMode( SEM_FAILCRITICALERRORS );
+Win32GameEngine::Win32GameEngine() {
+  // Stop blue screen
+  m_previousErrorMode = SetErrorMode(SEM_FAILCRITICALERRORS);
 }
 
 //-------------------------------------------------------------------------------------------------
 /** Destructor for Win32GameEngine */
 //-------------------------------------------------------------------------------------------------
-Win32GameEngine::~Win32GameEngine()
-{
-	// restore it (this isn't really necessary, but feels good.)
-	SetErrorMode( m_previousErrorMode );
+Win32GameEngine::~Win32GameEngine() {
+  // restore it (this isn't really necessary, but feels good.)
+  SetErrorMode(m_previousErrorMode);
 }
-
 
 //-------------------------------------------------------------------------------------------------
 /** Initialize the game engine */
 //-------------------------------------------------------------------------------------------------
-void Win32GameEngine::init( void )
-{
-
-	// extending functionality
-	GameEngine::init();
+void Win32GameEngine::init(void) {
+  // extending functionality
+  GameEngine::init();
 
 }  // end init
 
 //-------------------------------------------------------------------------------------------------
 /** Reset the system */
 //-------------------------------------------------------------------------------------------------
-void Win32GameEngine::reset( void )
-{
-
-	// extending functionality
-	GameEngine::reset();
+void Win32GameEngine::reset(void) {
+  // extending functionality
+  GameEngine::reset();
 
 }  // end reset
 
 //-------------------------------------------------------------------------------------------------
-/** Update the game engine by updating the GameClient and 
-	* GameLogic singletons. */
+/** Update the game engine by updating the GameClient and
+ * GameLogic singletons. */
 //-------------------------------------------------------------------------------------------------
-void Win32GameEngine::update( void )
-{
+void Win32GameEngine::update(void) {
+  // call the engine normal update
+  GameEngine::update();
 
+  extern HWND ApplicationHWnd;
+  if (ApplicationHWnd && ::IsIconic(ApplicationHWnd)) {
+    while (ApplicationHWnd && ::IsIconic(ApplicationHWnd)) {
+      // We are alt-tabbed out here.  Sleep a bit, & process windows
+      // so that we can become un-alt-tabbed out.
+      Sleep(5);
+      serviceWindowsOS();
 
-	// call the engine normal update
-	GameEngine::update();
+      if (TheLAN != NULL) {
+        // BGC - need to update TheLAN so we can process and respond to other
+        // people's messages who may not be alt-tabbed out like we are.
+        TheLAN->setIsActive(isActive());
+        TheLAN->update();
+      }
 
-	extern HWND ApplicationHWnd;
-	if (ApplicationHWnd && ::IsIconic(ApplicationHWnd)) {
-		while (ApplicationHWnd && ::IsIconic(ApplicationHWnd)) {
-			// We are alt-tabbed out here.  Sleep a bit, & process windows
-			// so that we can become un-alt-tabbed out.
-			Sleep(5);
-			serviceWindowsOS();
+      // If we are running a multiplayer game, keep running the logic.
+      // There is code in the client to skip client redraw if we are
+      // iconic.  jba.
+      if (TheGameEngine->getQuitting() || TheGameLogic->isInInternetGame() ||
+          TheGameLogic->isInLanGame()) {
+        break;  // keep running.
+      }
+    }
+  }
 
-			if (TheLAN != NULL) {
-				// BGC - need to update TheLAN so we can process and respond to other
-				// people's messages who may not be alt-tabbed out like we are.
-				TheLAN->setIsActive(isActive());
-				TheLAN->update();
-			}
-
-			// If we are running a multiplayer game, keep running the logic.
-			// There is code in the client to skip client redraw if we are 
-			// iconic.  jba.
-			if (TheGameEngine->getQuitting() || TheGameLogic->isInInternetGame() || TheGameLogic->isInLanGame()) {
-				break; // keep running.
-			}
-		}
-	}
-
-	// allow windows to perform regular windows maintenance stuff like msgs
-	serviceWindowsOS();
+  // allow windows to perform regular windows maintenance stuff like msgs
+  serviceWindowsOS();
 
 }  // end update
 
 //-------------------------------------------------------------------------------------------------
 /** This function may be called from within this application to let
-  * Microsoft Windows do its message processing and dispatching.  Presumeably
-	* we would call this at least once each time around the game loop to keep
-	* Windows services from backing up */
+ * Microsoft Windows do its message processing and dispatching.  Presumeably
+ * we would call this at least once each time around the game loop to keep
+ * Windows services from backing up */
 //-------------------------------------------------------------------------------------------------
-void Win32GameEngine::serviceWindowsOS( void )
-{
-	MSG msg;
+void Win32GameEngine::serviceWindowsOS(void) {
+  MSG msg;
   Int returnValue;
 
-	//
-	// see if we have any messages to process, a NULL window handle tells the
-	// OS to look at the main window associated with the calling thread, us!
-	//
-	while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
-	{
+  //
+  // see if we have any messages to process, a NULL window handle tells the
+  // OS to look at the main window associated with the calling thread, us!
+  //
+  while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
+    // get the message
+    returnValue = GetMessage(&msg, NULL, 0, 0);
 
-		// get the message
-		returnValue = GetMessage( &msg, NULL, 0, 0 );
+    // this is one possible way to check for quitting conditions as a message
+    // of WM_QUIT will cause GetMessage() to return 0
+    /*
+                    if( returnValue == 0 )
+                    {
 
-		// this is one possible way to check for quitting conditions as a message
-		// of WM_QUIT will cause GetMessage() to return 0
-/*
-		if( returnValue == 0 )
-		{
+                            setQuitting( true );
+                            break;
 
-			setQuitting( true );
-			break;
+                    }
+    */
 
-		}
-*/
+    TheMessageTime = msg.time;
+    // translate and dispatch the message
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+    TheMessageTime = 0;
 
-		TheMessageTime = msg.time;
-		// translate and dispatch the message
-		TranslateMessage( &msg );
-		DispatchMessage( &msg );
-		TheMessageTime = 0;
-			
-	}  // end while
+  }  // end while
 
 }  // end ServiceWindowsOS
-

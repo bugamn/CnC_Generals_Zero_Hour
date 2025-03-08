@@ -18,17 +18,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 //----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //----------------------------------------------------------------------------
 //
 // Project:   Generals
@@ -42,256 +43,192 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//         Includes                                                      
+//         Includes
 //----------------------------------------------------------------------------
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
 #include "Common/CDManager.h"
+
 #include "GameLogic/GameLogic.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //----------------------------------------------------------------------------
-//         Externals                                                     
+//         Externals
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Defines                                                         
+//         Defines
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Types                                                     
+//         Private Types
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Data                                                     
+//         Private Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Public Data                                                      
+//         Public Data
 //----------------------------------------------------------------------------
 
-CDManagerInterface* TheCDManager = NULL;
+CDManagerInterface *TheCDManager = NULL;
 
 //----------------------------------------------------------------------------
-//         Private Prototypes                                               
+//         Private Prototypes
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Functions                                               
+//         Private Functions
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Public Functions                                                
+//         Public Functions
 //----------------------------------------------------------------------------
-
 
 //============================================================================
 // CDDrive::CDDrive
 //============================================================================
 
-CDDrive::CDDrive()
-: m_disk(CD::UNKNOWN_DISK)
-{
-	m_diskName.clear();
-	m_drivePath.clear();
-	
+CDDrive::CDDrive() : m_disk(CD::UNKNOWN_DISK) {
+  m_diskName.clear();
+  m_drivePath.clear();
 }
 
 //============================================================================
 // CDDrive::~CDDrive
 //============================================================================
 
-CDDrive::~CDDrive()
-{
-
-}
+CDDrive::~CDDrive() {}
 
 //============================================================================
 // CDDrive::getPath
 //============================================================================
 
-AsciiString CDDrive::getPath( void )
-{
-	return m_drivePath;
-}
+AsciiString CDDrive::getPath(void) { return m_drivePath; }
 
 //============================================================================
 // CDDrive::getDiskName
 //============================================================================
 
-AsciiString CDDrive::getDiskName( void )
-{
-	return m_diskName;
-}
+AsciiString CDDrive::getDiskName(void) { return m_diskName; }
 
-void CDDrive::refreshInfo( void )
-{
-		// map disk names to disk ID
-		m_disk = CD::UNKNOWN_DISK;
+void CDDrive::refreshInfo(void) {
+  // map disk names to disk ID
+  m_disk = CD::UNKNOWN_DISK;
 }
 
 //============================================================================
 // CDDrive::getDisk
 //============================================================================
 
-CD::Disk CDDrive::getDisk( void )
-{
-	return m_disk;
-}
+CD::Disk CDDrive::getDisk(void) { return m_disk; }
 
 //============================================================================
 // CDDrive::setPath
 //============================================================================
 
-void CDDrive::setPath( const Char *path )
-{
-	m_drivePath = path;
-}
+void CDDrive::setPath(const Char *path) { m_drivePath = path; }
 
 //============================================================================
 // CDManager::CDManager
 //============================================================================
 
-CDManager::CDManager()
-{
-
-}
+CDManager::CDManager() {}
 
 //============================================================================
 // CDManager::~CDManager
 //============================================================================
 
-CDManager::~CDManager()
-{
-	destroyAllDrives();
-}
+CDManager::~CDManager() { destroyAllDrives(); }
 
 //============================================================================
 // CDManager::init
 //============================================================================
 
-void CDManager::init( void )
-{
-
-}
+void CDManager::init(void) {}
 
 //============================================================================
 // CDManager::update
 //============================================================================
 
-void CDManager::update( void )
-{
-	// Every so often, check to make sure the CD is still in the drive
-	if ((TheGameLogic->getFrame() % 300) == 299) {
-		refreshDrives();
-	}
+void CDManager::update(void) {
+  // Every so often, check to make sure the CD is still in the drive
+  if ((TheGameLogic->getFrame() % 300) == 299) {
+    refreshDrives();
+  }
 }
 
 //============================================================================
 // CDManager::reset
 //============================================================================
 
-void CDManager::reset( void )
-{
-
-}
+void CDManager::reset(void) {}
 
 //============================================================================
 // CDManager::driveCount
 //============================================================================
 
-Int CDManager::driveCount( void )
-{
-	return m_drives.nodeCount();
-}
+Int CDManager::driveCount(void) { return m_drives.nodeCount(); }
 
 //============================================================================
 // CDManager::getDrive
 //============================================================================
 
-CDDriveInterface* CDManager::getDrive( Int index )
-{
-	CDDriveInterface *cd = NULL;
-	LListNode *node = m_drives.getNode( index );
+CDDriveInterface *CDManager::getDrive(Int index) {
+  CDDriveInterface *cd = NULL;
+  LListNode *node = m_drives.getNode(index);
 
-	if ( node )
-	{
-		cd = (CDDriveInterface*) node->item();
-	}
+  if (node) {
+    cd = (CDDriveInterface *)node->item();
+  }
 
-	return cd;
+  return cd;
 }
 
 //============================================================================
 // CDManager::newDrive
 //============================================================================
 
-CDDriveInterface* CDManager::newDrive( const Char *path )
-{
-	CDDrive *drive= (CDDrive*) createDrive();
+CDDriveInterface *CDManager::newDrive(const Char *path) {
+  CDDrive *drive = (CDDrive *)createDrive();
 
-	if ( drive )
-	{
-		drive->setPath( path );
-		
-		drive->m_node.setItem( drive );
-		m_drives.add( &drive->m_node );
-	}
-	return drive;
+  if (drive) {
+    drive->setPath(path);
+
+    drive->m_node.setItem(drive);
+    m_drives.add(&drive->m_node);
+  }
+  return drive;
 }
 
 //============================================================================
 // CDManager::refreshDrives
 //============================================================================
 
-void CDManager::refreshDrives( void )
-{
-	LListNode *node = m_drives.firstNode();
+void CDManager::refreshDrives(void) {
+  LListNode *node = m_drives.firstNode();
 
-	while ( node )
-	{
-		CDDriveInterface *drive = (CDDriveInterface *) node->item();
-		if ( drive )
-		{
-			drive->refreshInfo();
-		}
+  while (node) {
+    CDDriveInterface *drive = (CDDriveInterface *)node->item();
+    if (drive) {
+      drive->refreshInfo();
+    }
 
-		node = node->next();
-	}
+    node = node->next();
+  }
 }
-
 
 //============================================================================
 // CDManager::destroyAllDrives
 //============================================================================
 
-void CDManager::destroyAllDrives( void )
-{
-	LListNode *node;
+void CDManager::destroyAllDrives(void) {
+  LListNode *node;
 
-	while ( (node = m_drives.firstNode() ) != NULL )
-	{
-		node->remove();
-		CDDriveInterface *drive = (CDDriveInterface *) node->item();
-		if ( drive )
-		{
-			delete drive;
-		}
-	}
+  while ((node = m_drives.firstNode()) != NULL) {
+    node->remove();
+    CDDriveInterface *drive = (CDDriveInterface *)node->item();
+    if (drive) {
+      delete drive;
+    }
+  }
 }
-
-
-
-
-

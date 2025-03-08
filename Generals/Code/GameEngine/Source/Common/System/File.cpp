@@ -18,17 +18,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 //----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright(C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright(C) 2001 - All Rights Reserved
+//
 //----------------------------------------------------------------------------
 //
 // Project:   WSYS Library
@@ -42,218 +43,175 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//         Includes                                                      
+//         Includes
 //----------------------------------------------------------------------------
-
-#include "PreRTS.h"
-
-#include <assert.h>
-#include <string.h>
-#include <stdarg.h>
-#include <stdio.h>
-
 
 #include "Common/File.h"
 
+#include <assert.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "PreRTS.h"
 
 //----------------------------------------------------------------------------
-//         Externals                                                     
+//         Externals
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Defines                                                         
+//         Defines
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Types                                                     
+//         Private Types
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Data                                                     
+//         Private Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Public Data                                                      
+//         Public Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Prototypes                                               
+//         Private Prototypes
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Functions                                               
+//         Private Functions
 //----------------------------------------------------------------------------
 
 //=================================================================
 // File::File
 //=================================================================
 
-File::File()
-:	m_open(FALSE),
-	m_deleteOnClose(FALSE),
-	m_access(NONE)
-{
-
-	setName("<no file>");
-
+File::File() : m_open(FALSE), m_deleteOnClose(FALSE), m_access(NONE) {
+  setName("<no file>");
 }
-
 
 //----------------------------------------------------------------------------
-//         Public Functions                                                
+//         Public Functions
 //----------------------------------------------------------------------------
 
+//=================================================================
+// File::~File
+//=================================================================
+
+File::~File() { close(); }
 
 //=================================================================
-// File::~File	
+// File::open
+//=================================================================
+/**
+ * Any derived open() members must first call File::open. If File::open
+ * succeeds but the derived class's open failes then make sure to call
+ * File::close() before returning.
+ */
 //=================================================================
 
-File::~File()
-{
-	close();
+Bool File::open(const Char *filename, Int access) {
+  if (m_open) {
+    return FALSE;
+  }
+
+  setName(filename);
+
+  if ((access & (STREAMING | WRITE)) == (STREAMING | WRITE)) {
+    // illegal access
+    return FALSE;
+  }
+
+  if ((access & (TEXT | BINARY)) == (TEXT | BINARY)) {
+    // illegal access
+    return FALSE;
+  }
+
+  if ((access & (READ | WRITE)) == 0) {
+    access |= READ;
+  }
+
+  if (!(access & (READ | APPEND))) {
+    access |= TRUNCATE;
+  }
+
+  if ((access & (TEXT | BINARY)) == 0) {
+    access |= BINARY;
+  }
+
+  m_access = access;
+  m_open = TRUE;
+  return TRUE;
 }
 
 //=================================================================
-// File::open	
+// File::close
 //=================================================================
 /**
-  * Any derived open() members must first call File::open. If File::open
-	* succeeds but the derived class's open failes then make sure to call
-	* File::close() before returning.
-	*/
+ * Must call File::close() for each successful File::open() call.
+ */
 //=================================================================
 
-Bool File::open( const Char *filename, Int access )
-{
-	if( m_open )
-	{
-		return FALSE;
-	}
-
-	setName( filename );
-
-	if( (access & ( STREAMING | WRITE )) == ( STREAMING | WRITE ))
-	{
-		// illegal access
-		return FALSE;
-	}
-
-	if( (access & ( TEXT | BINARY)) == ( TEXT | BINARY ))
-	{
-		// illegal access
-		return FALSE;
-	}
-
-	if ( (access & (READ|WRITE)) == 0 )
-	{
-		access |= READ;
-	}
-
-	if ( !(access & (READ|APPEND)) )
-	{
-		access |= TRUNCATE;
-	}
-
-	if ( (access & (TEXT|BINARY)) == 0 )
-	{
-		access |= BINARY;
-	}
-
-	m_access = access;
-	m_open = TRUE;
-	return TRUE;
+void File::close(void) {
+  if (m_open) {
+    setName("<no file>");
+    m_open = FALSE;
+    if (m_deleteOnClose) {
+      this->deleteInstance();  // on special cases File object will delete
+                               // itself when closing
+    }
+  }
 }
 
 //=================================================================
-// File::close 	
+// File::size
 //=================================================================
 /**
-  * Must call File::close() for each successful File::open() call.
-	*/
+ * Default implementation of File::size. Derived classes can optimize
+ * this member function.
+ */
 //=================================================================
 
-void File::close( void )
-{
-	if( m_open )
-	{
-		setName( "<no file>" );
-		m_open = FALSE;
-		if ( m_deleteOnClose )
-		{
-			this->deleteInstance(); // on special cases File object will delete itself when closing
-		}
-	}
-}
+Int File::size(void) {
+  Int pos = seek(0, CURRENT);
+  Int size = seek(0, END);
 
-//=================================================================
-// File::size 
-//=================================================================
-/**
-  * Default implementation of File::size. Derived classes can optimize
-	* this member function.
-	*/
-//=================================================================
+  seek(pos, START);
 
-Int File::size( void )
-{
-	Int pos = seek( 0, CURRENT );
-	Int size = seek( 0, END );
-
-	seek( pos, START );
-
-	return size < 0 ? 0 : size;
+  return size < 0 ? 0 : size;
 }
 
 //============================================================================
 // File::position
 //============================================================================
 
-Int File::position( void )
-{
-	return seek(0, CURRENT);
-}
+Int File::position(void) { return seek(0, CURRENT); }
 
 //============================================================================
 // File::print
 //============================================================================
 
-Bool	File::print ( const Char *format, ...)
-{
-	Char buffer[10*1024];
-	Int len;
+Bool File::print(const Char *format, ...) {
+  Char buffer[10 * 1024];
+  Int len;
 
-	if ( ! (m_access & TEXT ) )
-	{
-		return FALSE;
-	}
+  if (!(m_access & TEXT)) {
+    return FALSE;
+  }
 
-	va_list args;
-	va_start( args, format );     /* Initialize variable arguments. */
-	len = vsprintf( buffer, format, args );
-	va_end( args );
+  va_list args;
+  va_start(args, format); /* Initialize variable arguments. */
+  len = vsprintf(buffer, format, args);
+  va_end(args);
 
-	if ( len >= sizeof(buffer) )
-	{
-		// Big Problem
-		assert( FALSE );
-		return FALSE;
-	}
+  if (len >= sizeof(buffer)) {
+    // Big Problem
+    assert(FALSE);
+    return FALSE;
+  }
 
-	return (write ( buffer, len ) == len);
+  return (write(buffer, len) == len);
 }
 
-Bool	File::eof() {
-	return (position() == size());
-}
+Bool File::eof() { return (position() == size()); }

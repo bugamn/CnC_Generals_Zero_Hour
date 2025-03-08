@@ -18,16 +18,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: CreateObjectDie.cpp ///////////////////////////////////////////////////////////////////////////
+// FILE: CreateObjectDie.cpp
+// ///////////////////////////////////////////////////////////////////////////
 // Author: Michael S. Booth, January 2002
 // Desc:   Create an object upon this object's death
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 #define DEFINE_OBJECT_STATUS_NAMES
 #include "Common/ThingFactory.h"
@@ -39,26 +41,19 @@
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-CreateObjectDieModuleData::CreateObjectDieModuleData()
-{
-
-	m_ocl = NULL;
-
-}
+CreateObjectDieModuleData::CreateObjectDieModuleData() { m_ocl = NULL; }
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-/*static*/ void CreateObjectDieModuleData::buildFieldParse(MultiIniFieldParse& p)
-{
-	DieModuleData::buildFieldParse(p);
+/*static*/ void CreateObjectDieModuleData::buildFieldParse(
+    MultiIniFieldParse &p) {
+  DieModuleData::buildFieldParse(p);
 
-	static const FieldParse dataFieldParse[] = 
-	{
-		{ "CreationList",	INI::parseObjectCreationList,		NULL,											offsetof( CreateObjectDieModuleData, m_ocl ) },
-		{ 0, 0, 0, 0 }
-	};
-	p.add(dataFieldParse);
-
+  static const FieldParse dataFieldParse[] = {
+      {"CreationList", INI::parseObjectCreationList, NULL,
+       offsetof(CreateObjectDieModuleData, m_ocl)},
+      {0, 0, 0, 0}};
+  p.add(dataFieldParse);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,66 +62,56 @@ CreateObjectDieModuleData::CreateObjectDieModuleData()
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-CreateObjectDie::CreateObjectDie( Thing *thing, const ModuleData* moduleData ) : DieModule( thing, moduleData )
-{
-}
+CreateObjectDie::CreateObjectDie(Thing *thing, const ModuleData *moduleData)
+    : DieModule(thing, moduleData) {}
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-CreateObjectDie::~CreateObjectDie( void )
-{
-
-}
+CreateObjectDie::~CreateObjectDie(void) {}
 
 //-------------------------------------------------------------------------------------------------
 /** The die callback. */
 //-------------------------------------------------------------------------------------------------
-void CreateObjectDie::onDie( const DamageInfo * damageInfo )
-{
-	if (!isDieApplicable(damageInfo))
-		return;
+void CreateObjectDie::onDie(const DamageInfo *damageInfo) {
+  if (!isDieApplicable(damageInfo)) return;
 
-	Object *damageDealer = TheGameLogic->findObjectByID( damageInfo->in.m_sourceID );
+  Object *damageDealer =
+      TheGameLogic->findObjectByID(damageInfo->in.m_sourceID);
 
-	ObjectCreationList::create(getCreateObjectDieModuleData()->m_ocl, getObject(), damageDealer);
+  ObjectCreationList::create(getCreateObjectDieModuleData()->m_ocl, getObject(),
+                             damageDealer);
 }  // end onDie
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void CreateObjectDie::crc( Xfer *xfer )
-{
-
-	// extend base class
-	DieModule::crc( xfer );
+void CreateObjectDie::crc(Xfer *xfer) {
+  // extend base class
+  DieModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void CreateObjectDie::xfer( Xfer *xfer )
-{
+void CreateObjectDie::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// extend base class
-	DieModule::xfer( xfer );
+  // extend base class
+  DieModule::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void CreateObjectDie::loadPostProcess( void )
-{
-
-	// extend base class
-	DieModule::loadPostProcess();
+void CreateObjectDie::loadPostProcess(void) {
+  // extend base class
+  DieModule::loadPostProcess();
 
 }  // end loadPostProcess

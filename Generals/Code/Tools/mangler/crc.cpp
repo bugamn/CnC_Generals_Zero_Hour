@@ -16,28 +16,23 @@
 **	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <signal.h>
 
 #include <iostream>
-#include <signal.h>
 #ifdef _WINDOWS
-#include <process.h> // *MUST* be included before ANY Wnet/Wlib headers if _REENTRANT is defined
+#include <process.h>  // *MUST* be included before ANY Wnet/Wlib headers if _REENTRANT is defined
 #endif
 
-#include "crc.h"
+#include <filed.h>
+#include <udp.h>
+#include <wdebug.h>
+#include <wstring.h>
 
 #include "configfile.h"
-#include "threadfac.h"
-
+#include "crc.h"
 #include "endian.h"
-
+#include "threadfac.h"
 #include "xtime.h"
-#include <filed.h>
-#include <wstring.h>
-#include <wdebug.h>
-#include <udp.h>
-
-
-
 
 /***************************************************************************
  * Add_CRC -- Adds a value to a CRC                                        *
@@ -55,127 +50,118 @@
  * HISTORY:                                                                *
  *   05/09/1995 BRR : Created.                                             *
  *=========================================================================*/
-void Add_CRC(unsigned long *crc, unsigned char val)
-{
-	int hibit;
+void Add_CRC(unsigned long *crc, unsigned char val) {
+  int hibit;
 
-	//cout << "\t\t" << hex << val;
-//	val = htonl(val);
-	//cout << " / " << hex << val <<endl;
+  // cout << "\t\t" << hex << val;
+  //	val = htonl(val);
+  // cout << " / " << hex << val <<endl;
 
-	if ((*crc) & 0x80000000) {
-		hibit = 1;
-	} else {
-		hibit = 0;
-	}
+  if ((*crc) & 0x80000000) {
+    hibit = 1;
+  } else {
+    hibit = 0;
+  }
 
-	(*crc) <<= 1;
-	(*crc) += val;
-	(*crc) += hibit;
+  (*crc) <<= 1;
+  (*crc) += val;
+  (*crc) += hibit;
 
-	//cout << hex << (*crc) <<endl;
+  // cout << hex << (*crc) <<endl;
 }
 
+void Build_Packet_CRC(unsigned char *buf, int len) {
+  if (len < 5) {
+    DBGMSG("Ack!  Constructing a packet too small to hold a CRC!");
+    return;
+  }
+  if (!buf) {
+    DBGMSG("Ack!  Constructing a CRC for a void *");
+    return;
+  }
 
-void Build_Packet_CRC(unsigned char *buf, int len)
-{
-	if (len < 5)
-	{
-		DBGMSG("Ack!  Constructing a packet too small to hold a CRC!");
-		return;
-	}
-	if (!buf)
-	{
-		DBGMSG("Ack!  Constructing a CRC for a void *");
-		return;
-	}
+  *((unsigned long *)buf) = 0;
 
-	*((unsigned long *)buf) = 0;
+  unsigned long *crc_ptr = (unsigned long *)buf;
+  unsigned char *packetptr = (unsigned char *)(buf + 4);
 
-	unsigned long *crc_ptr = (unsigned long *)buf;
-	unsigned char *packetptr = (unsigned char*) (buf+4);
+  len -= 4;  // look past CRC
 
-	len -= 4; // look past CRC
-
-	for (int i=0 ; i<len ; i++) {
-		Add_CRC (crc_ptr, *packetptr++);
-	}
-/*
-	int leftover = len & 3;
-	if (leftover) {
-		unsigned long val = 0;
-		unsigned char *c = (unsigned char *)packetptr;
-		for (int i=0; i<leftover; i++)
-		{
-			val += (c[i] << (i*8));
-		}
-		val = htonl(val);
-		Add_CRC (crc_ptr, val);
-	}
-*/
-	*crc_ptr = htonl(*crc_ptr);
+  for (int i = 0; i < len; i++) {
+    Add_CRC(crc_ptr, *packetptr++);
+  }
+  /*
+          int leftover = len & 3;
+          if (leftover) {
+                  unsigned long val = 0;
+                  unsigned char *c = (unsigned char *)packetptr;
+                  for (int i=0; i<leftover; i++)
+                  {
+                          val += (c[i] << (i*8));
+                  }
+                  val = htonl(val);
+                  Add_CRC (crc_ptr, val);
+          }
+  */
+  *crc_ptr = htonl(*crc_ptr);
 }
-
 
 /***********************************************************************************************
- * Passes_CRC_Check -- Checks the CRC for a packet                                             *
+ * Passes_CRC_Check -- Checks the CRC for a packet *
  *                                                                                             *
  *                                                                                             *
  *                                                                                             *
- * INPUT:    ptr to packet                                                                     *
+ * INPUT:    ptr to packet *
  *                                                                                             *
- * OUTPUT:   true if packet passes CRC check                                                   *
+ * OUTPUT:   true if packet passes CRC check *
  *                                                                                             *
- * WARNINGS: None                                                                              *
+ * WARNINGS: None *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/5/99  1:26PM ST : Created                                                              *
- *   1/9/2001 2:21PM MDC: Ripped from RA2 (WinsockInterfaceClass in wsproto.cpp/queue.cpp)     *
- *  1/31/2001 4:30PM MDC: Converted to network-byte-order so Sparc boxes can talk with Intels. *
- *   2/1/2001 4:07PM MDC: Converted back to Intel order to avoid messing with C&C packets      *
+ * HISTORY: * 10/5/99  1:26PM ST : Created * 1/9/2001 2:21PM MDC: Ripped from
+ *RA2 (WinsockInterfaceClass in wsproto.cpp/queue.cpp)     * 1/31/2001 4:30PM
+ *MDC: Converted to network-byte-order so Sparc boxes can talk with Intels. *
+ *   2/1/2001 4:07PM MDC: Converted back to Intel order to avoid messing with
+ *C&C packets      *
  *=============================================================================================*/
-bool Passes_CRC_Check(unsigned char *buf, int len)
-{
-	if (len < 5)
-	{
-		DBGMSG("Recieved packet too small to contain a CRC");
-		return false;
-	}
-	if (!buf)
-	{
-		DBGMSG("Ack!  Checking a CRC for a void *");
-		return false;
-	}
+bool Passes_CRC_Check(unsigned char *buf, int len) {
+  if (len < 5) {
+    DBGMSG("Recieved packet too small to contain a CRC");
+    return false;
+  }
+  if (!buf) {
+    DBGMSG("Ack!  Checking a CRC for a void *");
+    return false;
+  }
 
-	unsigned long crc = 0;
+  unsigned long crc = 0;
 
-	unsigned long *crc_ptr = &crc;
-	unsigned char *packetptr = (unsigned char*) (buf+4);
+  unsigned long *crc_ptr = &crc;
+  unsigned char *packetptr = (unsigned char *)(buf + 4);
 
-	len -= 4; // remove the CRC from packet size - just look at payload
+  len -= 4;  // remove the CRC from packet size - just look at payload
 
-	for (int i=0 ; i<len ; i++) {
-		Add_CRC (crc_ptr, *packetptr++);
-	}
-/*
-	int leftover = len & 3;
-	if (leftover) {
-		unsigned long val = 0;
-		unsigned char *c = (unsigned char *)packetptr;
-		for (int i=0; i<leftover; i++)
-		{
-			val += (c[i] << (i*8));
-		}
-		val = htonl(val);
-		Add_CRC (crc_ptr, val);
-	}
-*/
-	crc = htonl(crc);
+  for (int i = 0; i < len; i++) {
+    Add_CRC(crc_ptr, *packetptr++);
+  }
+  /*
+          int leftover = len & 3;
+          if (leftover) {
+                  unsigned long val = 0;
+                  unsigned char *c = (unsigned char *)packetptr;
+                  for (int i=0; i<leftover; i++)
+                  {
+                          val += (c[i] << (i*8));
+                  }
+                  val = htonl(val);
+                  Add_CRC (crc_ptr, val);
+          }
+  */
+  crc = htonl(crc);
 
-	if (crc == *((unsigned long *)buf)) {
-		return (true);
-	}
+  if (crc == *((unsigned long *)buf)) {
+    return (true);
+  }
 
-	DBGMSG("Invalid packet CRC");
-	return (false);
+  DBGMSG("Invalid packet CRC");
+  return (false);
 }

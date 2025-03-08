@@ -18,24 +18,26 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: BaseRegenerateUpdate.cpp /////////////////////////////////////////////////////////////////
-// Author: Colin Day, July 2002
-// Desc:   Update module for base objects automatically regenerating health
+// FILE: BaseRegenerateUpdate.cpp
+// ///////////////////////////////////////////////////////////////// Author:
+// Colin Day, July 2002 Desc:   Update module for base objects automatically
+// regenerating health
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
 #include "Common/GlobalData.h"
 #include "Common/Xfer.h"
 #include "GameLogic/GameLogic.h"
 #include "GameLogic/Module/BaseRegenerateUpdate.h"
 #include "GameLogic/Module/BodyModule.h"
 #include "GameLogic/Object.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,24 +45,16 @@
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-BaseRegenerateUpdateModuleData::BaseRegenerateUpdateModuleData()
-{
-
-}
+BaseRegenerateUpdateModuleData::BaseRegenerateUpdateModuleData() {}
 
 //-------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-void BaseRegenerateUpdateModuleData::buildFieldParse( MultiIniFieldParse &p ) 
-{
-  UpdateModuleData::buildFieldParse( p );
+void BaseRegenerateUpdateModuleData::buildFieldParse(MultiIniFieldParse &p) {
+  UpdateModuleData::buildFieldParse(p);
 
-	static const FieldParse dataFieldParse[] = 
-	{
-		{ 0, 0, 0, 0 }
-	};
+  static const FieldParse dataFieldParse[] = {{0, 0, 0, 0}};
 
-  p.add( dataFieldParse );
-
+  p.add(dataFieldParse);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,118 +63,98 @@ void BaseRegenerateUpdateModuleData::buildFieldParse( MultiIniFieldParse &p )
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-BaseRegenerateUpdate::BaseRegenerateUpdate( Thing *thing, const ModuleData* moduleData ) 
-										: UpdateModule( thing, moduleData )
-{
-
-	if( TheGlobalData->m_baseRegenHealthPercentPerSecond == 0.0f )
-	{
-		setWakeFrame(getObject(), UPDATE_SLEEP_FOREVER);
-	}
-	else
-	{
-		setWakeFrame(getObject(), UPDATE_SLEEP_NONE);
-	}
+BaseRegenerateUpdate::BaseRegenerateUpdate(Thing *thing,
+                                           const ModuleData *moduleData)
+    : UpdateModule(thing, moduleData) {
+  if (TheGlobalData->m_baseRegenHealthPercentPerSecond == 0.0f) {
+    setWakeFrame(getObject(), UPDATE_SLEEP_FOREVER);
+  } else {
+    setWakeFrame(getObject(), UPDATE_SLEEP_NONE);
+  }
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-BaseRegenerateUpdate::~BaseRegenerateUpdate( void )
-{
-}
+BaseRegenerateUpdate::~BaseRegenerateUpdate(void) {}
 
 //-------------------------------------------------------------------------------------------------
 /** Damage has been dealt, this is an opportunity to reach to that damage */
 //-------------------------------------------------------------------------------------------------
-void BaseRegenerateUpdate::onDamage( DamageInfo *damageInfo )
-{
-	if (TheGlobalData->m_baseRegenHealthPercentPerSecond > 0.0 &&
-			damageInfo->in.m_damageType != DAMAGE_HEALING)
-	{
-		setWakeFrame(getObject(), UPDATE_SLEEP(TheGlobalData->m_baseRegenDelay));
-	}
-	else
-	{
-		setWakeFrame(getObject(), UPDATE_SLEEP_FOREVER);
-	}
+void BaseRegenerateUpdate::onDamage(DamageInfo *damageInfo) {
+  if (TheGlobalData->m_baseRegenHealthPercentPerSecond > 0.0 &&
+      damageInfo->in.m_damageType != DAMAGE_HEALING) {
+    setWakeFrame(getObject(), UPDATE_SLEEP(TheGlobalData->m_baseRegenDelay));
+  } else {
+    setWakeFrame(getObject(), UPDATE_SLEEP_FOREVER);
+  }
 }
 
 //-------------------------------------------------------------------------------------------------
-/** The update callback, this is pretty similar to AutoHealUpdate, but that module is supposed
-	* to be used in concert with an upgrade and doesn't have any of the "only regenerate
-	* if we haven't been damaged recently" restrictions */
+/** The update callback, this is pretty similar to AutoHealUpdate, but that
+ * module is supposed to be used in concert with an upgrade and doesn't have any
+ * of the "only regenerate if we haven't been damaged recently" restrictions */
 //-------------------------------------------------------------------------------------------------
-UpdateSleepTime BaseRegenerateUpdate::update( void )
-{
-	// this is us!
-	Object *me = getObject();
-	
-	if( me->testStatus(OBJECT_STATUS_UNDER_CONSTRUCTION) )
-	{
-		return UPDATE_SLEEP_NONE;
-	}
+UpdateSleepTime BaseRegenerateUpdate::update(void) {
+  // this is us!
+  Object *me = getObject();
 
-	if( me->testStatus(OBJECT_STATUS_SOLD) )
-	{
-		return UPDATE_SLEEP_FOREVER;
-	}
+  if (me->testStatus(OBJECT_STATUS_UNDER_CONSTRUCTION)) {
+    return UPDATE_SLEEP_NONE;
+  }
 
-	// do not heal if we are at max health already
-	BodyModuleInterface *body = me->getBodyModule();
-	if( body->getMaxHealth() == body->getHealth() )
-	{
-		return UPDATE_SLEEP_FOREVER;	// sleep till we get damaged again
-	}
-	else
-	{
-		// we don't really need to heal every frame. do it every 3 frames or so.
-		const Int HEAL_RATE = 3;
+  if (me->testStatus(OBJECT_STATUS_SOLD)) {
+    return UPDATE_SLEEP_FOREVER;
+  }
 
-		// do some healing
-		Real amount = HEAL_RATE * (body->getMaxHealth() * TheGlobalData->m_baseRegenHealthPercentPerSecond) / 
-														 LOGICFRAMES_PER_SECOND;
-		me->attemptHealing(amount, me);
+  // do not heal if we are at max health already
+  BodyModuleInterface *body = me->getBodyModule();
+  if (body->getMaxHealth() == body->getHealth()) {
+    return UPDATE_SLEEP_FOREVER;  // sleep till we get damaged again
+  } else {
+    // we don't really need to heal every frame. do it every 3 frames or so.
+    const Int HEAL_RATE = 3;
 
-		return UPDATE_SLEEP(HEAL_RATE);
-	}
+    // do some healing
+    Real amount = HEAL_RATE *
+                  (body->getMaxHealth() *
+                   TheGlobalData->m_baseRegenHealthPercentPerSecond) /
+                  LOGICFRAMES_PER_SECOND;
+    me->attemptHealing(amount, me);
+
+    return UPDATE_SLEEP(HEAL_RATE);
+  }
 }  // end update
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void BaseRegenerateUpdate::crc( Xfer *xfer )
-{
-
-	// extend base class
-	UpdateModule::crc( xfer );
+void BaseRegenerateUpdate::crc(Xfer *xfer) {
+  // extend base class
+  UpdateModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void BaseRegenerateUpdate::xfer( Xfer *xfer )
-{
+void BaseRegenerateUpdate::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// extend base class
-	UpdateModule::xfer( xfer );
+  // extend base class
+  UpdateModule::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void BaseRegenerateUpdate::loadPostProcess( void )
-{
-
-	// extend base class
-	UpdateModule::loadPostProcess();
+void BaseRegenerateUpdate::loadPostProcess(void) {
+  // extend base class
+  UpdateModule::loadPostProcess();
 
 }  // end loadPostProcess

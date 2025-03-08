@@ -18,61 +18,55 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: INICommandButton.cpp /////////////////////////////////////////////////////////////////////
-// Author: Colin Day, March 2002
-// Desc:   Command buttons are the atomic units we can configure into command sets to then
+// FILE: INICommandButton.cpp
+// ///////////////////////////////////////////////////////////////////// Author:
+// Colin Day, March 2002 Desc:   Command buttons are the atomic units we can
+// configure into command sets to then
 //				 display in the context sensitive user interface
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// USER INCLUDES //////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
+// USER INCLUDES
+// //////////////////////////////////////////////////////////////////////////////////
 #include "Common/INI.h"
 #include "GameClient/ControlBar.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-------------------------------------------------------------------------------------------------
 /** Parse a command button */
 //-------------------------------------------------------------------------------------------------
-void INI::parseCommandButtonDefinition( INI *ini )
-{
-	ControlBar::parseCommandButtonDefinition(ini);
+void INI::parseCommandButtonDefinition(INI *ini) {
+  ControlBar::parseCommandButtonDefinition(ini);
 }
 
 //-------------------------------------------------------------------------------------------------
 /** Parse a command button */
 //-------------------------------------------------------------------------------------------------
-void ControlBar::parseCommandButtonDefinition( INI *ini )
-{
-	// read the name
-	AsciiString name = ini->getNextToken();
+void ControlBar::parseCommandButtonDefinition(INI *ini) {
+  // read the name
+  AsciiString name = ini->getNextToken();
 
-	// find existing item if present
-	CommandButton *button = TheControlBar->findNonConstCommandButton( name );
-	if( button == NULL )
-	{
-		// allocate a new item
-		button = TheControlBar->newCommandButton( name );
-		if (ini->getLoadType() == INI_LOAD_CREATE_OVERRIDES) 
-		{
-			button->markAsOverride();
-		}
-	}  // end if
-	else if( ini->getLoadType() != INI_LOAD_CREATE_OVERRIDES )
-	{
-		DEBUG_CRASH(( "[LINE: %d in '%s'] Duplicate commandbutton %s found!", ini->getLineNum(), ini->getFilename().str(), name.str() ));
-	}
-	else
-	{
-		button = TheControlBar->newCommandButtonOverride( button );
-	}
+  // find existing item if present
+  CommandButton *button = TheControlBar->findNonConstCommandButton(name);
+  if (button == NULL) {
+    // allocate a new item
+    button = TheControlBar->newCommandButton(name);
+    if (ini->getLoadType() == INI_LOAD_CREATE_OVERRIDES) {
+      button->markAsOverride();
+    }
+  }  // end if
+  else if (ini->getLoadType() != INI_LOAD_CREATE_OVERRIDES) {
+    DEBUG_CRASH(("[LINE: %d in '%s'] Duplicate commandbutton %s found!",
+                 ini->getLineNum(), ini->getFilename().str(), name.str()));
+  } else {
+    button = TheControlBar->newCommandButtonOverride(button);
+  }
 
-	// parse the ini definition
-	ini->initFromINI( button, button->getFieldParse() );
+  // parse the ini definition
+  ini->initFromINI(button, button->getFieldParse());
 
 }  // end parseCommandButtonDefinition
-
-

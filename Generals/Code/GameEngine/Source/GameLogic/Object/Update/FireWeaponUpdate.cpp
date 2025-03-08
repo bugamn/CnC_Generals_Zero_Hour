@@ -18,120 +18,111 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: FireWeaponUpdate.h /////////////////////////////////////////////////////////////////////////
+// FILE: FireWeaponUpdate.h
+// /////////////////////////////////////////////////////////////////////////
 // Author: Graham Smallwood, August 2002
 // Desc:   Update fires a weapon at its own feet as quickly as the weapon allows
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
+#include "GameLogic/Module/FireWeaponUpdate.h"
 
 #include "Common/Xfer.h"
 #include "GameLogic/Object.h"
-#include "GameLogic/Module/FireWeaponUpdate.h"
 #include "GameLogic/WeaponStatus.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 #ifdef _INTERNAL
 // for occasional debugging...
-//#pragma optimize("", off)
-//#pragma MESSAGE("************************************** WARNING, optimization disabled for debugging purposes")
+// #pragma optimize("", off)
+// #pragma MESSAGE("************************************** WARNING, optimization
+// disabled for debugging purposes")
 #endif
 
 //-------------------------------------------------------------------------------------------------
-FireWeaponUpdateModuleData::FireWeaponUpdateModuleData()
-{
-	m_weaponTemplate = NULL;
+FireWeaponUpdateModuleData::FireWeaponUpdateModuleData() {
+  m_weaponTemplate = NULL;
 }
 
 //-------------------------------------------------------------------------------------------------
-/*static*/ void FireWeaponUpdateModuleData::buildFieldParse(MultiIniFieldParse& p) 
-{
+/*static*/ void FireWeaponUpdateModuleData::buildFieldParse(
+    MultiIniFieldParse &p) {
   UpdateModuleData::buildFieldParse(p);
 
-	static const FieldParse dataFieldParse[] = 
-	{
-		{ "Weapon",	INI::parseWeaponTemplate,	NULL, offsetof( FireWeaponUpdateModuleData, m_weaponTemplate ) },
-		{ 0, 0, 0, 0 }
-	};
+  static const FieldParse dataFieldParse[] = {
+      {"Weapon", INI::parseWeaponTemplate, NULL,
+       offsetof(FireWeaponUpdateModuleData, m_weaponTemplate)},
+      {0, 0, 0, 0}};
   p.add(dataFieldParse);
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-FireWeaponUpdate::FireWeaponUpdate( Thing *thing, const ModuleData* moduleData ) : 
-	UpdateModule( thing, moduleData ),
-	m_weapon(NULL)
-{
-	const WeaponTemplate *tmpl = getFireWeaponUpdateModuleData()->m_weaponTemplate;
-	if (tmpl)
-	{
-		m_weapon = TheWeaponStore->allocateNewWeapon(tmpl, PRIMARY_WEAPON);
-		m_weapon->loadAmmoNow( getObject() );
-	}
+FireWeaponUpdate::FireWeaponUpdate(Thing *thing, const ModuleData *moduleData)
+    : UpdateModule(thing, moduleData), m_weapon(NULL) {
+  const WeaponTemplate *tmpl =
+      getFireWeaponUpdateModuleData()->m_weaponTemplate;
+  if (tmpl) {
+    m_weapon = TheWeaponStore->allocateNewWeapon(tmpl, PRIMARY_WEAPON);
+    m_weapon->loadAmmoNow(getObject());
+  }
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-FireWeaponUpdate::~FireWeaponUpdate( void )
-{
-	if (m_weapon)
-		m_weapon->deleteInstance();
+FireWeaponUpdate::~FireWeaponUpdate(void) {
+  if (m_weapon) m_weapon->deleteInstance();
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-UpdateSleepTime FireWeaponUpdate::update( void )
-{
-	// If my weapon is ready, shoot it.
-	if( m_weapon && m_weapon->getStatus() == READY_TO_FIRE )
-	{
-		m_weapon->forceFireWeapon( getObject(), getObject()->getPosition() );
-	}
-	return UPDATE_SLEEP_NONE;
+UpdateSleepTime FireWeaponUpdate::update(void) {
+  // If my weapon is ready, shoot it.
+  if (m_weapon && m_weapon->getStatus() == READY_TO_FIRE) {
+    m_weapon->forceFireWeapon(getObject(), getObject()->getPosition());
+  }
+  return UPDATE_SLEEP_NONE;
 }
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void FireWeaponUpdate::crc( Xfer *xfer )
-{
-	// extend base class
-	UpdateModule::crc( xfer );
+void FireWeaponUpdate::crc(Xfer *xfer) {
+  // extend base class
+  UpdateModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void FireWeaponUpdate::xfer( Xfer *xfer )
-{
+void FireWeaponUpdate::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
+  // extend base class
+  UpdateModule::xfer(xfer);
 
-	// extend base class
-	UpdateModule::xfer( xfer );
-
-	// weapon
-	xfer->xferSnapshot( m_weapon );
+  // weapon
+  xfer->xferSnapshot(m_weapon);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void FireWeaponUpdate::loadPostProcess( void )
-{
-
-	// extend base class
-	UpdateModule::loadPostProcess();
+void FireWeaponUpdate::loadPostProcess(void) {
+  // extend base class
+  UpdateModule::loadPostProcess();
 
 }  // end loadPostProcess

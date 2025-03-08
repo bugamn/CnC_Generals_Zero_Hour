@@ -18,19 +18,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 ///// EstablishConnectionsWindow.cpp /////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
-
-#include "GameClient/GameWindowManager.h"
 #include "Common/NameKeyGenerator.h"
 #include "GameClient/EstablishConnectionsMenu.h"
+#include "GameClient/GameWindowManager.h"
 #include "GameNetwork/GUIUtil.h"
 #include "GameNetwork/GameSpy/StagingRoomGameInfo.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 static WindowLayout *establishConnectionsLayout;
 
@@ -70,125 +69,114 @@ static GameWindow *staticPlayer7Status = NULL;
 
 static const char *layoutFilename = "GameSpyGameOptionsMenu.wnd";
 static const char *parentName = "GameSpyGameOptionsMenuParent";
-static const char *gadgetsToHide[] =
-{
-	"MapWindow",
-	"StaticTextGameName",
-	"StaticTextTeam",
-	"StaticTextFaction",
-	"StaticTextColor",
-	"StaticTextPlayers",
-	"TextEntryMapDisplay",
-	"ButtonSelectMap",
-	"ButtonStart",
-	"StaticTextMapPreview",
-	NULL // keep this last
+static const char *gadgetsToHide[] = {
+    "MapWindow",
+    "StaticTextGameName",
+    "StaticTextTeam",
+    "StaticTextFaction",
+    "StaticTextColor",
+    "StaticTextPlayers",
+    "TextEntryMapDisplay",
+    "ButtonSelectMap",
+    "ButtonStart",
+    "StaticTextMapPreview",
+    NULL  // keep this last
 };
-static const char *perPlayerGadgetsToHide[] =
-{
-	"ComboBoxTeam",
-	"ComboBoxColor",
-	"ComboBoxPlayerTemplate",
-	"ComboBoxPlayer",
-	"ButtonAccept",
-	"GenericPing",
-	//"ButtonStartPosition",
-	NULL // keep this last
+static const char *perPlayerGadgetsToHide[] = {
+    "ComboBoxTeam", "ComboBoxColor", "ComboBoxPlayerTemplate", "ComboBoxPlayer",
+    "ButtonAccept", "GenericPing",
+    //"ButtonStartPosition",
+    NULL  // keep this last
 };
 
 static const char *qmlayoutFilename = "WOLQuickMatchMenu.wnd";
 static const char *qmparentName = "WOLQuickMatchMenuParent";
-static const char *qmgadgetsToHide[] =
-{
-	"StaticTextTitle",
-	"ButtonBack",
-	"ButtonOptions",
-	"ButtonBuddies",
-	"ButtonWiden",
-	"ButtonStop",
-	"ButtonStart",
-	NULL // keep this last
+static const char *qmgadgetsToHide[] = {
+    "StaticTextTitle",
+    "ButtonBack",
+    "ButtonOptions",
+    "ButtonBuddies",
+    "ButtonWiden",
+    "ButtonStop",
+    "ButtonStart",
+    NULL  // keep this last
 };
-static const char *qmperPlayerGadgetsToHide[] =
-{
-	//"ButtonStartPosition",
-	NULL // keep this last
+static const char *qmperPlayerGadgetsToHide[] = {
+    //"ButtonStartPosition",
+    NULL  // keep this last
 };
 
-static void showGameSpyGameOptionsUnderlyingGUIElements( Bool show )
-{
-	ShowUnderlyingGUIElements( show, layoutFilename, parentName, gadgetsToHide, perPlayerGadgetsToHide );
-	
+static void showGameSpyGameOptionsUnderlyingGUIElements(Bool show) {
+  ShowUnderlyingGUIElements(show, layoutFilename, parentName, gadgetsToHide,
+                            perPlayerGadgetsToHide);
 }
-static void showGameSpyQMUnderlyingGUIElements( Bool show )
-{
-	ShowUnderlyingGUIElements( show, qmlayoutFilename, qmparentName, qmgadgetsToHide, qmperPlayerGadgetsToHide );
-}
-
-static void InitEstablishConnectionsDialog( void ) {
-	buttonQuitID = TheNameKeyGenerator->nameToKey( AsciiString("EstablishConnectionsScreen.wnd:ButtonQuit") );
-	buttonQuitWindow = TheWindowManager->winGetWindowFromId(NULL, buttonQuitID);
+static void showGameSpyQMUnderlyingGUIElements(Bool show) {
+  ShowUnderlyingGUIElements(show, qmlayoutFilename, qmparentName,
+                            qmgadgetsToHide, qmperPlayerGadgetsToHide);
 }
 
-void ShowEstablishConnectionsWindow( void ) {
-	if (establishConnectionsLayout == NULL) {
-		establishConnectionsLayout = TheWindowManager->winCreateLayout( "Menus/EstablishConnectionsScreen.wnd" );
-		InitEstablishConnectionsDialog();
-	}
-	establishConnectionsLayout->hide(FALSE);
-	TheWindowManager->winSetFocus(establishConnectionsLayout->getFirstWindow());
-	if (!TheGameSpyGame->isQMGame())
-	{
-		showGameSpyGameOptionsUnderlyingGUIElements(FALSE);
-	}
-	else
-	{
-		showGameSpyQMUnderlyingGUIElements(FALSE);
-	}
+static void InitEstablishConnectionsDialog(void) {
+  buttonQuitID = TheNameKeyGenerator->nameToKey(
+      AsciiString("EstablishConnectionsScreen.wnd:ButtonQuit"));
+  buttonQuitWindow = TheWindowManager->winGetWindowFromId(NULL, buttonQuitID);
 }
 
-void HideEstablishConnectionsWindow( void ) {
-	if (establishConnectionsLayout == NULL) {
-//		establishConnectionsLayout = TheWindowManager->winCreateLayout( "Menus/EstablishConnectionsScreen.wnd" );
-//		InitEstablishConnectionsDialog();
-		return;
-	}
-//	establishConnectionsLayout->hide(TRUE);
-//	establishConnectionsLayout->hide(TRUE);
-//	TheWindowManager->winDestroy(establishConnectionsLayout);
-	establishConnectionsLayout->destroyWindows();
-	establishConnectionsLayout->deleteInstance();
-	establishConnectionsLayout = NULL;
-	if (!TheGameSpyGame->isQMGame())
-	{
-		showGameSpyGameOptionsUnderlyingGUIElements(TRUE);
-	}
-	else
-	{
-		showGameSpyQMUnderlyingGUIElements(TRUE);
-	}
+void ShowEstablishConnectionsWindow(void) {
+  if (establishConnectionsLayout == NULL) {
+    establishConnectionsLayout = TheWindowManager->winCreateLayout(
+        "Menus/EstablishConnectionsScreen.wnd");
+    InitEstablishConnectionsDialog();
+  }
+  establishConnectionsLayout->hide(FALSE);
+  TheWindowManager->winSetFocus(establishConnectionsLayout->getFirstWindow());
+  if (!TheGameSpyGame->isQMGame()) {
+    showGameSpyGameOptionsUnderlyingGUIElements(FALSE);
+  } else {
+    showGameSpyQMUnderlyingGUIElements(FALSE);
+  }
 }
 
-WindowMsgHandledType EstablishConnectionsControlInput(GameWindow *window, UnsignedInt msg,
-																											WindowMsgData mData1, WindowMsgData mData2) {
-
-	return MSG_IGNORED;
+void HideEstablishConnectionsWindow(void) {
+  if (establishConnectionsLayout == NULL) {
+    //		establishConnectionsLayout = TheWindowManager->winCreateLayout(
+    //"Menus/EstablishConnectionsScreen.wnd" );
+    //		InitEstablishConnectionsDialog();
+    return;
+  }
+  //	establishConnectionsLayout->hide(TRUE);
+  //	establishConnectionsLayout->hide(TRUE);
+  //	TheWindowManager->winDestroy(establishConnectionsLayout);
+  establishConnectionsLayout->destroyWindows();
+  establishConnectionsLayout->deleteInstance();
+  establishConnectionsLayout = NULL;
+  if (!TheGameSpyGame->isQMGame()) {
+    showGameSpyGameOptionsUnderlyingGUIElements(TRUE);
+  } else {
+    showGameSpyQMUnderlyingGUIElements(TRUE);
+  }
 }
 
-WindowMsgHandledType EstablishConnectionsControlSystem(GameWindow *window, UnsignedInt msg,
-																											 WindowMsgData mData1, WindowMsgData mData2) {
+WindowMsgHandledType EstablishConnectionsControlInput(GameWindow *window,
+                                                      UnsignedInt msg,
+                                                      WindowMsgData mData1,
+                                                      WindowMsgData mData2) {
+  return MSG_IGNORED;
+}
 
-	switch (msg) {
-		case GBM_SELECTED:
-			{
-				GameWindow *control = (GameWindow *)mData1;
-				Int controlID = control->winGetWindowId();
+WindowMsgHandledType EstablishConnectionsControlSystem(GameWindow *window,
+                                                       UnsignedInt msg,
+                                                       WindowMsgData mData1,
+                                                       WindowMsgData mData2) {
+  switch (msg) {
+    case GBM_SELECTED: {
+      GameWindow *control = (GameWindow *)mData1;
+      Int controlID = control->winGetWindowId();
 
-				if (controlID == buttonQuitID) {
-					TheEstablishConnectionsMenu->abortGame();
-				}
-				break;
-			}
-	} // end switch
-	return MSG_HANDLED;
+      if (controlID == buttonQuitID) {
+        TheEstablishConnectionsMenu->abortGame();
+      }
+      break;
+    }
+  }  // end switch
+  return MSG_HANDLED;
 }

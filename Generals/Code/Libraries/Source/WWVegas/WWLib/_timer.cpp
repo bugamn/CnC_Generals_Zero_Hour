@@ -17,26 +17,28 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : Command & Conquer                                            *
+ *                 Project Name : Command & Conquer *
  *                                                                                             *
- *                     $Archive:: /Commando/Library/_Timer.cpp                                $*
+ *                     $Archive:: /Commando/Library/_Timer.cpp $*
  *                                                                                             *
- *                      $Author:: Greg_h                                                      $*
+ *                      $Author:: Greg_h $*
  *                                                                                             *
- *                     $Modtime:: 7/22/97 11:37a                                              $*
+ *                     $Modtime:: 7/22/97 11:37a $*
  *                                                                                             *
- *                    $Revision:: 1                                                           $*
+ *                    $Revision:: 1 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
-#include	"always.h"
-#include	"_timer.h"
+#include "_timer.h"
 
+#include "always.h"
 
 /***************************************************************************
 **	Game frame timer (this is synced between processes).
@@ -47,5 +49,3 @@ CDTimerClass<SystemTimerClass> FrameTimer;
 ** Tick Count global timer object.
 */
 TTimerClass<SystemTimerClass> TickCount = 0;
-
-

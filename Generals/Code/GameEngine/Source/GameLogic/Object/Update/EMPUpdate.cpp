@@ -18,290 +18,268 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: EMPUpdate.cpp ///////////////////////////////////////////////////////////////////////
+// FILE: EMPUpdate.cpp
+// ///////////////////////////////////////////////////////////////////////
 // Author: Mark Lorenzen Sept. 2002
-// Desc:   Update that makes the electromagnetic pulse field grow, fade and disable junk
+// Desc:   Update that makes the electromagnetic pulse field grow, fade and
+// disable junk
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
+#include "GameLogic/Module/EMPUpdate.h"
 
+#include "Common/INI.h"
+#include "Common/KindOf.h"
+#include "Common/Player.h"
+#include "Common/RandomValue.h"
 #include "Common/Thing.h"
 #include "Common/ThingTemplate.h"
-#include "Common/INI.h"
-#include "Common/RandomValue.h"
-#include "Common/Player.h"
+#include "GameClient/Drawable.h"
+#include "GameClient/ParticleSys.h"
 #include "GameLogic/GameLogic.h"
-#include "GameLogic/Module/EMPUpdate.h"
-#include "GameLogic/ObjectIter.h"
-#include "GameLogic/PartitionManager.h"
 #include "GameLogic/Module/AIUpdate.h"
 #include "GameLogic/Object.h"
-#include "GameClient/Drawable.h"
-#include "Common/KindOf.h"
-#include "GameClient/ParticleSys.h"
-
-
-
+#include "GameLogic/ObjectIter.h"
+#include "GameLogic/PartitionManager.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 #ifdef _INTERNAL
 // for occasional debugging...
-//#pragma optimize("", off)
-//#pragma MESSAGE("************************************** WARNING, optimization disabled for debugging purposes")
+// #pragma optimize("", off)
+// #pragma MESSAGE("************************************** WARNING, optimization
+// disabled for debugging purposes")
 #endif
-
-
-
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //	Static member initialization
 ///////////////////////////////////////////////////////////////////////////////////////////
-//Bool	EMPUpdate::s_lastInstanceSpunPositive	= FALSE;
+// Bool	EMPUpdate::s_lastInstanceSpunPositive	= FALSE;
 
 //-------------------------------------------------------------------------------------------------
-static void saturateRGB(RGBColor& color, Real factor)
-{
-	color.red *= factor;
-	color.green *= factor;
-	color.blue *= factor;
+static void saturateRGB(RGBColor &color, Real factor) {
+  color.red *= factor;
+  color.green *= factor;
+  color.blue *= factor;
 
-	Real halfFactor = factor * 0.5f;
+  Real halfFactor = factor * 0.5f;
 
-	color.red -= halfFactor;
-	color.green -= halfFactor;
-	color.blue -= halfFactor;
-
+  color.red -= halfFactor;
+  color.green -= halfFactor;
+  color.blue -= halfFactor;
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-EMPUpdate::EMPUpdate( Thing *thing, const ModuleData* moduleData ) : UpdateModule( thing, moduleData )
-{
+EMPUpdate::EMPUpdate(Thing *thing, const ModuleData *moduleData)
+    : UpdateModule(thing, moduleData) {
+  // s_lastInstanceSpunPositive = !s_lastInstanceSpunPositive; //TOGGLES STATIC
+  // BOOL
 
-	//s_lastInstanceSpunPositive = !s_lastInstanceSpunPositive; //TOGGLES STATIC BOOL 
+  const EMPUpdateModuleData *data = getEMPUpdateModuleData();
+  if (data) {
+    // SANITY
+    DEBUG_ASSERTCRASH(TheGameLogic,
+                      ("EMPUpdate::EMPUpdate - TheGameLogic is NULL\n"));
+    UnsignedInt now = TheGameLogic->getFrame();
 
-	const EMPUpdateModuleData *data = getEMPUpdateModuleData();
-	if ( data )
-	{
-		//SANITY
-		DEBUG_ASSERTCRASH( TheGameLogic, ("EMPUpdate::EMPUpdate - TheGameLogic is NULL\n" ) );
-		UnsignedInt now = TheGameLogic->getFrame();
+    m_currentScale = data->m_startScale;
+    m_dieFrame = REAL_TO_UNSIGNEDINT(now + data->m_lifeFrames);
+    m_tintEnvPlayFrame = REAL_TO_UNSIGNEDINT(now + data->m_startFadeFrame);
+    m_tintEnvFadeFrames = m_dieFrame - m_tintEnvPlayFrame;
+    // m_spinRate = GameLogicRandomValueReal(data->m_spinRateMax * 0.5f,
+    // data->m_spinRateMax);
+    m_targetScale = GameLogicRandomValueReal(data->m_targetScaleMin,
+                                             data->m_targetScaleMax);
+    // if (s_lastInstanceSpunPositive)
+    //{
+    //	m_spinRate *= -1.0f;
+    // }
 
-		m_currentScale = data->m_startScale;
-		m_dieFrame = REAL_TO_UNSIGNEDINT( now + data->m_lifeFrames );			
-		m_tintEnvPlayFrame = REAL_TO_UNSIGNEDINT( now + data->m_startFadeFrame );	
-		m_tintEnvFadeFrames = m_dieFrame - m_tintEnvPlayFrame;
-		//m_spinRate = GameLogicRandomValueReal(data->m_spinRateMax * 0.5f, data->m_spinRateMax);
-		m_targetScale = GameLogicRandomValueReal(data->m_targetScaleMin, data->m_targetScaleMax);
-		//if (s_lastInstanceSpunPositive)
-		//{
-		//	m_spinRate *= -1.0f;
-		//}
+    getObject()->setOrientation(GameLogicRandomValueReal(-PI, PI));
 
-		getObject()->setOrientation(GameLogicRandomValueReal(-PI,PI));
+    DEBUG_ASSERTCRASH(
+        m_tintEnvPlayFrame < m_dieFrame,
+        ("EMPUpdate::EMPUpdate - you cant play fade after death\n"));
 
-		DEBUG_ASSERTCRASH( m_tintEnvPlayFrame < m_dieFrame, ("EMPUpdate::EMPUpdate - you cant play fade after death\n" ) );
-		
-		return;
-	}
+    return;
+  }
 
-	//SANITY
-	DEBUG_ASSERTCRASH( data, ("EMPUpdate::EMPUpdate - getEMPUpdateModuleData is NULL\n" ) );
-	m_currentScale = 1.0f;
-	m_dieFrame = 0;			
-	m_tintEnvFadeFrames = 0;
-	m_tintEnvPlayFrame  = 0;	
-	//m_spinRate = 0;
-	m_targetScale = 1;
+  // SANITY
+  DEBUG_ASSERTCRASH(
+      data, ("EMPUpdate::EMPUpdate - getEMPUpdateModuleData is NULL\n"));
+  m_currentScale = 1.0f;
+  m_dieFrame = 0;
+  m_tintEnvFadeFrames = 0;
+  m_tintEnvPlayFrame = 0;
+  // m_spinRate = 0;
+  m_targetScale = 1;
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-EMPUpdate::~EMPUpdate( void )
-{
+EMPUpdate::~EMPUpdate(void) {}
+
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
+UpdateSleepTime EMPUpdate::update(void) {
+  /// @todo srj use SLEEPY_UPDATE here
+
+  Object *obj = getObject();
+
+  const EMPUpdateModuleData *data = getEMPUpdateModuleData();
+  Drawable *dr = obj->getDrawable();
+  UnsignedInt now = TheGameLogic->getFrame();
+
+  m_currentScale += (m_targetScale - m_currentScale) * 0.05f;
+  dr->setInstanceScale(m_currentScale);
+
+  if (now < m_tintEnvPlayFrame) {
+    RGBColor start = data->m_startColor;
+    saturateRGB(start, 2);
+    dr->colorTint(&start);
+  }
+  if (now == m_tintEnvPlayFrame) {
+    RGBColor end = data->m_endColor;
+    saturateRGB(end, 5);
+    dr->colorFlash(&end, 9999, m_tintEnvFadeFrames, TRUE);
+    doDisableAttack();
+  }
+
+  // Real curSpin = obj->getOrientation();
+  // curSpin += m_spinRate;
+  // curSpin = normalizeAngle(curSpin);
+  // obj->setOrientation( curSpin );
+
+  if (now >= m_dieFrame) obj->kill();
+
+  return UPDATE_SLEEP_NONE;
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
+void EMPUpdate::doDisableAttack(void) {
+  Object *object = getObject();
+  const EMPUpdateModuleData *data = getEMPUpdateModuleData();
+  if (!object || !data) return;  // sanity
 
-UpdateSleepTime EMPUpdate::update( void )
-{
-/// @todo srj use SLEEPY_UPDATE here
+  Real radius = 200.0f;  ///@todo kluge
+  Real curVictimDistSqr;
+  const Coord3D *pos = object->getPosition();
 
-	Object *obj = getObject();
+  SimpleObjectIterator *iter;
+  Object *curVictim;
 
-	const EMPUpdateModuleData *data = getEMPUpdateModuleData();
-	Drawable *dr = obj->getDrawable();
-	UnsignedInt now = TheGameLogic->getFrame();
-	
-	m_currentScale += ( m_targetScale - m_currentScale ) * 0.05f;
-	dr->setInstanceScale( m_currentScale );
+  if (radius > 0.0f) {
+    iter = ThePartitionManager->iterateObjectsInRange(pos, radius,
+                                                      FROM_BOUNDINGSPHERE_3D);
 
-	if ( now < m_tintEnvPlayFrame)
-	{
-		RGBColor start = data->m_startColor;
-		saturateRGB( start, 2 );
-		dr->colorTint( &start );
-	}
-	if ( now == m_tintEnvPlayFrame)
-	{
-		RGBColor end = data->m_endColor;
-		saturateRGB( end, 5 );
-		dr->colorFlash( &end, 9999, m_tintEnvFadeFrames, TRUE );
-		doDisableAttack();
-	}
+    curVictim = iter->firstWithNumeric(&curVictimDistSqr);
+  }
 
-	//Real curSpin = obj->getOrientation();
-	//curSpin += m_spinRate;
-	//curSpin = normalizeAngle(curSpin);
-	//obj->setOrientation( curSpin );
+  MemoryPoolObjectHolder hold(iter);
 
-	if( now >= m_dieFrame )
-		obj->kill();
+  for (; curVictim != NULL;
+       curVictim = iter ? iter->nextWithNumeric(&curVictimDistSqr) : NULL) {
+    if (curVictim != object) {
+      if (!curVictim->isKindOf(KINDOF_VEHICLE) &&
+          !curVictim->isKindOf(KINDOF_STRUCTURE) &&
+          !curVictim->isKindOf(KINDOF_SPAWNS_ARE_THE_WEAPONS)) {
+        // DONT DISABLE PEOPLE, EXCEPT FOR STINGER SOLDIERS
+        continue;
+      } else if (curVictim->isKindOf(KINDOF_AIRCRAFT) &&
+                 curVictim->isAirborneTarget()) {
+        if (curVictim->isKindOf(KINDOF_TRANSPORT) &&
+            curVictim->getRelationship(object) == ALLIES)
+          continue;  // DONT DISABLE YOUR OWN TRANSPORT PLANES
 
-	return UPDATE_SLEEP_NONE;
-}
+        curVictim->kill();  // @todo this should use some sort of DEADSTICK DIE
+                            // or something...
+        Drawable *drw = curVictim->getDrawable();
+        if (drw) {
+          drw->setTintStatus(TINT_STATUS_DISABLED);  // paint it black
+        }
+        continue;
+      } else if (curVictim->isKindOf(KINDOF_STRUCTURE)) {
+        if (!curVictim->isFactionStructure()) continue;
+      }
 
-//-------------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------------
-void EMPUpdate::doDisableAttack( void )
-{
-	Object *object = getObject();
-	const EMPUpdateModuleData *data = getEMPUpdateModuleData();
-	if( !object || !data )
-		return; //sanity
+      // Disable the target for a specified amount of time.
+      curVictim->setDisabledUntil(
+          DISABLED_EMP, TheGameLogic->getFrame() + data->m_disabledDuration);
 
-	Real radius = 200.0f; ///@todo kluge
-	Real curVictimDistSqr;
-	const Coord3D *pos = object->getPosition();
+      Drawable *drw = curVictim->getDrawable();
+      if (drw) {
+        const ParticleSystemTemplate *tmp = data->m_disableFXParticleSystem;
+        if (tmp) {
+          Real victimHeight =
+              curVictim->getGeometryInfo().getMaxHeightAbovePosition();
+          Real victimFootprintArea =
+              curVictim->getGeometryInfo().getFootprintArea();
+          Real victimVolume = victimFootprintArea * MIN(victimHeight, 10.0f);
 
-	SimpleObjectIterator *iter;
-	Object *curVictim;
+          UnsignedInt emitterCount = MAX(
+              15, REAL_TO_INT_CEIL(data->m_sparksPerCubicFoot * victimVolume));
 
-	if (radius > 0.0f)
-	{
-		iter = ThePartitionManager->iterateObjectsInRange(pos, 
-			radius, FROM_BOUNDINGSPHERE_3D);
+          for (Int e = 0; e < emitterCount; ++e) {
+            ParticleSystem *sys =
+                TheParticleSystemManager->createParticleSystem(tmp);
 
-		curVictim = iter->firstWithNumeric(&curVictimDistSqr);
-	} 
+            if (sys) {
+              Coord3D offs = {0, 0, 0};
+              curVictim->getGeometryInfo().makeRandomOffsetWithinFootprint(
+                  offs);
+              offs.z = GameLogicRandomValue(3, victimHeight);
 
-	MemoryPoolObjectHolder hold(iter);
+              // This puts all the sparks within a quadrahemicycloid
+              // (rectangular dome) volume The same shape as a four cornered
+              // camping dome tent, for those with less Greek
+              if (offs.length() > victimHeight) {
+                Real resoreX = offs.x;
+                Real resoreY = offs.y;
+                offs.normalize();
+                offs.z *= victimHeight;
+                offs.x = resoreX;
+                offs.y = resoreY;
+              }
 
-	for ( ; curVictim != NULL; curVictim = iter ? iter->nextWithNumeric(&curVictimDistSqr) : NULL)
-	{
-		if ( curVictim != object)
-		{
-			if ( !curVictim->isKindOf( KINDOF_VEHICLE ) && !curVictim->isKindOf(KINDOF_STRUCTURE) && !curVictim->isKindOf(KINDOF_SPAWNS_ARE_THE_WEAPONS) )
-			{
-				//DONT DISABLE PEOPLE, EXCEPT FOR STINGER SOLDIERS
-				continue;
-			}
-			else if ( curVictim->isKindOf( KINDOF_AIRCRAFT ) && curVictim->isAirborneTarget() )
-			{
-				if ( curVictim->isKindOf( KINDOF_TRANSPORT ) && curVictim->getRelationship( object ) == ALLIES)
-					continue;//DONT DISABLE YOUR OWN TRANSPORT PLANES
-
-				curVictim->kill();// @todo this should use some sort of DEADSTICK DIE or something...
-				Drawable *drw = curVictim->getDrawable();
-				if ( drw )
-				{
-					drw->setTintStatus( TINT_STATUS_DISABLED );// paint it black
-				}
-				continue;
-			}
-			else if ( curVictim->isKindOf( KINDOF_STRUCTURE ) )
-			{
-				if ( ! curVictim->isFactionStructure() )
-					continue;
-			}
-		
-			//Disable the target for a specified amount of time.
-			curVictim->setDisabledUntil( DISABLED_EMP, TheGameLogic->getFrame() + data->m_disabledDuration );
-
-
-			Drawable *drw = curVictim->getDrawable();
-			if ( drw )
-			{
-
-				const ParticleSystemTemplate *tmp = data->m_disableFXParticleSystem;
-				if (tmp)
-				{
-					Real victimHeight = curVictim->getGeometryInfo().getMaxHeightAbovePosition();
-					Real victimFootprintArea = curVictim->getGeometryInfo().getFootprintArea();
-					Real victimVolume = victimFootprintArea * MIN(victimHeight, 10.0f);
-
-					UnsignedInt emitterCount = MAX(15, REAL_TO_INT_CEIL(data->m_sparksPerCubicFoot * victimVolume));
-
-					for (Int e = 0 ; e < emitterCount; ++e)
-					{
-
-						ParticleSystem *sys = TheParticleSystemManager->createParticleSystem(tmp);
-						
-						if (sys)
-						{
-							Coord3D offs = {0,0,0};
-							curVictim->getGeometryInfo().makeRandomOffsetWithinFootprint( offs );
-							offs.z = GameLogicRandomValue(3, victimHeight);
-
-							//This puts all the sparks within a quadrahemicycloid (rectangular dome) volume
-							//The same shape as a four cornered camping dome tent, for those with less Greek
-							if (offs.length() > victimHeight)
-							{
-								Real resoreX = offs.x;
-								Real resoreY = offs.y;
-								offs.normalize();
-								offs.z *= victimHeight;
-								offs.x = resoreX;
-								offs.y = resoreY;
-							}
-
-							sys->attachToObject(curVictim);
-							sys->setPosition( &offs );
-							sys->setSystemLifetime(MAX(0, data->m_disabledDuration - 30));
-							sys->setInitialDelay(GameLogicRandomValue(1,100));
-						}
-					}
-				} 
-			}
-
-		}
-	}
-
+              sys->attachToObject(curVictim);
+              sys->setPosition(&offs);
+              sys->setSystemLifetime(MAX(0, data->m_disabledDuration - 30));
+              sys->setInitialDelay(GameLogicRandomValue(1, 100));
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void EMPUpdate::crc( Xfer *xfer )
-{
-
-}  // end crc
+void EMPUpdate::crc(Xfer *xfer) {}  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void EMPUpdate::xfer( Xfer *xfer )
-{
-
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
+void EMPUpdate::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void EMPUpdate::loadPostProcess( void )
-{
-
-}  // end loadPostProcess
+void EMPUpdate::loadPostProcess(void) {}  // end loadPostProcess

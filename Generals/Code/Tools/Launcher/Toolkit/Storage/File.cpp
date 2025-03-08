@@ -17,24 +17,25 @@
 */
 
 /******************************************************************************
-*
-* FILE
-*     $Archive:  $
-*
-* DESCRIPTION
-*     File functionality for WIN32
-*
-* PROGRAMMER
-*     Denzil E. Long, Jr.
-*     $Author:  $
-*
-* VERSION INFO
-*     $Modtime:  $
-*     $Revision:  $
-*
-******************************************************************************/
+ *
+ * FILE
+ *     $Archive:  $
+ *
+ * DESCRIPTION
+ *     File functionality for WIN32
+ *
+ * PROGRAMMER
+ *     Denzil E. Long, Jr.
+ *     $Author:  $
+ *
+ * VERSION INFO
+ *     $Modtime:  $
+ *     $Revision:  $
+ *
+ ******************************************************************************/
 
 #include "File.h"
+
 #include <Debug\DebugPrint.h>
 #include <assert.h>
 
@@ -42,1068 +43,927 @@
 const HANDLE File::INVALID_HANDLE = INVALID_HANDLE_VALUE;
 
 /******************************************************************************
-*
-* NAME
-*     File
-*
-* DESCRIPTION
-*     Default constructor
-*
-* INPUTS
-*     NONE
-*
-* RETURN
-*     NONE
-*
-******************************************************************************/
+ *
+ * NAME
+ *     File
+ *
+ * DESCRIPTION
+ *     Default constructor
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RETURN
+ *     NONE
+ *
+ ******************************************************************************/
 
-File::File()
-	: mRights(Rights_ReadOnly),
-		mHandle(INVALID_HANDLE)
-	{
-	}
-
+File::File() : mRights(Rights_ReadOnly), mHandle(INVALID_HANDLE) {}
 
 /******************************************************************************
-*
-* NAME
-*     File
-*
-* DESCRIPTION
-*     Create a file instance with the specified name and access rights.
-*
-* INPUTS
-*     Name   - Name of file
-*     Rights - Access rights
-*
-* RETURN
-*     NONE
-*
-******************************************************************************/
+ *
+ * NAME
+ *     File
+ *
+ * DESCRIPTION
+ *     Create a file instance with the specified name and access rights.
+ *
+ * INPUTS
+ *     Name   - Name of file
+ *     Rights - Access rights
+ *
+ * RETURN
+ *     NONE
+ *
+ ******************************************************************************/
 
 File::File(const Char* name, ERights rights)
-	: mRights(rights),
-		mHandle(INVALID_HANDLE)
-	{
-	SetName(name);
-	}
-
+    : mRights(rights), mHandle(INVALID_HANDLE) {
+  SetName(name);
+}
 
 /******************************************************************************
-*
-* NAME
-*     File
-*
-* DESCRIPTION
-*     Create a file instance with the specified name and access rights.
-*
-* INPUTS
-*     Name   - Name of file
-*     Rights - Access rights
-*
-* RETURN
-*     NONE
-*
-******************************************************************************/
+ *
+ * NAME
+ *     File
+ *
+ * DESCRIPTION
+ *     Create a file instance with the specified name and access rights.
+ *
+ * INPUTS
+ *     Name   - Name of file
+ *     Rights - Access rights
+ *
+ * RETURN
+ *     NONE
+ *
+ ******************************************************************************/
 
 File::File(const UString& name, ERights rights)
-	: mName(name),
-	  mRights(rights),
-		mHandle(INVALID_HANDLE)
-	{
-	}
-
+    : mName(name), mRights(rights), mHandle(INVALID_HANDLE) {}
 
 /******************************************************************************
-*
-* NAME
-*     ~File
-*
-* DESCRIPTION
-*     Destroy a file representation.
-*
-* INPUTS
-*     NONE
-*
-* RESULT
-*     NONE
-*
-******************************************************************************/
+ *
+ * NAME
+ *     ~File
+ *
+ * DESCRIPTION
+ *     Destroy a file representation.
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RESULT
+ *     NONE
+ *
+ ******************************************************************************/
 
-File::~File()
-	{
-	// Close any open file.
-	Close();
-	}
-
+File::~File() {
+  // Close any open file.
+  Close();
+}
 
 /******************************************************************************
-*
-* NAME
-*     GetName
-*
-* DESCRIPTION
-*     Retrieve name of file
-*
-* INPUTS
-*     NONE
-*
-* RETURN
-*     Name - Name of file.
-*
-******************************************************************************/
+ *
+ * NAME
+ *     GetName
+ *
+ * DESCRIPTION
+ *     Retrieve name of file
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RETURN
+ *     Name - Name of file.
+ *
+ ******************************************************************************/
 
-const UString& File::GetName(void) const
-	{
-	return mName;
-	}
-
+const UString& File::GetName(void) const { return mName; }
 
 /******************************************************************************
-*
-* NAME
-*     SetName
-*
-* DESCRIPTION
-*     Associate a filename to the file class. Any operations will be performed
-*     on the associated file with the specified name.
-*
-* INPUTS
-*     Filename - Name of file to associate.
-*
-* RESULT
-*     NONE
-*
-******************************************************************************/
+ *
+ * NAME
+ *     SetName
+ *
+ * DESCRIPTION
+ *     Associate a filename to the file class. Any operations will be performed
+ *     on the associated file with the specified name.
+ *
+ * INPUTS
+ *     Filename - Name of file to associate.
+ *
+ * RESULT
+ *     NONE
+ *
+ ******************************************************************************/
 
-void File::SetName(const UString& name)
-	{
-	mName = name;
-	}
-
+void File::SetName(const UString& name) { mName = name; }
 
 /******************************************************************************
-*
-* NAME
-*     GetRights
-*
-* DESCRIPTION
-*     Retrieve file access rights
-*
-* INPUTS
-*     NONE
-*
-* RETURN
-*     Rights - Current access rights for file
-*
-******************************************************************************/
+ *
+ * NAME
+ *     GetRights
+ *
+ * DESCRIPTION
+ *     Retrieve file access rights
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RETURN
+ *     Rights - Current access rights for file
+ *
+ ******************************************************************************/
 
-ERights File::GetRights(void) const
-	{
-	return mRights;
-	}
-
+ERights File::GetRights(void) const { return mRights; }
 
 /******************************************************************************
-*
-* NAME
-*     SetRights
-*
-* DESCRIPTION
-*     Set file access rights
-*
-* INPUTS
-*     Rights - New rights
-*
-* RESULT
-*     NONE
-*
-******************************************************************************/
+ *
+ * NAME
+ *     SetRights
+ *
+ * DESCRIPTION
+ *     Set file access rights
+ *
+ * INPUTS
+ *     Rights - New rights
+ *
+ * RESULT
+ *     NONE
+ *
+ ******************************************************************************/
 
-void File::SetRights(ERights rights)
-	{
-	mRights = rights;
-	}
-
+void File::SetRights(ERights rights) { mRights = rights; }
 
 /******************************************************************************
-*
-* NAME
-*     IsAvailable
-*
-* DESCRIPTION
-*     Checks if the associated file is available for access. If the force
-*     flag is true then the file is check for availabilty until it is found
-*     or the proceedure is aborted via OnError().
-*
-* INPUTS
-*     Force - Force file availability flag.
-*
-* RESULT
-*     Success - Success/Failure condition flag.
-*
-******************************************************************************/
+ *
+ * NAME
+ *     IsAvailable
+ *
+ * DESCRIPTION
+ *     Checks if the associated file is available for access. If the force
+ *     flag is true then the file is check for availabilty until it is found
+ *     or the proceedure is aborted via OnError().
+ *
+ * INPUTS
+ *     Force - Force file availability flag.
+ *
+ * RESULT
+ *     Success - Success/Failure condition flag.
+ *
+ ******************************************************************************/
 
-bool File::IsAvailable(bool force)
-	{
-	// If the filename is invalid then the file is not available.
-	if (mName.Length() == 0)
-		{
-		return false;
-		}
+bool File::IsAvailable(bool force) {
+  // If the filename is invalid then the file is not available.
+  if (mName.Length() == 0) {
+    return false;
+  }
 
-	// If the file is open then it must be available.
-	if (IsOpen())
-		{
-		return true;
-		}
+  // If the file is open then it must be available.
+  if (IsOpen()) {
+    return true;
+  }
 
-	// If this is a forced open then go through the standard file open
-	// procedure so that the abort/retry logic gets called.
-	if (force == true)
-		{
-		Open(GetRights());
-		Close();
-		return true;
-		}
+  // If this is a forced open then go through the standard file open
+  // procedure so that the abort/retry logic gets called.
+  if (force == true) {
+    Open(GetRights());
+    Close();
+    return true;
+  }
 
-	char name[MAX_PATH];
-	mName.ConvertToANSI(name, sizeof(name));
+  char name[MAX_PATH];
+  mName.ConvertToANSI(name, sizeof(name));
 
-	// Attempt to open the file
-	mHandle = CreateFile(name, GENERIC_READ, FILE_SHARE_READ,
-		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  // Attempt to open the file
+  mHandle = CreateFile(name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                       FILE_ATTRIBUTE_NORMAL, NULL);
 
-	// If the open failed then the file is not available.
-	if (mHandle == INVALID_HANDLE)
-		{
-		return false;
-		}
+  // If the open failed then the file is not available.
+  if (mHandle == INVALID_HANDLE) {
+    return false;
+  }
 
-	// Close the file.
-	CloseHandle(mHandle);
-	mHandle = INVALID_HANDLE;
+  // Close the file.
+  CloseHandle(mHandle);
+  mHandle = INVALID_HANDLE;
 
-	return true;
-	}
-
+  return true;
+}
 
 /******************************************************************************
-*
-* NAME
-*     IsOpen
-*
-* DESCRIPTION
-*     Check if the file is open.
-*
-* INPUTS
-*     NONE
-*
-* RETURN
-*     Opened - File is opened if true; otherwise false
-*
-******************************************************************************/
+ *
+ * NAME
+ *     IsOpen
+ *
+ * DESCRIPTION
+ *     Check if the file is open.
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RETURN
+ *     Opened - File is opened if true; otherwise false
+ *
+ ******************************************************************************/
 
-bool File::IsOpen(void) const
-	{
-	return ((mHandle != INVALID_HANDLE) ? true : false);
-	}
-
+bool File::IsOpen(void) const {
+  return ((mHandle != INVALID_HANDLE) ? true : false);
+}
 
 /******************************************************************************
-*
-* NAME
-*     Open
-*
-* DESCRIPTION
-*     Opens the file associated with this file class.
-*
-* INPUTS
-*     Rights - Access rights for the file to open.
-*
-* RESULT
-*     Success - Success/Failure condition flag.
-*
-******************************************************************************/
+ *
+ * NAME
+ *     Open
+ *
+ * DESCRIPTION
+ *     Opens the file associated with this file class.
+ *
+ * INPUTS
+ *     Rights - Access rights for the file to open.
+ *
+ * RESULT
+ *     Success - Success/Failure condition flag.
+ *
+ ******************************************************************************/
 
-File::EFileError File::Open(ERights rights)
-	{
-	// Close any currently opened file
-	Close();
+File::EFileError File::Open(ERights rights) {
+  // Close any currently opened file
+  Close();
 
-	// If the filename is invalid then there is no way to open the file.
-	if (mName.Length() == 0)
-		{
-		OnFileError(FileError_FNF, false);
-		return FileError_FNF;
-		}
+  // If the filename is invalid then there is no way to open the file.
+  if (mName.Length() == 0) {
+    OnFileError(FileError_FNF, false);
+    return FileError_FNF;
+  }
 
-	mRights = rights;
+  mRights = rights;
 
-	char name[MAX_PATH];
-	mName.ConvertToANSI(name, sizeof(name));
+  char name[MAX_PATH];
+  mName.ConvertToANSI(name, sizeof(name));
 
-	// Continue attempting open until successful or aborted.
-	for (;;)
-		{
-		switch (rights)
-			{
-			// Read only access
-			case Rights_ReadOnly:
-				mHandle = CreateFile(name, GENERIC_READ, FILE_SHARE_READ,
-						NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-			break;
+  // Continue attempting open until successful or aborted.
+  for (;;) {
+    switch (rights) {
+      // Read only access
+      case Rights_ReadOnly:
+        mHandle = CreateFile(name, GENERIC_READ, FILE_SHARE_READ, NULL,
+                             OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        break;
 
-			// Write only access
-			case Rights_WriteOnly:
-				mHandle = CreateFile(name, GENERIC_WRITE, 0,
-						NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			break;
+      // Write only access
+      case Rights_WriteOnly:
+        mHandle = CreateFile(name, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
+                             FILE_ATTRIBUTE_NORMAL, NULL);
+        break;
 
-			// Read and Write access
-			case Rights_ReadWrite:
-				mHandle = CreateFile(name, GENERIC_READ | GENERIC_WRITE, 0,
-						NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-			break;
+      // Read and Write access
+      case Rights_ReadWrite:
+        mHandle = CreateFile(name, GENERIC_READ | GENERIC_WRITE, 0, NULL,
+                             OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        break;
 
-			// Unknown rights access violation
-			default:
-				OnFileError(FileError_Access, false);
-				return FileError_Access;
-			break;
-			}
+      // Unknown rights access violation
+      default:
+        OnFileError(FileError_Access, false);
+        return FileError_Access;
+        break;
+    }
 
-		// Check for open failure
-		if (mHandle == INVALID_HANDLE)
-			{
-			PrintWin32Error("File::Open(%S)", mName.Get());
+    // Check for open failure
+    if (mHandle == INVALID_HANDLE) {
+      PrintWin32Error("File::Open(%S)", mName.Get());
 
-			if (GetLastError() == ERROR_FILE_NOT_FOUND)
-				{
-				if (OnFileError(FileError_FNF, true) == false)
-					{
-					return FileError_FNF;
-					}
-				else
-					{
-					continue;
-					}
-				}
-			else
-				{
-				OnFileError(FileError_Open, false);
-				return FileError_Open;
-				}
-			}
+      if (GetLastError() == ERROR_FILE_NOT_FOUND) {
+        if (OnFileError(FileError_FNF, true) == false) {
+          return FileError_FNF;
+        } else {
+          continue;
+        }
+      } else {
+        OnFileError(FileError_Open, false);
+        return FileError_Open;
+      }
+    }
 
-		break;
-		}
+    break;
+  }
 
-	return FileError_None;
-	}
-
+  return FileError_None;
+}
 
 /******************************************************************************
-*
-* NAME
-*     Open
-*
-* DESCRIPTION
-*     Associate a file then open that file.
-*
-* INPUTS
-*     Filename - Name of file to open.
-*     Rights   - Access rights to file.
-*
-* RESULT
-*     Success - Success/Failure condition flag.
-*
-******************************************************************************/
+ *
+ * NAME
+ *     Open
+ *
+ * DESCRIPTION
+ *     Associate a file then open that file.
+ *
+ * INPUTS
+ *     Filename - Name of file to open.
+ *     Rights   - Access rights to file.
+ *
+ * RESULT
+ *     Success - Success/Failure condition flag.
+ *
+ ******************************************************************************/
 
-File::EFileError File::Open(const UString& name, ERights rights)
-	{
-	// Associate the file then attempt to open it.
-	SetName(name);
-	return Open(rights);
-	}
-
+File::EFileError File::Open(const UString& name, ERights rights) {
+  // Associate the file then attempt to open it.
+  SetName(name);
+  return Open(rights);
+}
 
 /******************************************************************************
-*
-* NAME
-*     Close
-*
-* DESCRIPTION
-*     Close access to the file.
-*
-* INPUTS
-*     NONE
-*
-* RESULT
-*     NONE
-*
-******************************************************************************/
+ *
+ * NAME
+ *     Close
+ *
+ * DESCRIPTION
+ *     Close access to the file.
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RESULT
+ *     NONE
+ *
+ ******************************************************************************/
 
-void File::Close(void)
-	{
-	if (IsOpen())
-		{
-		CloseHandle(mHandle);
-		mHandle = INVALID_HANDLE;
-		}
-	}
-
+void File::Close(void) {
+  if (IsOpen()) {
+    CloseHandle(mHandle);
+    mHandle = INVALID_HANDLE;
+  }
+}
 
 /******************************************************************************
-*
-* NAME
-*     Create
-*
-* DESCRIPTION
-*     Creates a file on the local file system with a filename previously
-*     associated with a call to SetName().
-*
-* INPUTS
-*     NONE
-*
-* RESULT
-*     Success - Success/Failure condition flag.
-*
-******************************************************************************/
+ *
+ * NAME
+ *     Create
+ *
+ * DESCRIPTION
+ *     Creates a file on the local file system with a filename previously
+ *     associated with a call to SetName().
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RESULT
+ *     Success - Success/Failure condition flag.
+ *
+ ******************************************************************************/
 
-File::EFileError File::Create(void)
-	{
-	// Close any previous handle
-	Close();
+File::EFileError File::Create(void) {
+  // Close any previous handle
+  Close();
 
-	// Open the file for writing
-	EFileError error = Open(Rights_WriteOnly);
+  // Open the file for writing
+  EFileError error = Open(Rights_WriteOnly);
 
-	if (error == FileError_None)
-		{
-		Close();
-		}
+  if (error == FileError_None) {
+    Close();
+  }
 
-	return error;
-	}
-
+  return error;
+}
 
 /******************************************************************************
-*
-* NAME
-*     Delete
-*
-* DESCRIPTION
-*     Deletes the file on the local file system with the name previously
-*     associated by calling SetName().
-*
-* INPUTS
-*     NONE
-*
-* RESULT
-*     Success - Success/Failure condition flag.
-*
-******************************************************************************/
+ *
+ * NAME
+ *     Delete
+ *
+ * DESCRIPTION
+ *     Deletes the file on the local file system with the name previously
+ *     associated by calling SetName().
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RESULT
+ *     Success - Success/Failure condition flag.
+ *
+ ******************************************************************************/
 
-File::EFileError File::Delete(void)
-	{
-	// Make sure the file is closed.
-	Close();
+File::EFileError File::Delete(void) {
+  // Make sure the file is closed.
+  Close();
 
-	// The file must be available before it can be deleted.
-	if (IsAvailable() == false)
-		{
-		return FileError_FNF;
-		}
-	else
-		{
-		// Delete the file. Pass error conditions to OnError()
-		char name[MAX_PATH];
-		mName.ConvertToANSI(name, sizeof(name));
+  // The file must be available before it can be deleted.
+  if (IsAvailable() == false) {
+    return FileError_FNF;
+  } else {
+    // Delete the file. Pass error conditions to OnError()
+    char name[MAX_PATH];
+    mName.ConvertToANSI(name, sizeof(name));
 
-		if (!DeleteFile(name))
-			{
-			OnFileError(FileError_Fault, false);
-			return FileError_Fault;
-			}
-		}
+    if (!DeleteFile(name)) {
+      OnFileError(FileError_Fault, false);
+      return FileError_Fault;
+    }
+  }
 
-	return FileError_None;
-	}
-
+  return FileError_None;
+}
 
 /******************************************************************************
-*
-* NAME
-*     Load
-*
-* DESCRIPTION
-*     The entire contents of the file is loaded into the specified buffer.
-*
-* INPUTS
-*     outBuffer - Buffer with file contents.
-*
-* RESULT
-*
-******************************************************************************/
+ *
+ * NAME
+ *     Load
+ *
+ * DESCRIPTION
+ *     The entire contents of the file is loaded into the specified buffer.
+ *
+ * INPUTS
+ *     outBuffer - Buffer with file contents.
+ *
+ * RESULT
+ *
+ ******************************************************************************/
 
-File::EFileError File::Load(void*& outBuffer, UInt32& outSize)
-	{
-	outBuffer = NULL;
-	outSize = 0;
+File::EFileError File::Load(void*& outBuffer, UInt32& outSize) {
+  outBuffer = NULL;
+  outSize = 0;
 
-	// Enforce access control
-	if (mRights == Rights_WriteOnly)
-		{
-		OnFileError(FileError_Access, false);
-		return FileError_Access;
-		}
+  // Enforce access control
+  if (mRights == Rights_WriteOnly) {
+    OnFileError(FileError_Access, false);
+    return FileError_Access;
+  }
 
-	EFileError result = FileError_None;
+  EFileError result = FileError_None;
 
-	// Open the file here if it isn't already.
-	bool openedHere = false;
+  // Open the file here if it isn't already.
+  bool openedHere = false;
 
-	if (IsOpen() == false)
-		{
-		result = Open(GetRights());
-		
-		if (result != FileError_None)
-			{
-			return result;
-			}
+  if (IsOpen() == false) {
+    result = Open(GetRights());
 
-		// The file was opened here.
-		openedHere = true;
-		}
+    if (result != FileError_None) {
+      return result;
+    }
 
-	// Get the size of the file
-	UInt32 size = GetFileSize(mHandle, NULL);
+    // The file was opened here.
+    openedHere = true;
+  }
 
-	if (size == 0xFFFFFFFF)
-		{
-		PrintWin32Error("File::Load(%S) - GetFileSize", mName.Get());
-		result = FileError_Fault;
-		OnFileError(result, false);
-		}
+  // Get the size of the file
+  UInt32 size = GetFileSize(mHandle, NULL);
 
-	if (result == FileError_None)
-		{
-		// Allocate buffer to hold file contents
-		outBuffer = malloc(size);
-		outSize = size;
+  if (size == 0xFFFFFFFF) {
+    PrintWin32Error("File::Load(%S) - GetFileSize", mName.Get());
+    result = FileError_Fault;
+    OnFileError(result, false);
+  }
 
-		// If allocation succeded then load file data.
-		if (outBuffer != NULL)
-			{
-			// Fill the buffer with the file contents
-			while (size > 0)
-				{
-				unsigned long bytesRead = 0;
+  if (result == FileError_None) {
+    // Allocate buffer to hold file contents
+    outBuffer = malloc(size);
+    outSize = size;
 
-				// Read in some bytes.
-				if (ReadFile(mHandle, outBuffer, size, &bytesRead, NULL) == 0)
-					{
-					result = FileError_Read;
+    // If allocation succeded then load file data.
+    if (outBuffer != NULL) {
+      // Fill the buffer with the file contents
+      while (size > 0) {
+        unsigned long bytesRead = 0;
 
-					if (OnFileError(result, true) == false)
-						{
-						break;
-						}
+        // Read in some bytes.
+        if (ReadFile(mHandle, outBuffer, size, &bytesRead, NULL) == 0) {
+          result = FileError_Read;
 
-					result = FileError_None;
-					}
+          if (OnFileError(result, true) == false) {
+            break;
+          }
 
-				size -= bytesRead;
-				
-				if (bytesRead == 0)
-					{
-					break;
-					}
-				}
-			}
-		else
-			{
-			result = FileError_Nomem;
-			OnFileError(result, false);
-			}
-		}
+          result = FileError_None;
+        }
 
-	// Close the file if we opened it here.
-	if (openedHere == true)
-		{
-		Close();
-		}
+        size -= bytesRead;
 
-	return result;
-	}
+        if (bytesRead == 0) {
+          break;
+        }
+      }
+    } else {
+      result = FileError_Nomem;
+      OnFileError(result, false);
+    }
+  }
 
+  // Close the file if we opened it here.
+  if (openedHere == true) {
+    Close();
+  }
+
+  return result;
+}
 
 /******************************************************************************
-*
-* NAME
-*     Save
-*
-* DESCRIPTION
-*     Save data to the file.
-*
-* INPUTS
-*     Buffer - Pointer to data to write.
-*     Size   - Number of bytes to write.
-*
-* RESULT
-*
-******************************************************************************/
+ *
+ * NAME
+ *     Save
+ *
+ * DESCRIPTION
+ *     Save data to the file.
+ *
+ * INPUTS
+ *     Buffer - Pointer to data to write.
+ *     Size   - Number of bytes to write.
+ *
+ * RESULT
+ *
+ ******************************************************************************/
 
-File::EFileError File::Save(const void* buffer, UInt32 size)
-	{
-	// Enforce access control
-	if (mRights == Rights_ReadOnly)
-		{
-		OnFileError(FileError_Access, false);
-		return FileError_Access;
-		}
+File::EFileError File::Save(const void* buffer, UInt32 size) {
+  // Enforce access control
+  if (mRights == Rights_ReadOnly) {
+    OnFileError(FileError_Access, false);
+    return FileError_Access;
+  }
 
-	EFileError result = FileError_None;
+  EFileError result = FileError_None;
 
-	// Open the file if it isn't already.
-	bool openedHere = false;
+  // Open the file if it isn't already.
+  bool openedHere = false;
 
-	if (IsOpen() == false)
-		{
-		result = Open(GetRights());
+  if (IsOpen() == false) {
+    result = Open(GetRights());
 
-		if (result == FileError_None)
-			{
-			openedHere = true;
-			}
-		}
+    if (result == FileError_None) {
+      openedHere = true;
+    }
+  }
 
-	if (result == FileError_None)
-		{
-		SetMarker(0, EStreamFrom::FromStart);
+  if (result == FileError_None) {
+    SetMarker(0, EStreamFrom::FromStart);
 
-		// Write the data to the file.
-		unsigned long bytesWritten = 0;
+    // Write the data to the file.
+    unsigned long bytesWritten = 0;
 
-		if (WriteFile(mHandle, buffer, size, &bytesWritten, NULL) == 0)
-			{
-			result = FileError_Write;
-			OnFileError(result, false);
-			}
-		else
-			{
-			SetEndOfFile(mHandle);
-			}
-		}
+    if (WriteFile(mHandle, buffer, size, &bytesWritten, NULL) == 0) {
+      result = FileError_Write;
+      OnFileError(result, false);
+    } else {
+      SetEndOfFile(mHandle);
+    }
+  }
 
-	// If we opened the file here then we must close it here.
-	if (openedHere == true)
-		{
-		Close();
-		}
+  // If we opened the file here then we must close it here.
+  if (openedHere == true) {
+    Close();
+  }
 
-	// Return the number of actual butes written.
-	return result;
-	}
-
+  // Return the number of actual butes written.
+  return result;
+}
 
 /******************************************************************************
-*
-* NAME
-*     OnFileError(Error, CanRetry)
-*
-* DESCRIPTION
-*
-* INPUTS
-*     Error    - Error condition code.
-*     CanRetry - Retry allowed flag. If this is false then retrys are not
-*                permitted for this failure condition.
-*
-* RESULT
-*     Retry - Retry flag.
-*
-******************************************************************************/
-#pragma warning(disable:4100)
+ *
+ * NAME
+ *     OnFileError(Error, CanRetry)
+ *
+ * DESCRIPTION
+ *
+ * INPUTS
+ *     Error    - Error condition code.
+ *     CanRetry - Retry allowed flag. If this is false then retrys are not
+ *                permitted for this failure condition.
+ *
+ * RESULT
+ *     Retry - Retry flag.
+ *
+ ******************************************************************************/
+#pragma warning(disable : 4100)
 
-bool File::OnFileError(EFileError error, bool)
-	{
-	#ifdef _DEBUG
-	const char* _errorNames[] = 
-		{
-		"FileError_None",
-		"FileError_FNF",
-		"FileError_Access",
-		"FileError_Open",
-		"FileError_Read",
-		"FileError_Write",
-		"FileError_Seek",
-		"FileError_Nomem",
-		"FileError_Fault",
-		};
+bool File::OnFileError(EFileError error, bool) {
+#ifdef _DEBUG
+  const char* _errorNames[] = {
+      "FileError_None", "FileError_FNF",   "FileError_Access",
+      "FileError_Open", "FileError_Read",  "FileError_Write",
+      "FileError_Seek", "FileError_Nomem", "FileError_Fault",
+  };
 
-	DebugPrint("File::OnFileError(%S) - %s\n", mName.Get(), _errorNames[error]);
-	#endif
+  DebugPrint("File::OnFileError(%S) - %s\n", mName.Get(), _errorNames[error]);
+#endif
 
-	return false;
-	}
-
-	
-/******************************************************************************
-*
-* NAME
-*     GetLength
-*
-* DESCRIPTION
-*     Get the size of the file and return it to the caller.
-*
-* INPUTS
-*     NONE
-*
-* RESULT
-*     Length of the file in bytes.
-*
-******************************************************************************/
-
-UInt32 File::GetLength(void)
-	{
-	// If the file is not open then it must be opened first.
-	bool openedHere = false;
-
-	if (IsOpen() == false)
-		{
-		if (Open(GetRights()) != FileError_None)
-			{
-			return 0xFFFFFFFF;
-			}
-
-		openedHere = true;
-		}
-
-	UInt32 length = GetFileSize(mHandle, NULL);
-
-	if (length == 0xFFFFFFFF)
-		{
-		OnFileError(FileError_Fault, false);
-		}
-
-	// If the file was opened here then we need to close it.
-	if (openedHere == true)
-		{
-		Close();
-		}
-
-	return length;
-	}
-
+  return false;
+}
 
 /******************************************************************************
-*
-* NAME
-*     SetLength
-*
-* DESCRIPTION
-*     Set the length of the streamable file.
-*
-* INPUTS
-*     Length - Length of stream in bytes
-*
-* RESULT
-*     NONE
-*
-******************************************************************************/
+ *
+ * NAME
+ *     GetLength
+ *
+ * DESCRIPTION
+ *     Get the size of the file and return it to the caller.
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RESULT
+ *     Length of the file in bytes.
+ *
+ ******************************************************************************/
 
-void File::SetLength(UInt32 length)
-	{
-	// Get the current file position
-	UInt32 position = SetFilePointer(mHandle, 0, NULL, FILE_CURRENT);
+UInt32 File::GetLength(void) {
+  // If the file is not open then it must be opened first.
+  bool openedHere = false;
 
-	// Extend the file size by positioning the Win32 file pointer to the
-	// specified location then setting the end of file.
-	SetFilePointer(mHandle, length, NULL, FILE_BEGIN);
-	SetEndOfFile(mHandle);
+  if (IsOpen() == false) {
+    if (Open(GetRights()) != FileError_None) {
+      return 0xFFFFFFFF;
+    }
 
-	// Restore file position
-	SetFilePointer(mHandle, position, NULL, FILE_BEGIN);
-	}
+    openedHere = true;
+  }
 
+  UInt32 length = GetFileSize(mHandle, NULL);
 
-/******************************************************************************
-*
-* NAME
-*     GetMarker
-*
-* DESCRIPTION
-*     Returns the current position in the file stream.
-*
-* INPUTS
-*     NONE
-*
-* RESULT
-*     Current position in file
-*
-******************************************************************************/
+  if (length == 0xFFFFFFFF) {
+    OnFileError(FileError_Fault, false);
+  }
 
-UInt32 File::GetMarker(void)
-	{
-	return SetFilePointer(mHandle, 0, NULL, FILE_CURRENT);
-	}
+  // If the file was opened here then we need to close it.
+  if (openedHere == true) {
+    Close();
+  }
 
+  return length;
+}
 
 /******************************************************************************
-*
-* NAME
-*     SetMarker
-*
-* DESCRIPTION
-*     Position the marker within the file stream.
-*
-* INPUTS
-*     Offset - Offset to adjust marker by
-*     From   - 
-*
-* RESULT
-*     NONE
-*
-******************************************************************************/
+ *
+ * NAME
+ *     SetLength
+ *
+ * DESCRIPTION
+ *     Set the length of the streamable file.
+ *
+ * INPUTS
+ *     Length - Length of stream in bytes
+ *
+ * RESULT
+ *     NONE
+ *
+ ******************************************************************************/
 
-void File::SetMarker(Int32 offset, EStreamFrom from)
-	{
-	// The file must be open before we can seek into it.
-	if (IsOpen() == false)
-		{
-		OnFileError(FileError_Seek, false);
-		}
-	else
-		{
-		unsigned long dir;
+void File::SetLength(UInt32 length) {
+  // Get the current file position
+  UInt32 position = SetFilePointer(mHandle, 0, NULL, FILE_CURRENT);
 
-		switch (from)
-			{
-			default:
-			case Stream::FromStart:
-				dir = FILE_BEGIN;
-			break;
+  // Extend the file size by positioning the Win32 file pointer to the
+  // specified location then setting the end of file.
+  SetFilePointer(mHandle, length, NULL, FILE_BEGIN);
+  SetEndOfFile(mHandle);
 
-			case Stream::FromMarker:
-				dir = FILE_CURRENT;
-			break;
-
-			case Stream::FromEnd:
-				dir = FILE_END;
-			break;
-			}
-
-		offset = SetFilePointer(mHandle, offset, NULL, dir);
-
-		if (offset == 0xFFFFFFFF)
-			{
-			OnFileError(FileError_Seek, false);
-			}
-		}
-	}
-
+  // Restore file position
+  SetFilePointer(mHandle, position, NULL, FILE_BEGIN);
+}
 
 /******************************************************************************
-*
-* NAME
-*     AtEnd
-*
-* DESCRIPTION
-*     Test if at the end of stream.
-*
-* INPUTS
-*     NONE
-*
-* RESULT
-*     End - True if at end; otherwise False.
-*
-******************************************************************************/
+ *
+ * NAME
+ *     GetMarker
+ *
+ * DESCRIPTION
+ *     Returns the current position in the file stream.
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RESULT
+ *     Current position in file
+ *
+ ******************************************************************************/
 
-bool File::AtEnd(void)
-	{
-	return (GetMarker() >= GetLength());
-	}
-
+UInt32 File::GetMarker(void) {
+  return SetFilePointer(mHandle, 0, NULL, FILE_CURRENT);
+}
 
 /******************************************************************************
-*
-* NAME
-*     GetBytes
-*
-* DESCRIPTION
-*     Retrieve an arbitrary number of bytes from the file stream.
-*
-* INPUTS
-*     Buffer - Pointer to buffer to receive data
-*     Bytes  - Number of bytes to read
-*
-* RESULT
-*     Read - Number of bytes actually read.
-*
-******************************************************************************/
+ *
+ * NAME
+ *     SetMarker
+ *
+ * DESCRIPTION
+ *     Position the marker within the file stream.
+ *
+ * INPUTS
+ *     Offset - Offset to adjust marker by
+ *     From   -
+ *
+ * RESULT
+ *     NONE
+ *
+ ******************************************************************************/
 
-UInt32 File::GetBytes(void* ptr, UInt32 bytes)
-	{
-	// Parameter check; Null pointers are bad!
-	assert(ptr != NULL);
+void File::SetMarker(Int32 offset, EStreamFrom from) {
+  // The file must be open before we can seek into it.
+  if (IsOpen() == false) {
+    OnFileError(FileError_Seek, false);
+  } else {
+    unsigned long dir;
 
-	// Enforce rights control
-	if (GetRights() == Rights_WriteOnly)
-		{
-		OnFileError(FileError_Access, false);
-		return 0;
-		}
+    switch (from) {
+      default:
+      case Stream::FromStart:
+        dir = FILE_BEGIN;
+        break;
 
-	// Open the file if it isn't already
-	if (IsOpen() == false)
-		{
-		if (Open(GetRights()) != FileError_None)
-			{
-			return 0;
-			}
-		}
+      case Stream::FromMarker:
+        dir = FILE_CURRENT;
+        break;
 
-	// Zero total bytes read count
-	UInt32 totalRead = 0;
-	UInt32 bytesToRead = bytes;
+      case Stream::FromEnd:
+        dir = FILE_END;
+        break;
+    }
 
-	while (bytesToRead > 0)
-		{
-		unsigned long read;
+    offset = SetFilePointer(mHandle, offset, NULL, dir);
 
-		if (ReadFile(mHandle, ptr, bytesToRead, &read, NULL) == 0)
-			{
-			if (OnFileError(FileError_Read, true) == false)
-				{
-				return 0;
-				}
-			}
-
-		// End of file condition?
-		if (read == 0)
-			{
-			break;
-			}
-
-		// Adjust counts
-		bytesToRead -= read;
-		totalRead += read;
-		}
-
-	return totalRead;
-	}
-
+    if (offset == 0xFFFFFFFF) {
+      OnFileError(FileError_Seek, false);
+    }
+  }
+}
 
 /******************************************************************************
-*
-* NAME
-*     PutBytes(Buffer, Bytes)
-*
-* DESCRIPTION
-*     Write an arbitrary number of bytes to the stream
-*
-* INPUTS
-*     Buffer - Pointer to buffer containing data to write
-*     Bytes  - Number of bytes to transfer
-*
-* RESULT
-*     Actual number of bytes written
-*
-******************************************************************************/
+ *
+ * NAME
+ *     AtEnd
+ *
+ * DESCRIPTION
+ *     Test if at the end of stream.
+ *
+ * INPUTS
+ *     NONE
+ *
+ * RESULT
+ *     End - True if at end; otherwise False.
+ *
+ ******************************************************************************/
 
-UInt32 File::PutBytes(const void* ptr, UInt32 bytes)
-	{
-	// Parameter check; Null pointers are bad!
-	assert(ptr != NULL);
-
-	// Enforce access control
-	if (GetRights() == Rights_ReadOnly)
-		{
-		OnFileError(FileError_Access, false);
-		return 0;
-		}
-
-	// The file must already be open.
-	if (IsOpen() == false)
-		{
-		if (Open(GetRights()) != FileError_None)
-			{
-			return 0;
-			}
-		}
-
-	// Zero total bytes written count
-	UInt32 totalWritten = 0;
-	UInt32 bytesToWrite = bytes;
-
-	while (bytesToWrite > 0)
-		{
-		unsigned long written;
-
-		if (WriteFile(mHandle, ptr, bytes, &written, NULL) == 0)
-			{
-			if (OnFileError(FileError_Write, true) == false)
-				{
-				return 0;
-				}
-			}
-
-		bytesToWrite -= written;
-		totalWritten += written;
-		}
-
-	return totalWritten;
-	}
-
+bool File::AtEnd(void) { return (GetMarker() >= GetLength()); }
 
 /******************************************************************************
-*
-* NAME
-*     PeekBytes(Buffer, Bytes)
-*
-* DESCRIPTION
-*     Retrieve bytes from the stream without moving the position marker.
-*
-* INPUTS
-*     Buffer - Pointer to buffer to receive data
-*     Bytes  - Number of bytes to retrieve
-*
-* RESULT
-*     Actual number of bytes transfered
-*
-******************************************************************************/
+ *
+ * NAME
+ *     GetBytes
+ *
+ * DESCRIPTION
+ *     Retrieve an arbitrary number of bytes from the file stream.
+ *
+ * INPUTS
+ *     Buffer - Pointer to buffer to receive data
+ *     Bytes  - Number of bytes to read
+ *
+ * RESULT
+ *     Read - Number of bytes actually read.
+ *
+ ******************************************************************************/
 
-UInt32 File::PeekBytes(void* ptr, UInt32 bytes)
-	{
-	// Parameter check; NULL pointers are bad!
-	assert(ptr != NULL);
+UInt32 File::GetBytes(void* ptr, UInt32 bytes) {
+  // Parameter check; Null pointers are bad!
+  assert(ptr != NULL);
 
-	// Get current position
-	UInt32 pos = GetMarker();
+  // Enforce rights control
+  if (GetRights() == Rights_WriteOnly) {
+    OnFileError(FileError_Access, false);
+    return 0;
+  }
 
-	// Get bytes
-	UInt32 bytesPeeked = GetBytes(ptr, bytes);
-	
-	// Restore previous position
-	SetMarker(pos, Stream::FromStart);
+  // Open the file if it isn't already
+  if (IsOpen() == false) {
+    if (Open(GetRights()) != FileError_None) {
+      return 0;
+    }
+  }
 
-	return bytesPeeked;
-	}
+  // Zero total bytes read count
+  UInt32 totalRead = 0;
+  UInt32 bytesToRead = bytes;
 
+  while (bytesToRead > 0) {
+    unsigned long read;
+
+    if (ReadFile(mHandle, ptr, bytesToRead, &read, NULL) == 0) {
+      if (OnFileError(FileError_Read, true) == false) {
+        return 0;
+      }
+    }
+
+    // End of file condition?
+    if (read == 0) {
+      break;
+    }
+
+    // Adjust counts
+    bytesToRead -= read;
+    totalRead += read;
+  }
+
+  return totalRead;
+}
 
 /******************************************************************************
-*
-* NAME
-*
-* DESCRIPTION
-*
-* INPUTS
-*
-* RESULT
-*
-******************************************************************************/
+ *
+ * NAME
+ *     PutBytes(Buffer, Bytes)
+ *
+ * DESCRIPTION
+ *     Write an arbitrary number of bytes to the stream
+ *
+ * INPUTS
+ *     Buffer - Pointer to buffer containing data to write
+ *     Bytes  - Number of bytes to transfer
+ *
+ * RESULT
+ *     Actual number of bytes written
+ *
+ ******************************************************************************/
 
-void File::Flush(void)
-	{
-	}
+UInt32 File::PutBytes(const void* ptr, UInt32 bytes) {
+  // Parameter check; Null pointers are bad!
+  assert(ptr != NULL);
+
+  // Enforce access control
+  if (GetRights() == Rights_ReadOnly) {
+    OnFileError(FileError_Access, false);
+    return 0;
+  }
+
+  // The file must already be open.
+  if (IsOpen() == false) {
+    if (Open(GetRights()) != FileError_None) {
+      return 0;
+    }
+  }
+
+  // Zero total bytes written count
+  UInt32 totalWritten = 0;
+  UInt32 bytesToWrite = bytes;
+
+  while (bytesToWrite > 0) {
+    unsigned long written;
+
+    if (WriteFile(mHandle, ptr, bytes, &written, NULL) == 0) {
+      if (OnFileError(FileError_Write, true) == false) {
+        return 0;
+      }
+    }
+
+    bytesToWrite -= written;
+    totalWritten += written;
+  }
+
+  return totalWritten;
+}
+
+/******************************************************************************
+ *
+ * NAME
+ *     PeekBytes(Buffer, Bytes)
+ *
+ * DESCRIPTION
+ *     Retrieve bytes from the stream without moving the position marker.
+ *
+ * INPUTS
+ *     Buffer - Pointer to buffer to receive data
+ *     Bytes  - Number of bytes to retrieve
+ *
+ * RESULT
+ *     Actual number of bytes transfered
+ *
+ ******************************************************************************/
+
+UInt32 File::PeekBytes(void* ptr, UInt32 bytes) {
+  // Parameter check; NULL pointers are bad!
+  assert(ptr != NULL);
+
+  // Get current position
+  UInt32 pos = GetMarker();
+
+  // Get bytes
+  UInt32 bytesPeeked = GetBytes(ptr, bytes);
+
+  // Restore previous position
+  SetMarker(pos, Stream::FromStart);
+
+  return bytesPeeked;
+}
+
+/******************************************************************************
+ *
+ * NAME
+ *
+ * DESCRIPTION
+ *
+ * INPUTS
+ *
+ * RESULT
+ *
+ ******************************************************************************/
+
+void File::Flush(void) {}

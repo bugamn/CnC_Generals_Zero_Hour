@@ -18,47 +18,44 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: W3DGameWindowManager.cpp /////////////////////////////////////////////////////////////////
-// Created:   Colin Day, June 2001
-// Desc:      W3D implementation of the window manager, responsible for all
-//						interactions with the game windowing system for menus and
-//						window controls.
+// FILE: W3DGameWindowManager.cpp
+// ///////////////////////////////////////////////////////////////// Created:
+// Colin Day, June 2001 Desc:      W3D implementation of the window manager,
+// responsible for all
+//						interactions with the game
+//windowing system for menus and 						window controls.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include "W3DDevice/GameClient/W3DGameWindowManager.h"
 
 #include <stdlib.h>
 
 #include "GameClient/Image.h"
-#include "W3DDevice/GameClient/W3DGameWindowManager.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////////////////////////
+// PUBLIC FUNCTIONS
+// ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-W3DGameWindowManager::W3DGameWindowManager( void )
-{
-
-}  // end W3DGameWindowManager
+W3DGameWindowManager::W3DGameWindowManager(void) {}  // end W3DGameWindowManager
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-W3DGameWindowManager::~W3DGameWindowManager( void )
-{
+W3DGameWindowManager::~W3DGameWindowManager(void) {
 
 }  // end ~W3DGameWindowManager
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-void W3DGameWindowManager::init( void )
-{
-
-	// extend
-	GameWindowManager::init();
+void W3DGameWindowManager::init(void) {
+  // extend
+  GameWindowManager::init();
 
 }  // end init
-

@@ -20,7 +20,8 @@
 **                                                                          **
 **                       Westwood Studios Pacific.                          **
 **                                                                          **
-**                       Confidential Information					                  **
+**                       Confidential Information
+***
 **                Copyright (C) 2000 - All Rights Reserved                  **
 **                                                                          **
 ******************************************************************************
@@ -44,54 +45,46 @@
 *****************************************************************************/
 
 #define WIN32_LEAN_AND_MEAN
+#include <assert.h>
+#include <mmsystem.h>
 #include <stdio.h>
 #include <windows.h>
-#include <mmsystem.h>
-#include <assert.h>
-
 #include <wpaudio/time.h>
 
 /*****************************************************************************
 **          Externals                                                       **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **           Defines                                                        **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **        Private Types                                                     **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **         Private Data                                                     **
 *****************************************************************************/
 
-static	TimeStamp		lastTime = 0;
-static	TimeStamp		interval = 0;
-static	TimeStamp		timeOut = 0;
-static	TimeStamp		(*timerFunc)( void ) = NULL;// set to either highResGetTime or
-																								// failsafeGetTime at initialization
-static LONGLONG			timerMilliSecScale;					// res counter millisecond scaling factor
+static TimeStamp lastTime = 0;
+static TimeStamp interval = 0;
+static TimeStamp timeOut = 0;
+static TimeStamp (*timerFunc)(void) =
+    NULL;                            // set to either highResGetTime or
+                                     // failsafeGetTime at initialization
+static LONGLONG timerMilliSecScale;  // res counter millisecond scaling factor
 
 /*****************************************************************************
 **         Public Data                                                      **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **         Private Prototypes                                               **
 *****************************************************************************/
 
-static TimeStamp failsafeGetTime( void );
-static TimeStamp highResGetTime( void );
+static TimeStamp failsafeGetTime(void);
+static TimeStamp highResGetTime(void);
 
 /*****************************************************************************
 **          Private Functions                                               **
@@ -102,23 +95,20 @@ static TimeStamp highResGetTime( void );
 /*                                                                */
 /******************************************************************/
 
-static TimeStamp highResGetTime( void )
-{
-	LARGE_INTEGER count;
-	union
-	{
-		TimeStamp timeStamp;
-		LARGE_INTEGER largeInt;
-	}
-	myTime;
+static TimeStamp highResGetTime(void) {
+  LARGE_INTEGER count;
+  union {
+    TimeStamp timeStamp;
+    LARGE_INTEGER largeInt;
+  } myTime;
 
-	// read the high res counter
-	QueryPerformanceCounter(&count);
+  // read the high res counter
+  QueryPerformanceCounter(&count);
 
-	// convert high res ticks to number of milliseconds
-	myTime.largeInt.QuadPart = count.QuadPart / timerMilliSecScale;
+  // convert high res ticks to number of milliseconds
+  myTime.largeInt.QuadPart = count.QuadPart / timerMilliSecScale;
 
-	return myTime.timeStamp;
+  return myTime.timeStamp;
 }
 
 /******************************************************************/
@@ -126,51 +116,48 @@ static TimeStamp highResGetTime( void )
 /*                                                                */
 /******************************************************************/
 
-static TimeStamp failsafeGetTime( void )
-{
-	static	volatile TimeStamp	time = (TimeStamp) 0x100000000;					// last time value
-	static	unsigned int*	const	pl = (unsigned int* const) &time;		// low word of time
-	static	unsigned int*	const	ph = (unsigned int* const) ((unsigned int)&time + 4);		// high word of time
-					unsigned int					now, lw, hw, called;
-	static	volatile unsigned int	calls = 0;
+static TimeStamp failsafeGetTime(void) {
+  static volatile TimeStamp time = (TimeStamp)0x100000000;  // last time value
+  static unsigned int* const pl =
+      (unsigned int* const)&time;  // low word of time
+  static unsigned int* const ph =
+      (unsigned int* const)((unsigned int)&time + 4);  // high word of time
+  unsigned int now, lw, hw, called;
+  static volatile unsigned int calls = 0;
 
-		
-	calls++;
+  calls++;
 
 retry:
 
-	called = calls;
+  called = calls;
 
-	hw = *ph;	// read high word of time stamp
-	lw = *pl;	// read low word of time stamp
+  hw = *ph;  // read high word of time stamp
+  lw = *pl;  // read low word of time stamp
 
-	if ( called != calls)	
-	{
-		// AudioGetTime() has been re-entered. Cannot trust lw and lh values
-		goto retry;
-	}
+  if (called != calls) {
+    // AudioGetTime() has been re-entered. Cannot trust lw and lh values
+    goto retry;
+  }
 
 reread:
 
-	now = timeGetTime ();
+  now = timeGetTime();
 
-	if ( now < lw )
-	{
-		// wrap round
-		hw++; // increment high word by one
-	}
+  if (now < lw) {
+    // wrap round
+    hw++;  // increment high word by one
+  }
 
-	*ph = hw;
-	*pl = now;
+  *ph = hw;
+  *pl = now;
 
-	if ( called != calls )
-	{
-		// re-entered. cannot trust *ph and *pl to be correct
-		called = calls;
-		goto reread;
-	}
+  if (called != calls) {
+    // re-entered. cannot trust *ph and *pl to be correct
+    called = calls;
+    goto reread;
+  }
 
-	return time;
+  return time;
 }
 
 /*****************************************************************************
@@ -189,23 +176,19 @@ reread:
 // For the hi res counter we precalculate the millisecond scaling factor to
 // convert hi res ticks to millisecond usage.
 
-void InitAudioTimer( void )
-{
-	LARGE_INTEGER freq;
+void InitAudioTimer(void) {
+  LARGE_INTEGER freq;
 
-	// does hardware exist for high res counter?
-	if (QueryPerformanceFrequency(&freq))
-	{
-		// calculate timer ticks per second
-		timerMilliSecScale = freq.QuadPart / (LONGLONG) SECONDS(1);
+  // does hardware exist for high res counter?
+  if (QueryPerformanceFrequency(&freq)) {
+    // calculate timer ticks per second
+    timerMilliSecScale = freq.QuadPart / (LONGLONG)SECONDS(1);
 
-		timerFunc = highResGetTime;
-	}
-	else
-	{
-		// no high res timer, use old code instead
-		timerFunc = failsafeGetTime;
-	}
+    timerFunc = highResGetTime;
+  } else {
+    // no high res timer, use old code instead
+    timerFunc = failsafeGetTime;
+  }
 }
 
 /******************************************************************/
@@ -213,8 +196,4 @@ void InitAudioTimer( void )
 /*                                                                */
 /******************************************************************/
 
-TimeStamp AudioGetTime( void )
-{
-	return timerFunc ? timerFunc() : 0 ;
-}
-
+TimeStamp AudioGetTime(void) { return timerFunc ? timerFunc() : 0; }

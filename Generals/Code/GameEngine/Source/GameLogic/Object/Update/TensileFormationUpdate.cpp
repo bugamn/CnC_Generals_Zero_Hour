@@ -18,98 +18,90 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: TensileFormationUpdate.cpp //////////////////////////////////////////////////////////////////////////
+// FILE: TensileFormationUpdate.cpp
+// //////////////////////////////////////////////////////////////////////////
 // Author: Mark Lorenzen, November 2002
 // Desc:   Springy formation movement like that of say, an avalanche
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
-#include "Common/Xfer.h"
-#include "Common/QuickTrig.h"
-#include "Common/AudioEventRTS.h"
-
-#include "GameLogic/Object.h"
-#include "GameLogic/TerrainLogic.h"
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
 #include "GameLogic/Module/TensileFormationUpdate.h"
-#include "GameLogic/Module/BodyModule.h"
-#include "GameLogic/PartitionManager.h"
-#include "GameLogic/GameLogic.h" 
+
+#include "Common/AudioEventRTS.h"
+#include "Common/QuickTrig.h"
+#include "Common/Xfer.h"
+#include "GameClient/Drawable.h"
+#include "GameClient/TerrainVisual.h"
 #include "GameLogic/AI.h"
 #include "GameLogic/AIPathfind.h"
-
-#include "GameClient/TerrainVisual.h"
-#include "GameClient/Drawable.h"
-
-
+#include "GameLogic/GameLogic.h"
+#include "GameLogic/Module/BodyModule.h"
+#include "GameLogic/Object.h"
+#include "GameLogic/PartitionManager.h"
+#include "GameLogic/TerrainLogic.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 #ifdef _INTERNAL
 // for occasional debugging...
-//#pragma optimize("", off)
-//#pragma MESSAGE("************************************** WARNING, optimization disabled for debugging purposes")
+// #pragma optimize("", off)
+// #pragma MESSAGE("************************************** WARNING, optimization
+// disabled for debugging purposes")
 #endif
 
-
-#define MAP_XY_FACTOR			(10.0f)	 //How wide and tall each height map square is in world space.
-#define MAP_HEIGHT_SCALE	(MAP_XY_FACTOR/16.0f)		//divide all map heights by 8.
-
-
-
-
+#define MAP_XY_FACTOR \
+  (10.0f)  // How wide and tall each height map square is in world space.
+#define MAP_HEIGHT_SCALE (MAP_XY_FACTOR / 16.0f)  // divide all map heights
+                                                  // by 8.
 
 //---------------------------------------------------------------------------------
-TensileFormationUpdate* getTFU( Object *obj )
-{
-	static NameKeyType theTFUKey = TheNameKeyGenerator->nameToKey( "TensileFormationUpdate" );
-	TensileFormationUpdate* tfu = (TensileFormationUpdate *)obj->findUpdateModule( theTFUKey );
-	return tfu;
+TensileFormationUpdate *getTFU(Object *obj) {
+  static NameKeyType theTFUKey =
+      TheNameKeyGenerator->nameToKey("TensileFormationUpdate");
+  TensileFormationUpdate *tfu =
+      (TensileFormationUpdate *)obj->findUpdateModule(theTFUKey);
+  return tfu;
 }
 
-class PartitionFilterTensileFormationMember : public PartitionFilter
-{
-private:
-	Object* m_obj;
+class PartitionFilterTensileFormationMember : public PartitionFilter {
+ private:
+  Object *m_obj;
 
-public:
-	PartitionFilterTensileFormationMember( Object* obj ) : m_obj( obj ) { }
+ public:
+  PartitionFilterTensileFormationMember(Object *obj) : m_obj(obj) {}
 #if defined(_DEBUG) || defined(_INTERNAL)
-	virtual const char* debugGetName() { return "PartitionFilterTensileFormationMember"; }
+  virtual const char *debugGetName() {
+    return "PartitionFilterTensileFormationMember";
+  }
 #endif
-	virtual Bool allow( Object *objOther )
-	{
-		return ( getTFU( objOther ) != NULL );
-	}
+  virtual Bool allow(Object *objOther) { return (getTFU(objOther) != NULL); }
 };
 
-
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-TensileFormationUpdateModuleData::TensileFormationUpdateModuleData( void )
-{
-
-	m_enabled = FALSE;
+TensileFormationUpdateModuleData::TensileFormationUpdateModuleData(void) {
+  m_enabled = FALSE;
 
 }  // end TensileFormationUpdateModuleData
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-/*static*/ void TensileFormationUpdateModuleData::buildFieldParse(MultiIniFieldParse& p)
-{
+/*static*/ void TensileFormationUpdateModuleData::buildFieldParse(
+    MultiIniFieldParse &p) {
+  UpdateModuleData::buildFieldParse(p);
 
-	UpdateModuleData::buildFieldParse( p );
-
-	static const FieldParse dataFieldParse[] = 
-	{
-		{ "Enabled",	    INI::parseBool,	NULL, offsetof( TensileFormationUpdateModuleData, m_enabled ) },
-		{ "CrackSound",	INI::parseAudioEventRTS,	NULL,	offsetof( TensileFormationUpdateModuleData, m_crackSound) },
-		{ 0, 0, 0, 0 }
-	};
-	p.add(dataFieldParse);
+  static const FieldParse dataFieldParse[] = {
+      {"Enabled", INI::parseBool, NULL,
+       offsetof(TensileFormationUpdateModuleData, m_enabled)},
+      {"CrackSound", INI::parseAudioEventRTS, NULL,
+       offsetof(TensileFormationUpdateModuleData, m_crackSound)},
+      {0, 0, 0, 0}};
+  p.add(dataFieldParse);
 
 }  // end buildFieldParse
 
@@ -119,363 +111,299 @@ TensileFormationUpdateModuleData::TensileFormationUpdateModuleData( void )
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-TensileFormationUpdate::TensileFormationUpdate( Thing *thing, const ModuleData *moduleData )
-						:UpdateModule( thing, moduleData )
-{
+TensileFormationUpdate::TensileFormationUpdate(Thing *thing,
+                                               const ModuleData *moduleData)
+    : UpdateModule(thing, moduleData) {
+  const TensileFormationUpdateModuleData *modData =
+      getTensileFormationUpdateModuleData();
 
+  // save our initial enabled status based on INI settings
+  m_enabled = ((TensileFormationUpdateModuleData *)moduleData)->m_enabled;
+  m_inertia.set(0, 0, 0);
+  m_linksInited = FALSE;
+  m_motionlessCounter = 0;
+  m_life = 0;
+  m_lowestSlideElevation = 255.0f;
 
-	const TensileFormationUpdateModuleData *modData = getTensileFormationUpdateModuleData();
+  for (int t = 0; t < 4; ++t) {
+    m_links[t].id = INVALID_ID;
+    m_links[t].tensor.set(0, 0, 0);
+  }
 
-	// save our initial enabled status based on INI settings
-	m_enabled = ((TensileFormationUpdateModuleData *)moduleData)->m_enabled;
-	m_inertia.set(0,0,0);
-	m_linksInited = FALSE;
-	m_motionlessCounter = 0;
-	m_life = 0;
-	m_lowestSlideElevation = 255.0f;
+  m_crackSound = modData->m_crackSound;
+  m_crackSound.setObjectID(getObject()->getID());
 
-	for ( int t = 0; t < 4; ++t)
-	{
-		m_links[ t ].id = INVALID_ID; 
-		m_links[ t ].tensor.set(0,0,0);
-	}
+  TheAI->pathfinder()->createAWallFromMyFootprint(
+      getObject());  // Temporarily treat this object as an obstacle.
 
-	m_crackSound = modData->m_crackSound;
-	m_crackSound.setObjectID( getObject()->getID() ) ;
-
-	TheAI->pathfinder()->createAWallFromMyFootprint( getObject() ); // Temporarily treat this object as an obstacle.
-
-
-	//Coord3D pos = *getObject()->getPosition();
-	//if ( pos.z > 80)
-	//{
-	//	pos.z = 80 + ( ( pos.z - 80 ) * 2);
-	//	getObject()->setPosition( &pos );
-	//}
-
-
+  // Coord3D pos = *getObject()->getPosition();
+  // if ( pos.z > 80)
+  //{
+  //	pos.z = 80 + ( ( pos.z - 80 ) * 2);
+  //	getObject()->setPosition( &pos );
+  // }
 
 }  // end TensileFormationUpdate
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-TensileFormationUpdate::~TensileFormationUpdate( void )
-{
+TensileFormationUpdate::~TensileFormationUpdate(void) {
 
 }  // end ~TensileFormationUpdate
 
+void TensileFormationUpdate::initLinks(void) {
+  m_linksInited = TRUE;
 
+  Object *obj = getObject();
+  if (!obj) return;
 
-void TensileFormationUpdate::initLinks( void )
-{
+  PartitionFilterTensileFormationMember tfmFilter(getObject());
+  PartitionFilter *filters[] = {&tfmFilter, NULL};
+  SimpleObjectIterator *iter = NULL;
+  iter = ThePartitionManager->iterateObjectsInRange(
+      getObject(), 1000.0f, FROM_BOUNDINGSPHERE_3D, filters);
+  MemoryPoolObjectHolder hold(iter);
 
-	m_linksInited = TRUE;
+  Real closestDistance = 99999.9f;
+  Real thisDistance = 99999.9f;
+  const Coord3D *myPos = obj->getPosition();
 
-	Object *obj = getObject();
-	if ( !obj )
-		return;
+  for (Object *other = iter->first(); other; other = iter->next()) {
+    const Coord3D *theirPos = other->getPosition();
+    Coord3D delta = {theirPos->x - myPos->x, theirPos->y - myPos->y,
+                     theirPos->z - myPos->z};
 
-	PartitionFilterTensileFormationMember tfmFilter( getObject() );
-	PartitionFilter *filters[] = { &tfmFilter, NULL };
-	SimpleObjectIterator *iter = NULL;
-	iter = ThePartitionManager->iterateObjectsInRange(getObject(), 1000.0f, FROM_BOUNDINGSPHERE_3D, filters);
-	MemoryPoolObjectHolder hold(iter);
+    thisDistance = delta.length();
+    if (closestDistance > thisDistance) {
+      closestDistance = thisDistance;
 
-	Real closestDistance = 99999.9f;
-	Real thisDistance    = 99999.9f;
-	const Coord3D *myPos = obj->getPosition();
+      // push a new link
+      for (int t = 3; t > 0; --t) m_links[t] = m_links[t - 1];
 
-	for (Object* other = iter->first(); other; other = iter->next())
-	{
-		const Coord3D *theirPos = other->getPosition();
-		Coord3D delta = { theirPos->x - myPos->x, theirPos->y - myPos->y, theirPos->z - myPos->z };
+      m_links[0].id = other->getID();
+      m_links[0].tensor = delta;
+    }
+  }
 
-		thisDistance = delta.length();
-		if ( closestDistance > thisDistance )
-		{
-			closestDistance = thisDistance;
-			
-			//push a new link 
-			for ( int t = 3; t > 0; --t )
-				m_links[ t ] = m_links[ t-1 ];
+  // ICoord2D gridPos;
+  // gridPos.x = REAL_TO_INT_FLOOR(getObject()->getPosition()->x/MAP_XY_FACTOR);
+  // gridPos.y = REAL_TO_INT_FLOOR(getObject()->getPosition()->y/MAP_XY_FACTOR);
+  // TheTerrainVisual->setRawMapHeight(&gridPos, 500);
 
-			m_links[ 0 ].id = other->getID();
-			m_links[ 0 ].tensor = delta;
-		}
-	}
-
-	//ICoord2D gridPos;
-	//gridPos.x = REAL_TO_INT_FLOOR(getObject()->getPosition()->x/MAP_XY_FACTOR);
-	//gridPos.y = REAL_TO_INT_FLOOR(getObject()->getPosition()->y/MAP_XY_FACTOR);
-	//TheTerrainVisual->setRawMapHeight(&gridPos, 500);
-
-	getObject()->setOrientation(GameLogicRandomValueReal(-PI,PI));
-
+  getObject()->setOrientation(GameLogicRandomValueReal(-PI, PI));
 }
 
-
-
- 
-
-
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-UpdateSleepTime TensileFormationUpdate::update( void )
-{
+UpdateSleepTime TensileFormationUpdate::update(void) {
+  if (!m_linksInited) initLinks();
 
-	if ( ! m_linksInited )
-		initLinks();
+  if (m_enabled == FALSE) {
+    // We are all going to sit here idle and do not much of anything until one
+    // of us gets hurt
+    BodyModuleInterface *body = getObject()->getBodyModule();
+    BodyDamageType bdt = body->getDamageState();
 
+    if (bdt >= BODY_DAMAGED) {
+      // THen the hurt one (maybe me) will tell every other member of the
+      // formation to enable So we will start moving
+      setEnabled(TRUE);
 
+      TheAI->pathfinder()->removeWallFromMyFootprint(
+          getObject());  // Undo createAWallFromMyFootprint.
 
-	if( m_enabled == FALSE )
-	{
-	//We are all going to sit here idle and do not much of anything until one of us gets hurt
-		BodyModuleInterface *body = getObject()->getBodyModule();
-		BodyDamageType bdt = body->getDamageState();
+      // ALert players of disaster happening
+      if (!m_crackSound.isCurrentlyPlaying())
+        m_crackSound.setPlayingHandle(TheAudio->addAudioEvent(&m_crackSound));
 
-		if ( bdt >= BODY_DAMAGED )
-		{
-			//THen the hurt one (maybe me) will tell every other member of the formation to enable
-			//So we will start moving
-			setEnabled( TRUE );
+    } else
+      return UPDATE_SLEEP(30);
+  }
 
-			TheAI->pathfinder()->removeWallFromMyFootprint( getObject() );  // Undo createAWallFromMyFootprint.
+  Drawable *draw = getObject()->getDrawable();
+  if (!draw) return UPDATE_SLEEP_NONE;
 
+  if (++m_life > 300) {
+    draw->clearModelConditionFlags(
+        MAKE_MODELCONDITION_MASK(MODELCONDITION_MOVING));
+    draw->clearModelConditionFlags(
+        MAKE_MODELCONDITION_MASK(MODELCONDITION_FREEFALL));
+    draw->clearModelConditionFlags(
+        MAKE_MODELCONDITION_MASK(MODELCONDITION_POST_COLLAPSE));
 
-			//ALert players of disaster happening
-			if ( ! m_crackSound.isCurrentlyPlaying())
-				m_crackSound.setPlayingHandle(TheAudio->addAudioEvent( &m_crackSound ));
+    BodyModuleInterface *body = getObject()->getBodyModule();
+    body->setDamageState(BODY_RUBBLE);
 
-		}
-		else
-			return UPDATE_SLEEP(30);
-	}
+    TheAI->pathfinder()->createAWallFromMyFootprint(
+        getObject());  // Temporarily treat this object as an obstacle.
 
+    return UPDATE_SLEEP_FOREVER;
+  }
 
-	Drawable *draw = getObject()->getDrawable();
-	if ( ! draw )
-		return UPDATE_SLEEP_NONE;
+  if (m_life % 30 == 29) propagateDislodgement(TRUE);
 
-	if (++m_life > 300)
-	{
-		draw->clearModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_MOVING));
-		draw->clearModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_FREEFALL));
-		draw->clearModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_POST_COLLAPSE));
+  // APPLY PHYSICS===========================
+  const Coord3D *pos = getObject()->getPosition();
 
-		BodyModuleInterface *body = getObject()->getBodyModule();
-		body->setDamageState( BODY_RUBBLE );
+  Coord3D normal = {0.0f, 0.0f, 1.0f};
+  TheTerrainLogic->getGroundHeight(
+      pos->x, pos->y, &normal);  // which way does the ground slope?
 
+  Coord3D slope = {normal.x, normal.y, 0.0f};
+  Real steepness = 1.0f - normal.z;
+  slope.scale(0.3f + steepness);
 
-		TheAI->pathfinder()->createAWallFromMyFootprint( getObject() ); // Temporarily treat this object as an obstacle.
+  m_inertia.add(&slope);
 
-		return UPDATE_SLEEP_FOREVER;
-	}
+  Real friction = 0.95f;
+  m_inertia.scale(friction);
 
+  Coord3D newPos;
+  newPos.x = pos->x + m_inertia.x;  // flow down the slope
+  newPos.y = pos->y + m_inertia.y;
+  newPos.z = TheTerrainLogic->getGroundHeight(
+      newPos.x, newPos.y);  // rest on surface here
 
-	if ( m_life%30 == 29 )		
-		propagateDislodgement( TRUE );
+  Object *tree = ThePartitionManager->getClosestObject(
+      &newPos, getObject()->getGeometryInfo().getMajorRadius(), FROM_CENTER_2D);
+  if (tree->isKindOf(KINDOF_SHRUBBERY))
+    tree->topple(&m_inertia, m_inertia.length(), 1);  // No Bounce
 
+  // APPLY TENSORS===========================
+  Coord3D tensorSum = {0, 0, 0};
+  for (int t = 0; t < 4; ++t) {
+    Object *other = TheGameLogic->findObjectByID(m_links[t].id);
 
-	//APPLY PHYSICS===========================
-	const Coord3D *pos = getObject()->getPosition();
+    if (other) {
+      Coord3D desiredPos = *other->getPosition();
 
-	Coord3D normal = { 0.0f, 0.0f, 1.0f };
-	TheTerrainLogic->getGroundHeight(pos->x, pos->y, &normal); // which way does the ground slope?
+      Coord3D tensor = m_links[t].tensor;
 
-	Coord3D slope = { normal.x, normal.y, 0.0f};
-	Real steepness = 1.0f - normal.z;
-	slope.scale( 0.3f + steepness);
+      desiredPos.sub(&tensor);
 
-	m_inertia.add( &slope );
+      // Coord3D desiredPos = { theirPos->x - m_links[ t ].tensor.x, theirPos->y
+      // - m_links[ t ].tensor.y, theirPos->z - m_links[ t ].tensor.z };
 
-	Real friction = 0.95f;
-	m_inertia.scale( friction );
+      newPos.x = newPos.x * 0.93f + desiredPos.x * 0.07f;
+      newPos.y = newPos.y * 0.93f + desiredPos.y * 0.07f;
+      newPos.z = MIN(m_lowestSlideElevation,
+                     TheTerrainLogic->getGroundHeight(
+                         newPos.x, newPos.y));  // rest on surface here
 
+      tensor.normalize();
+      tensorSum.add(&tensor);
+    }
+  }
 
+  tensorSum.normalize();
 
-	Coord3D newPos;
-	newPos.x = pos->x + m_inertia.x;//flow down the slope
-	newPos.y = pos->y + m_inertia.y;
-	newPos.z = TheTerrainLogic->getGroundHeight(newPos.x, newPos.y);//rest on surface here
+  Coord3D inertiaNormal = m_inertia;
+  inertiaNormal.normalize();
 
+  draw->setModelConditionFlags(
+      MAKE_MODELCONDITION_MASK(MODELCONDITION_POST_COLLAPSE));
 
+  if (m_life < 200)
+    draw->setModelConditionFlags(
+        MAKE_MODELCONDITION_MASK(MODELCONDITION_MOVING));
+  else
+    draw->clearModelConditionFlags(
+        MAKE_MODELCONDITION_MASK(MODELCONDITION_MOVING));
 
-	Object *tree = ThePartitionManager->getClosestObject( &newPos, getObject()->getGeometryInfo().getMajorRadius(), FROM_CENTER_2D );
-	if (tree->isKindOf( KINDOF_SHRUBBERY ))
-		tree->topple( &m_inertia, m_inertia.length(), 1 );//No Bounce
+  if (fabs(pos->z - newPos.z) > 0.2f && m_life < 100)
+    draw->setModelConditionFlags(
+        MAKE_MODELCONDITION_MASK(MODELCONDITION_FREEFALL));
+  else
+    draw->clearModelConditionFlags(
+        MAKE_MODELCONDITION_MASK(MODELCONDITION_FREEFALL));
 
+  //	{
+  //		RGBColor cyan = {0,1,1};
+  //		draw->flashAsSelected(&cyan);
+  //	}
 
+  // else
+  // m_motionlessCounter = 0;
 
-	//APPLY TENSORS===========================
-	Coord3D tensorSum = { 0, 0, 0 };
-	for ( int t = 0; t < 4; ++t )
-	{
-		Object *other = TheGameLogic->findObjectByID( m_links[ t ].id );
+  // if ( newPos.z > 80)
+  //	newPos.z = 80 + ( ( newPos.z - 80 ) * 2);
 
-		if ( other )
-		{
-			Coord3D desiredPos = *other->getPosition();
+  m_lowestSlideElevation = newPos.z;
+  getObject()->setPosition(&newPos);
 
-			Coord3D tensor = m_links[ t ].tensor;
-
-			desiredPos.sub( &tensor );
-
-			//Coord3D desiredPos = { theirPos->x - m_links[ t ].tensor.x, theirPos->y - m_links[ t ].tensor.y, theirPos->z - m_links[ t ].tensor.z };
-			
-			newPos.x = newPos.x*0.93f + desiredPos.x*0.07f;
-			newPos.y = newPos.y*0.93f + desiredPos.y*0.07f; 
-			newPos.z = MIN( m_lowestSlideElevation, TheTerrainLogic->getGroundHeight(newPos.x, newPos.y) );//rest on surface here
-
-			tensor.normalize();
-			tensorSum.add( &tensor );
-
-		}
-
-	}
-
-	tensorSum.normalize();
-
-	Coord3D inertiaNormal = m_inertia;
-	inertiaNormal.normalize();
-
-
-
-
-
-
-
-
-
-	draw->setModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_POST_COLLAPSE));
-			
-	if ( m_life < 200 )
-		draw->setModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_MOVING));
-	else
-		draw->clearModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_MOVING));
-
-	if ( fabs( pos->z - newPos.z ) > 0.2f && m_life < 100)
-		draw->setModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_FREEFALL));
-	else
-		draw->clearModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_FREEFALL));
-		
-//	{
-//		RGBColor cyan = {0,1,1};
-//		draw->flashAsSelected(&cyan);
-//	}
-
-	
-
-	//else
-		//m_motionlessCounter = 0;
-
-
-	//if ( newPos.z > 80)
-	//	newPos.z = 80 + ( ( newPos.z - 80 ) * 2);
-
-
-	m_lowestSlideElevation = newPos.z;
-	getObject()->setPosition( &newPos );
-
-
-
-	return UPDATE_SLEEP_NONE;
+  return UPDATE_SLEEP_NONE;
 }  // end update
-
-
-
-
 
 //-------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------
-void TensileFormationUpdate::propagateDislodgement ( Bool enabled )
-{
-	PartitionFilterTensileFormationMember tfmFilter( getObject() );
-	PartitionFilter *filters[] = { &tfmFilter, NULL };
-	SimpleObjectIterator *iter = NULL;
-	iter = ThePartitionManager->iterateObjectsInRange(getObject(), 100.0f, FROM_BOUNDINGSPHERE_3D, filters);
-	MemoryPoolObjectHolder hold(iter);
-	for (Object* other = iter->first(); other; other = iter->next())
-	{
+void TensileFormationUpdate::propagateDislodgement(Bool enabled) {
+  PartitionFilterTensileFormationMember tfmFilter(getObject());
+  PartitionFilter *filters[] = {&tfmFilter, NULL};
+  SimpleObjectIterator *iter = NULL;
+  iter = ThePartitionManager->iterateObjectsInRange(
+      getObject(), 100.0f, FROM_BOUNDINGSPHERE_3D, filters);
+  MemoryPoolObjectHolder hold(iter);
+  for (Object *other = iter->first(); other; other = iter->next()) {
+    // Object *other = TheGameLogic->findObjectByID( m_links[ t ].id );
+    if (other) {
+      BodyModuleInterface *body = other->getBodyModule();
+      if (body) {
+        body->setDamageState(BODY_DAMAGED);
+      }
+    }
 
-		//Object *other = TheGameLogic->findObjectByID( m_links[ t ].id );
-		if ( other )
-		{
-			BodyModuleInterface *body = other->getBodyModule();
-			if ( body )
-			{
-				body->setDamageState( BODY_DAMAGED );
-			}
-		}
+    // TensileFormationUpdate* tfu = getTFU(other);
+    // if ( tfu != NULL )
+    //{
+    //	tfu->setEnabled( enabled );
+    // }
+  }
 
-
-		//TensileFormationUpdate* tfu = getTFU(other);
-		//if ( tfu != NULL )
-		//{
-		//	tfu->setEnabled( enabled );
-		//}
-	}
-
-	for ( int t = 0; t < 4; ++t )
-	{
-		Object *other = TheGameLogic->findObjectByID( m_links[ t ].id );
-		if ( other )
-		{
-			BodyModuleInterface *body = other->getBodyModule();
-			if ( body )
-			{
-				body->setDamageState( BODY_DAMAGED );
-			}
-		}
-	}
-
-
-
+  for (int t = 0; t < 4; ++t) {
+    Object *other = TheGameLogic->findObjectByID(m_links[t].id);
+    if (other) {
+      BodyModuleInterface *body = other->getBodyModule();
+      if (body) {
+        body->setDamageState(BODY_DAMAGED);
+      }
+    }
+  }
 }
-
-
-
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void TensileFormationUpdate::crc( Xfer *xfer )
-{
+void TensileFormationUpdate::crc(Xfer *xfer) {
+  // extend base class
+  UpdateModule::crc(xfer);
 
-	// extend base class
-	UpdateModule::crc( xfer );
-
-}  // end crc  
+}  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void TensileFormationUpdate::xfer( Xfer *xfer )
-{
+void TensileFormationUpdate::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
+  // extend base class
+  UpdateModule::xfer(xfer);
 
-	// extend base class
-	UpdateModule::xfer( xfer );
-
-	// enabled
-	xfer->xferBool( &m_enabled );
+  // enabled
+  xfer->xferBool(&m_enabled);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void TensileFormationUpdate::loadPostProcess( void )
-{
-
-	// extend base class
-	UpdateModule::loadPostProcess();
+void TensileFormationUpdate::loadPostProcess(void) {
+  // extend base class
+  UpdateModule::loadPostProcess();
 
 }  // end loadPostProcess

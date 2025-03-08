@@ -18,27 +18,28 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: .cpp /////////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 // Project:    RTS3
 //
 // File name:  .cpp
 //
-// Created:    
+// Created:
 //
-// Desc:       
+// Desc:
 //
 //-----------------------------------------------------------------------------
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,8 +48,8 @@
 #include <stdlib.h>
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
-#include "GUIEditDisplay.h"
 #include "EditWindow.h"
+#include "GUIEditDisplay.h"
 
 // DEFINES ////////////////////////////////////////////////////////////////////
 
@@ -69,97 +70,72 @@
 // GUIEditDisplay::GUIEditDisplay =============================================
 /** */
 //=============================================================================
-GUIEditDisplay::GUIEditDisplay( void )
-{
-
-}  // end GUIEditDisplay
+GUIEditDisplay::GUIEditDisplay(void) {}  // end GUIEditDisplay
 
 // GUIEditDisplay::~GUIEditDisplay ============================================
 /** */
 //=============================================================================
-GUIEditDisplay::~GUIEditDisplay( void )
-{
-
-}  // end ~GUIEditDisplay
+GUIEditDisplay::~GUIEditDisplay(void) {}  // end ~GUIEditDisplay
 
 // GUIEditDisplay::drawLine ===================================================
 /** draw a line on the display in pixel coordinates with the specified color */
 //=============================================================================
-void GUIEditDisplay::drawLine( Int startX, Int startY, 
-															 Int endX, Int endY, 
-															 Real lineWidth, UnsignedInt lineColor )
-{
+void GUIEditDisplay::drawLine(Int startX, Int startY, Int endX, Int endY,
+                              Real lineWidth, UnsignedInt lineColor) {
+  TheEditWindow->drawLine(startX, startY, endX, endY, lineWidth, lineColor);
 
-	TheEditWindow->drawLine( startX, startY, endX, endY, lineWidth, lineColor );
-	
 }  // end drawLIne
 
 // GUIEditDisplay::drawOpenRect ===============================================
-/** draw a rect border on the display in pixel coordinates with the 
-	* specified color */
+/** draw a rect border on the display in pixel coordinates with the
+ * specified color */
 //=============================================================================
-void GUIEditDisplay::drawOpenRect( Int startX, Int startY, 
-																	 Int width, Int height,
-																	 Real lineWidth, UnsignedInt lineColor )
-{
-
-	TheEditWindow->drawOpenRect( startX, startY, width, height, 
-															 lineWidth, lineColor );
+void GUIEditDisplay::drawOpenRect(Int startX, Int startY, Int width, Int height,
+                                  Real lineWidth, UnsignedInt lineColor) {
+  TheEditWindow->drawOpenRect(startX, startY, width, height, lineWidth,
+                              lineColor);
 
 }  // end drawOpenRect
 
 // GUIEditDisplay::drawFillRect ===============================================
-/** draw a filled rect on the display in pixel coords with the 
-	* specified color */
+/** draw a filled rect on the display in pixel coords with the
+ * specified color */
 //=============================================================================
-void GUIEditDisplay::drawFillRect( Int startX, Int startY, 
-																	 Int width, Int height,
-																	 UnsignedInt color )
-{
-
-	TheEditWindow->drawFillRect( startX, startY,
-															 width, height,
-															 color );
+void GUIEditDisplay::drawFillRect(Int startX, Int startY, Int width, Int height,
+                                  UnsignedInt color) {
+  TheEditWindow->drawFillRect(startX, startY, width, height, color);
 
 }  // end drawFillRect
 
 // GUIEditDisplay::drawImage ==================================================
 /** draw an image fit within the screen coordinates */
 //=============================================================================
-void GUIEditDisplay::drawImage( const Image *image, 
-																Int startX, Int startY, 
-																Int endX, Int endY, 
-																Color color, DrawImageMode mode )
-{
-
-	TheEditWindow->drawImage( image,
-														startX, startY,
-														endX, endY, 
-														color );
-
+void GUIEditDisplay::drawImage(const Image *image, Int startX, Int startY,
+                               Int endX, Int endY, Color color,
+                               DrawImageMode mode) {
+  TheEditWindow->drawImage(image, startX, startY, endX, endY, color);
 
 }  // end drawImage
 
 // GUIEditDisplay::setClipRegion ==============================================
 /** sets clipping rectangle for 2D drawing operations */
 //=============================================================================
-void GUIEditDisplay::setClipRegion( IRegion2D *region )
-{
-	TheEditWindow->setClipRegion(region);
+void GUIEditDisplay::setClipRegion(IRegion2D *region) {
+  TheEditWindow->setClipRegion(region);
 }
 
-// GUIEditDisplay::isClippingEnabled ==============================================
+// GUIEditDisplay::isClippingEnabled
+// ==============================================
 /** returns current state of 2D image clipping */
 //=============================================================================
-Bool GUIEditDisplay::isClippingEnabled( void )
-{
-	return	TheEditWindow->isClippingEnabled();
+Bool GUIEditDisplay::isClippingEnabled(void) {
+  return TheEditWindow->isClippingEnabled();
 }
 
-// GUIEditDisplay::isClippingEnabled ==============================================
+// GUIEditDisplay::isClippingEnabled
+// ==============================================
 /** returns current state of 2D image clipping */
 //=============================================================================
-void GUIEditDisplay::enableClipping( Bool onoff )
-{
-	TheEditWindow->enableClipping(onoff);
+void GUIEditDisplay::enableClipping(Bool onoff) {
+  TheEditWindow->enableClipping(onoff);
 }

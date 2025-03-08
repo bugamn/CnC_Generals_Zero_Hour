@@ -17,24 +17,25 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WW3D                                                         *
+ *                 Project Name : WW3D *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/ww3d2/prim_anim.cpp                          $*
+ *                     $Archive:: /Commando/Code/ww3d2/prim_anim.cpp $*
  *                                                                                             *
- *                       Author:: Patrick Smith                                                *
+ *                       Author:: Patrick Smith *
  *                                                                                             *
- *                     $Modtime:: 1/08/01 10:04a                                              $*
+ *                     $Modtime:: 1/08/01 10:04a $*
  *                                                                                             *
- *                    $Revision:: 1                                                           $*
+ *                    $Revision:: 1 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "prim_anim.h"
-#include "chunkio.h"
 
+#include "chunkio.h"

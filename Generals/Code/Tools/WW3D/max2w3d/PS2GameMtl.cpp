@@ -17,57 +17,56 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project name : Buccaneer Bay                                                *
+ *                 Project name : Buccaneer Bay *
  *                                                                                             *
- *                    File name : PS2GameMtl.cpp                                               *
+ *                    File name : PS2GameMtl.cpp *
  *                                                                                             *
- *                   Programmer : Mike Lytle                                                   *
+ *                   Programmer : Mike Lytle *
  *                                                                                             *
- *                   Start date : 10/12/1999                                                   *
+ *                   Start date : 10/12/1999 *
  *                                                                                             *
- *                  Last update : 10/12/1999                                                   *
+ *                  Last update : 10/12/1999 *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
-#include "gamemtl.h"
 #include <Max.h>
 #include <gport.h>
 #include <hsv.h>
+
 #include "dllmain.h"
+#include "gamemtl.h"
 #include "resource.h"
 #include "util.h"
 
-
-
 /*****************************************************************
-*
-*		PS2 GameMtl Class Descriptor
-*
-*****************************************************************/
+ *
+ *		PS2 GameMtl Class Descriptor
+ *
+ *****************************************************************/
 Class_ID PS2GameMaterialClassID(0x2ed62ad7, 0x50571dfd);
 
 // This adds W3D PS2 choice to the Max material selector.
-class PS2GameMaterialClassDesc:public ClassDesc {
-
-public:
-	int				IsPublic()					{ return 1; }
-	void *			Create(BOOL loading)		
-	{ 
-		GameMtl *mtl = new GameMtl(loading);
-		mtl->Set_Shader_Type(GameMtl::STE_PS2_SHADER);
-		return ((void*)mtl); 
-	}
-	const TCHAR *	ClassName()					{ return Get_String(IDS_PS2_GAMEMTL); }
-	SClass_ID		SuperClassID()				{ return MATERIAL_CLASS_ID; }
-	Class_ID 		ClassID()					{ return PS2GameMaterialClassID; }
-	const TCHAR* 	Category()					{ return _T("");  }
+class PS2GameMaterialClassDesc : public ClassDesc {
+ public:
+  int IsPublic() { return 1; }
+  void* Create(BOOL loading) {
+    GameMtl* mtl = new GameMtl(loading);
+    mtl->Set_Shader_Type(GameMtl::STE_PS2_SHADER);
+    return ((void*)mtl);
+  }
+  const TCHAR* ClassName() { return Get_String(IDS_PS2_GAMEMTL); }
+  SClass_ID SuperClassID() { return MATERIAL_CLASS_ID; }
+  Class_ID ClassID() { return PS2GameMaterialClassID; }
+  const TCHAR* Category() { return _T(""); }
 };
 
 static PS2GameMaterialClassDesc _PS2GameMaterialCD;
 
-ClassDesc * Get_PS2_Game_Material_Desc() { return &_PS2GameMaterialCD;  }
+ClassDesc* Get_PS2_Game_Material_Desc() { return &_PS2GameMaterialCD; }

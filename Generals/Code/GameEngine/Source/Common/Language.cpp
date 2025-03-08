@@ -18,18 +18,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: Language.cpp /////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 // Project:   RTS3
@@ -46,9 +47,9 @@
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
 #include "Common/Language.h"
+
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 // DEFINES ////////////////////////////////////////////////////////////////////
 
@@ -66,4 +67,3 @@ LanguageID OurLanguage = LANGUAGE_ID_US;
 // PRIVATE FUNCTIONS //////////////////////////////////////////////////////////
 
 // PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
-

@@ -18,17 +18,18 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 //----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //----------------------------------------------------------------------------
 //
 // Project:   WSYS Library
@@ -42,287 +43,237 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-//         Includes                                                      
+//         Includes
 //----------------------------------------------------------------------------
 
-#include "PreRTS.h"
+#include "Common/string.h"
+
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include <string.h>
 
-#include "Common/string.h"
+#include "PreRTS.h"
 
 // 'assignment within condition expression'.
 #pragma warning(disable : 4706)
 
 //----------------------------------------------------------------------------
-//         Externals                                                     
+//         Externals
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Defines                                                         
+//         Defines
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Types                                                     
+//         Private Types
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Data                                                     
+//         Private Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Public Data                                                      
+//         Public Data
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Prototypes                                               
+//         Private Prototypes
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Private Functions                                               
+//         Private Functions
 //----------------------------------------------------------------------------
 
-
-
 //----------------------------------------------------------------------------
-//         Public Functions                                                
+//         Public Functions
 //----------------------------------------------------------------------------
-
 
 //============================================================================
 // WSYS_String::WSYS_String
 //============================================================================
 
-WSYS_String::WSYS_String(const Char *string)
-: m_data(NULL)
-{
-	set(string);
-}
+WSYS_String::WSYS_String(const Char *string) : m_data(NULL) { set(string); }
 
 //============================================================================
 // WSYS_String::~WSYS_String
 //============================================================================
 
-WSYS_String::~WSYS_String()
-{
-	delete [] m_data;
+WSYS_String::~WSYS_String() { delete[] m_data; }
+
+//============================================================================
+// WSYS_String::operator==
+//============================================================================
+
+Bool WSYS_String::operator==(const char *rvalue) const {
+  return strcmp(get(), rvalue) == 0;
 }
 
 //============================================================================
-// WSYS_String::operator== 
+// WSYS_String::operator!=
 //============================================================================
 
-Bool WSYS_String::operator== (const char *rvalue) const
-{
-	return strcmp( get(), rvalue) == 0;
+Bool WSYS_String::operator!=(const char *rvalue) const {
+  return strcmp(get(), rvalue) != 0;
 }
 
 //============================================================================
-// WSYS_String::operator!= 
+// WSYS_String::operator=
 //============================================================================
 
-Bool WSYS_String::operator!= (const char *rvalue) const
-{
-	return strcmp( get(), rvalue) != 0;
+const WSYS_String &WSYS_String::operator=(const WSYS_String &string) {
+  set(string.get());
+  return (*this);
 }
 
 //============================================================================
-// WSYS_String::operator= 
+// WSYS_String::operator=
 //============================================================================
 
-const WSYS_String&	WSYS_String::operator= (const WSYS_String &string)
-{
-	set( string.get());
-	return (*this);
+const WSYS_String &WSYS_String::operator=(const Char *string) {
+  set(string);
+  return (*this);
 }
 
 //============================================================================
-// WSYS_String::operator= 
+// WSYS_String::operator+=
 //============================================================================
 
-const WSYS_String&	WSYS_String::operator= (const Char *string)
-{
-	set( string );
-	return (*this);
+const WSYS_String &WSYS_String::operator+=(const WSYS_String &string) {
+  Char *buffer =
+      MSGNEW("WSYS_String") Char[length() + string.length() + 1];  // pool[]ify
+
+  if (buffer != NULL) {
+    strcpy(buffer, m_data);
+    strcat(buffer, string.get());
+    delete[] m_data;
+    m_data = buffer;
+  }
+
+  return (*this);
 }
 
 //============================================================================
-// WSYS_String::operator+= 
+// WSYS_String::operator+=
 //============================================================================
 
-const WSYS_String&	WSYS_String::operator+= (const WSYS_String &string)
-{
-	Char *buffer = MSGNEW("WSYS_String") Char [ length() + string.length() + 1 ];		// pool[]ify
+const WSYS_String &WSYS_String::operator+=(const Char *string) {
+  if (string != NULL) {
+    Char *buffer = MSGNEW("WSYS_String") Char[length() + strlen(string) + 1];
 
-	if ( buffer != NULL )
-	{
-		strcpy( buffer, m_data );
-		strcat( buffer, string.get() );
-		delete [] m_data;
-		m_data = buffer;
-	}
+    if (buffer != NULL) {
+      strcpy(buffer, m_data);
+      strcat(buffer, string);
+      delete[] m_data;
+      m_data = buffer;
+    }
+  }
 
-	return (*this);
-}
-
-//============================================================================
-// WSYS_String::operator+= 
-//============================================================================
-
-const WSYS_String&	WSYS_String::operator+= (const Char *string)
-{
-	if ( string != NULL )
-	{
-		Char *buffer = MSGNEW("WSYS_String") Char [ length() + strlen( string ) + 1 ];	
-
-		if ( buffer != NULL )
-		{
-			strcpy( buffer, m_data );
-			strcat( buffer, string );
-			delete [] m_data;
-			m_data = buffer;
-		}
-	}
-
-	return (*this);
+  return (*this);
 }
 
 //============================================================================
 // operator+ (const WSYS_String &string1, const WSYS_String &string2)
 //============================================================================
 
-WSYS_String	operator+ (const WSYS_String &string1, const WSYS_String &string2)
-{
-	WSYS_String temp(string1);
-	temp += string2;
-	return temp;
-
+WSYS_String operator+(const WSYS_String &string1, const WSYS_String &string2) {
+  WSYS_String temp(string1);
+  temp += string2;
+  return temp;
 }
 
 //============================================================================
 // operator+ (const Char *string1, const WSYS_String &string2)
 //============================================================================
 
-WSYS_String	operator+ (const Char *string1, const WSYS_String &string2)
-{
-	WSYS_String temp(string1);
-	temp += string2;
-	return temp;
+WSYS_String operator+(const Char *string1, const WSYS_String &string2) {
+  WSYS_String temp(string1);
+  temp += string2;
+  return temp;
 }
 
 //============================================================================
 // operator+ (const WSYS_String &string1, const Char *string2)
 //============================================================================
 
-WSYS_String	operator+ (const WSYS_String &string1, const Char *string2)
-{
-	WSYS_String temp(string1);
-	temp += string2;
-	return temp;
+WSYS_String operator+(const WSYS_String &string1, const Char *string2) {
+  WSYS_String temp(string1);
+  temp += string2;
+  return temp;
 }
 
 //============================================================================
 // WSYS_String::length
 //============================================================================
 
-Int WSYS_String::length(void) const
-{
-	return strlen( m_data );
-}
+Int WSYS_String::length(void) const { return strlen(m_data); }
 
 //============================================================================
 // WSYS_String::isEmpty
 //============================================================================
 
-Bool WSYS_String::isEmpty(void) const
-{
-	return m_data[0] == 0;
-}
+Bool WSYS_String::isEmpty(void) const { return m_data[0] == 0; }
 
 //============================================================================
 // WSYS_String::format
 //============================================================================
 
-Int _cdecl WSYS_String::format(const Char *format, ...)
-{
-	Int result = 0;
-	char *buffer = MSGNEW("WSYS_String") char[100*1024];
+Int _cdecl WSYS_String::format(const Char *format, ...) {
+  Int result = 0;
+  char *buffer = MSGNEW("WSYS_String") char[100 * 1024];
 
-	if ( buffer )
-	{
-		va_list args;
-		va_start( args, format );     /* Initialize variable arguments. */
-		result = vsprintf ( buffer, format, args );
-		va_end( args );
-		set( buffer );
-		delete [] buffer;
-	}
-	else
-	{
-		set("");
-	}
+  if (buffer) {
+    va_list args;
+    va_start(args, format); /* Initialize variable arguments. */
+    result = vsprintf(buffer, format, args);
+    va_end(args);
+    set(buffer);
+    delete[] buffer;
+  } else {
+    set("");
+  }
 
-	return result;
+  return result;
 }
 
 //============================================================================
 // WSYS_String::set
 //============================================================================
 
-void WSYS_String::set( const Char *string )
-{
-	delete [] m_data;
+void WSYS_String::set(const Char *string) {
+  delete[] m_data;
 
-	if ( string == NULL )
-	{
-		string = "";
-	}
+  if (string == NULL) {
+    string = "";
+  }
 
-	m_data = MSGNEW("WSYS_String") Char [ strlen(string) + 1];
-	strcpy ( m_data, string );
+  m_data = MSGNEW("WSYS_String") Char[strlen(string) + 1];
+  strcpy(m_data, string);
 }
-
 
 //============================================================================
 // WSYS_String::makeUpperCase
 //============================================================================
 
-void WSYS_String::makeUpperCase( void )
-{
-	Char *chr = m_data;
-	Char ch;
+void WSYS_String::makeUpperCase(void) {
+  Char *chr = m_data;
+  Char ch;
 
-	while( (ch = *chr) )
-	{
-		*chr++ = (Char) toupper( ch );
-	}
+  while ((ch = *chr)) {
+    *chr++ = (Char)toupper(ch);
+  }
 }
 
 //============================================================================
 // WSYS_String::makeLowerCase
 //============================================================================
 
-void WSYS_String::makeLowerCase( void )
-{
-	Char *chr = m_data;
-	Char ch;
+void WSYS_String::makeLowerCase(void) {
+  Char *chr = m_data;
+  Char ch;
 
-	while( (ch = *chr) )
-	{
-		*chr++ = (Char) tolower( ch );
-	}
+  while ((ch = *chr)) {
+    *chr++ = (Char)tolower(ch);
+  }
 }

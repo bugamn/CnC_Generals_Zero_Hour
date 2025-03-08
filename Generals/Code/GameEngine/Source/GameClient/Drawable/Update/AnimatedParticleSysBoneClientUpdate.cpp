@@ -18,116 +18,97 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: AnimatedParticleSysBoneClientUpdate.cpp //////////////////////////////////////////////////////////////////
-// Author: Mark Lorenzen, October 2002
-// Desc:   client update module to translate particle systems with animation
+// FILE: AnimatedParticleSysBoneClientUpdate.cpp
+// ////////////////////////////////////////////////////////////////// Author:
+// Mark Lorenzen, October 2002 Desc:   client update module to translate
+// particle systems with animation
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
-#include "GameClient/Drawable.h"
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
 #include "GameClient/Module/AnimatedParticleSysBoneClientUpdate.h"
-#include "Common/Player.h"
-#include "Common/PlayerList.h"
-#include "Common/ThingFactory.h"
-#include "Common/ThingTemplate.h"
-#include "Common/RandomValue.h"
+
 #include "Common/DrawModule.h"
 #include "Common/PerfTimer.h"
+#include "Common/Player.h"
+#include "Common/PlayerList.h"
+#include "Common/RandomValue.h"
+#include "Common/ThingFactory.h"
+#include "Common/ThingTemplate.h"
 #include "Common/Xfer.h"
+#include "GameClient/Drawable.h"
 #include "GameLogic/Object.h"
 #include "GameLogic/ScriptEngine.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-AnimatedParticleSysBoneClientUpdate::AnimatedParticleSysBoneClientUpdate( Thing *thing, const ModuleData* moduleData ) :
-	ClientUpdateModule( thing, moduleData )
-{
-	m_life = 0;
-
+AnimatedParticleSysBoneClientUpdate::AnimatedParticleSysBoneClientUpdate(
+    Thing *thing, const ModuleData *moduleData)
+    : ClientUpdateModule(thing, moduleData) {
+  m_life = 0;
 }
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-AnimatedParticleSysBoneClientUpdate::~AnimatedParticleSysBoneClientUpdate( void )
-{
-
-}
-
+AnimatedParticleSysBoneClientUpdate::~AnimatedParticleSysBoneClientUpdate(
+    void) {}
 
 //-------------------------------------------------------------------------------------------------
 /** The client update callback. */
 //-------------------------------------------------------------------------------------------------
-void AnimatedParticleSysBoneClientUpdate::clientUpdate( void )
-{
-	//THIS IS HAPPENING CLIENT-SIDE
-	// I CAN DO WHAT I NEED HERE AND NOT HAVE TO BE LOGIC SYNC-SAFE
+void AnimatedParticleSysBoneClientUpdate::clientUpdate(void) {
+  // THIS IS HAPPENING CLIENT-SIDE
+  //  I CAN DO WHAT I NEED HERE AND NOT HAVE TO BE LOGIC SYNC-SAFE
 
+  ++m_life;
 
-	++m_life;
-
-	Drawable *draw = getDrawable();
-	if (draw)
-	{
-
-		for (DrawModule** dm = draw->getDrawModules(); *dm; ++dm)
-		{
-			ObjectDrawInterface* di = (*dm)->getObjectDrawInterface();
-			if (di)
-			{
-				if (di->updateBonesForClientParticleSystems())
-					break;
-			}
-		}
-
-
-	}
-
-
+  Drawable *draw = getDrawable();
+  if (draw) {
+    for (DrawModule **dm = draw->getDrawModules(); *dm; ++dm) {
+      ObjectDrawInterface *di = (*dm)->getObjectDrawInterface();
+      if (di) {
+        if (di->updateBonesForClientParticleSystems()) break;
+      }
+    }
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void AnimatedParticleSysBoneClientUpdate::crc( Xfer *xfer )
-{
-
-	// extend base class
-	ClientUpdateModule::crc( xfer );
+void AnimatedParticleSysBoneClientUpdate::crc(Xfer *xfer) {
+  // extend base class
+  ClientUpdateModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void AnimatedParticleSysBoneClientUpdate::xfer( Xfer *xfer )
-{
+void AnimatedParticleSysBoneClientUpdate::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// extend base class
-	ClientUpdateModule::xfer( xfer );
-
+  // extend base class
+  ClientUpdateModule::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void AnimatedParticleSysBoneClientUpdate::loadPostProcess( void )
-{
-
-	// extend base class
-	ClientUpdateModule::loadPostProcess();
+void AnimatedParticleSysBoneClientUpdate::loadPostProcess(void) {
+  // extend base class
+  ClientUpdateModule::loadPostProcess();
 
 }  // end loadPostProcess

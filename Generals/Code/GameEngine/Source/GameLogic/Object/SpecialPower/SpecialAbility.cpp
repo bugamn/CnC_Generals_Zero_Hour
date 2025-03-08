@@ -18,23 +18,26 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: SpecialAbility.cpp /////////////////////////////////////////////////////////////
-// Author: Kris Morness, July 2002
-// Desc:   This is the class that handles processing of any special attack from a unit. There are 
+// FILE: SpecialAbility.cpp
+// ///////////////////////////////////////////////////////////// Author: Kris
+// Morness, July 2002 Desc:   This is the class that handles processing of any
+// special attack from a unit. There are
 //         many different styles and rules for various attacks.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+// INCLUDES
+// ///////////////////////////////////////////////////////////////////////////////////////
+#include "GameLogic/Module/SpecialAbility.h"
 
 #include "Common/Player.h"
 #include "Common/Xfer.h"
 #include "GameLogic/Object.h"
-#include "GameLogic/Module/SpecialAbility.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,96 +45,77 @@
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-SpecialAbility::SpecialAbility( Thing *thing, const ModuleData *moduleData )
-												: SpecialPowerModule( thing, moduleData )
-{
-
-}  // end SpecialAbility
+SpecialAbility::SpecialAbility(Thing *thing, const ModuleData *moduleData)
+    : SpecialPowerModule(thing, moduleData) {}  // end SpecialAbility
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-SpecialAbility::~SpecialAbility( void )
-{
-
-}  // end ~SpecialAbility
+SpecialAbility::~SpecialAbility(void) {}  // end ~SpecialAbility
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-void SpecialAbility::doSpecialPowerAtLocation( const Coord3D *loc, UnsignedInt commandOptions )
-{
-	if (getObject()->isDisabled())
-		return;
+void SpecialAbility::doSpecialPowerAtLocation(const Coord3D *loc,
+                                              UnsignedInt commandOptions) {
+  if (getObject()->isDisabled()) return;
 
-	// sanity
-	if( loc == NULL )
-		return;
+  // sanity
+  if (loc == NULL) return;
 
-	// call the base class action cause we are *EXTENDING* functionality
-	SpecialPowerModule::doSpecialPowerAtLocation( loc, commandOptions );
-}  
+  // call the base class action cause we are *EXTENDING* functionality
+  SpecialPowerModule::doSpecialPowerAtLocation(loc, commandOptions);
+}
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-void SpecialAbility::doSpecialPowerAtObject( Object *obj, UnsignedInt commandOptions )
-{
-	if (getObject()->isDisabled())
-		return;
+void SpecialAbility::doSpecialPowerAtObject(Object *obj,
+                                            UnsignedInt commandOptions) {
+  if (getObject()->isDisabled()) return;
 
-	if (!obj)
-		return;
+  if (!obj) return;
 
-	// call the base class action cause we are *EXTENDING* functionality
-	SpecialPowerModule::doSpecialPowerAtObject( obj, commandOptions );
-}  
-
+  // call the base class action cause we are *EXTENDING* functionality
+  SpecialPowerModule::doSpecialPowerAtObject(obj, commandOptions);
+}
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-void SpecialAbility::doSpecialPower( UnsignedInt commandOptions )
-{
-	if (getObject()->isDisabled())
-		return;
+void SpecialAbility::doSpecialPower(UnsignedInt commandOptions) {
+  if (getObject()->isDisabled()) return;
 
-	// call the base class action cause we are *EXTENDING* functionality
-	SpecialPowerModule::doSpecialPower( commandOptions );
-}  
+  // call the base class action cause we are *EXTENDING* functionality
+  SpecialPowerModule::doSpecialPower(commandOptions);
+}
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void SpecialAbility::crc( Xfer *xfer )
-{
-
-	// extend base class
-	SpecialPowerModule::crc( xfer );
+void SpecialAbility::crc(Xfer *xfer) {
+  // extend base class
+  SpecialPowerModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void SpecialAbility::xfer( Xfer *xfer )
-{
+void SpecialAbility::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
-
-	// extend base class
-	SpecialPowerModule::xfer( xfer );
+  // extend base class
+  SpecialPowerModule::xfer(xfer);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void SpecialAbility::loadPostProcess( void )
-{
-
-	// extend base class
-	SpecialPowerModule::loadPostProcess();
+void SpecialAbility::loadPostProcess(void) {
+  // extend base class
+  SpecialPowerModule::loadPostProcess();
 
 }  // end loadPostProcess

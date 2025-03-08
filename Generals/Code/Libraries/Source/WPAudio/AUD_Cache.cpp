@@ -20,7 +20,8 @@
 **                                                                          **
 **                       Westwood Studios Pacific.                          **
 **                                                                          **
-**                       Confidential Information					                  **
+**                       Confidential Information
+***
 **                Copyright (C) 2000 - All Rights Reserved                  **
 **                                                                          **
 ******************************************************************************
@@ -43,30 +44,25 @@
 **            Includes                                                      **
 *****************************************************************************/
 
-#include <string.h>
 #include <memory.h>
-
-#include <wpaudio/altypes.h>						//  always include this header first 
-#include <wpaudio/memory.h>
-#include <wpaudio/list.h>
-#include <wpaudio/source.h>
+#include <string.h>
+#include <wpaudio/altypes.h>  //  always include this header first
 #include <wpaudio/cache.h>
+#include <wpaudio/list.h>
+#include <wpaudio/memory.h>
 #include <wpaudio/profiler.h>
-
+#include <wpaudio/source.h>
 #include <wsys/File.h>
 
 // 'assignment within condition expression'.
 #pragma warning(disable : 4706)
 
-
-DBG_DECLARE_TYPE ( AudioCache );
-DBG_DECLARE_TYPE ( AudioCacheItem );
+DBG_DECLARE_TYPE(AudioCache);
+DBG_DECLARE_TYPE(AudioCacheItem);
 
 /*****************************************************************************
 **          Externals                                                       **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **           Defines                                                        **
@@ -78,24 +74,17 @@ DBG_DECLARE_TYPE ( AudioCacheItem );
 **        Private Types                                                     **
 *****************************************************************************/
 
-
 /*****************************************************************************
 **         Private Data                                                     **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **         Public Data                                                      **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **         Private Prototypes                                               **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **          Private Functions                                               **
@@ -106,15 +95,13 @@ DBG_DECLARE_TYPE ( AudioCacheItem );
 /*                                                                */
 /******************************************************************/
 
-static void audioCacheAssetClose ( AudioCache *cache )
-{
-	if ( cache->assetFile )
-	{
-		cache->assetFile->close();
-		cache->assetFile = NULL;
-	}
+static void audioCacheAssetClose(AudioCache *cache) {
+  if (cache->assetFile) {
+    cache->assetFile->close();
+    cache->assetFile = NULL;
+  }
 
-	cache->assetBytesLeft = 0;
+  cache->assetBytesLeft = 0;
 }
 
 /******************************************************************/
@@ -122,29 +109,26 @@ static void audioCacheAssetClose ( AudioCache *cache )
 /*                                                                */
 /******************************************************************/
 
-static int	audioCacheAssetOpen ( AudioCache *cache, const char *name )
-{
-	audioCacheAssetClose ( cache );
+static int audioCacheAssetOpen(AudioCache *cache, const char *name) {
+  audioCacheAssetClose(cache);
 
-	if ( name == NULL || cache->openAssetCB == NULL )
-	{
-		return FALSE;
-	}
+  if (name == NULL || cache->openAssetCB == NULL) {
+    return FALSE;
+  }
 
-	cache->assetFile = cache->openAssetCB( name );
+  cache->assetFile = cache->openAssetCB(name);
 
-	if ( !cache->assetFile )
-	{
-		return FALSE;
-	}
+  if (!cache->assetFile) {
+    return FALSE;
+  }
 
-	if ( !AudioFormatReadWaveFile ( cache->assetFile, &cache->assetFormat, &cache->assetBytesLeft ))
-	{
-		audioCacheAssetClose ( cache );
-		return FALSE;
-	}
+  if (!AudioFormatReadWaveFile(cache->assetFile, &cache->assetFormat,
+                               &cache->assetBytesLeft)) {
+    audioCacheAssetClose(cache);
+    return FALSE;
+  }
 
-	return TRUE;
+  return TRUE;
 }
 
 /******************************************************************/
@@ -152,16 +136,13 @@ static int	audioCacheAssetOpen ( AudioCache *cache, const char *name )
 /*                                                                */
 /******************************************************************/
 
-int audioCacheAssetRead ( AudioCache *cache, void *data, int bytes )
-{
-		if ( bytes > cache->assetBytesLeft )
-		{
-			bytes = cache->assetBytesLeft;
-		}
+int audioCacheAssetRead(AudioCache *cache, void *data, int bytes) {
+  if (bytes > cache->assetBytesLeft) {
+    bytes = cache->assetBytesLeft;
+  }
 
-		return cache->assetFile ? cache->assetFile->read ( data, bytes ) : 0 ;
+  return cache->assetFile ? cache->assetFile->read(data, bytes) : 0;
 }
-
 
 /*****************************************************************************
 **          Public Functions                                                **
@@ -172,39 +153,37 @@ int audioCacheAssetRead ( AudioCache *cache, void *data, int bytes )
 /*                                                                */
 /******************************************************************/
 
-AudioCache*			AudioCacheCreate ( int cacheSize, int maxItems, int frameSize )
-{
-	AudioCache	*cache;
-	int					frameBytes;
-	int					pages;
+AudioCache *AudioCacheCreate(int cacheSize, int maxItems, int frameSize) {
+  AudioCache *cache;
+  int frameBytes;
+  int pages;
 
-	ALLOC_STRUCT ( cache, AudioCache );
+  ALLOC_STRUCT(cache, AudioCache);
 
-	DBG_SET_TYPE ( cache, AudioCache );
+  DBG_SET_TYPE(cache, AudioCache);
 
-	cache->frameSize = frameSize;
+  cache->frameSize = frameSize;
 
-	frameBytes = sizeof ( AudioFrame ) + frameSize;
-	pages = cacheSize/frameBytes;
+  frameBytes = sizeof(AudioFrame) + frameSize;
+  pages = cacheSize / frameBytes;
 
-	cache->framePool = MemoryPoolCreate ( pages, frameBytes );
+  cache->framePool = MemoryPoolCreate(pages, frameBytes);
 
-	cache->itemPool = MemoryPoolCreate ( maxItems, sizeof ( AudioCacheItem ) );
+  cache->itemPool = MemoryPoolCreate(maxItems, sizeof(AudioCacheItem));
 
-	ListInit ( &cache->items );
-	cache->assetFile = NULL;
-	AudioFormatInit ( &cache->assetFormat );
+  ListInit(&cache->items);
+  cache->assetFile = NULL;
+  AudioFormatInit(&cache->assetFormat);
 
-	ProfCacheInit ( &cache->profile, pages, frameSize );
-	ProfCacheUpdateInterval ( &cache->profile, 10 ); // every ten milliseconds
-	
-	if ( !cache->framePool || !cache->itemPool )
-	{
-		AudioCacheDestroy ( cache );
-		cache = NULL;
-	}
+  ProfCacheInit(&cache->profile, pages, frameSize);
+  ProfCacheUpdateInterval(&cache->profile, 10);  // every ten milliseconds
 
-	return cache;
+  if (!cache->framePool || !cache->itemPool) {
+    AudioCacheDestroy(cache);
+    cache = NULL;
+  }
+
+  return cache;
 }
 
 /******************************************************************/
@@ -212,31 +191,26 @@ AudioCache*			AudioCacheCreate ( int cacheSize, int maxItems, int frameSize )
 /*                                                                */
 /******************************************************************/
 
-void				AudioCacheDestroy ( AudioCache *cache )
-{
-	AudioCacheItem	*item;
-	
+void AudioCacheDestroy(AudioCache *cache) {
+  AudioCacheItem *item;
 
-	DBG_ASSERT_TYPE ( cache, AudioCache );
+  DBG_ASSERT_TYPE(cache, AudioCache);
 
-	while ( ( item = (AudioCacheItem *) ListNodeNext ( &cache->items )) )
-	{
-		AudioCacheItemFree ( item );
-	}
+  while ((item = (AudioCacheItem *)ListNodeNext(&cache->items))) {
+    AudioCacheItemFree(item);
+  }
 
-	if ( cache->framePool )
-	{
-		MemoryPoolDestroy ( cache->framePool );
-	}
+  if (cache->framePool) {
+    MemoryPoolDestroy(cache->framePool);
+  }
 
-	if ( cache->itemPool )
-	{
-		MemoryPoolDestroy ( cache->itemPool );
-	}
+  if (cache->itemPool) {
+    MemoryPoolDestroy(cache->itemPool);
+  }
 
-	DBG_INVALIDATE_TYPE ( cache );
+  DBG_INVALIDATE_TYPE(cache);
 
-	AudioMemFree ( cache );
+  AudioMemFree(cache);
 }
 
 /******************************************************************/
@@ -244,24 +218,20 @@ void				AudioCacheDestroy ( AudioCache *cache )
 /*                                                                */
 /******************************************************************/
 
-AudioCacheItem*		AudioCacheGetItem ( AudioCache *cache, const char *name )
-{
-	AudioCacheItem	*item, *head;
-	
+AudioCacheItem *AudioCacheGetItem(AudioCache *cache, const char *name) {
+  AudioCacheItem *item, *head;
 
-	DBG_ASSERT_TYPE ( cache, AudioCache );
+  DBG_ASSERT_TYPE(cache, AudioCache);
 
-	item = head = (AudioCacheItem *) &cache->items ;
+  item = head = (AudioCacheItem *)&cache->items;
 
-	while ( (item = (AudioCacheItem *) item->nd.next ) != head )
-	{
-		if ( item->valid && item->name == name )
-		{
-			return item;
-		}
-	}
+  while ((item = (AudioCacheItem *)item->nd.next) != head) {
+    if (item->valid && item->name == name) {
+      return item;
+    }
+  }
 
-	return NULL;
+  return NULL;
 }
 
 /******************************************************************/
@@ -269,20 +239,16 @@ AudioCacheItem*		AudioCacheGetItem ( AudioCache *cache, const char *name )
 /*                                                                */
 /******************************************************************/
 
-void		AudioCacheInvalidate ( AudioCache *cache )
-{
-	AudioCacheItem	*item, *head;
-	
+void AudioCacheInvalidate(AudioCache *cache) {
+  AudioCacheItem *item, *head;
 
-	DBG_ASSERT_TYPE ( cache, AudioCache );
+  DBG_ASSERT_TYPE(cache, AudioCache);
 
-	item = head = (AudioCacheItem *) &cache->items ;
+  item = head = (AudioCacheItem *)&cache->items;
 
-	while ( (item = (AudioCacheItem *) item->nd.next ) != head )
-	{
-		item->valid = FALSE;
-	}
-
+  while ((item = (AudioCacheItem *)item->nd.next) != head) {
+    item->valid = FALSE;
+  }
 }
 
 /******************************************************************/
@@ -290,13 +256,12 @@ void		AudioCacheInvalidate ( AudioCache *cache )
 /*                                                                */
 /******************************************************************/
 
-AudioCacheOpenCB*		AudioCacheSetOpenCB ( AudioCache *cache, AudioCacheOpenCB *cb )
-{
-	DBG_ASSERT_TYPE ( cache, AudioCache );
+AudioCacheOpenCB *AudioCacheSetOpenCB(AudioCache *cache, AudioCacheOpenCB *cb) {
+  DBG_ASSERT_TYPE(cache, AudioCache);
 
-	AudioCacheOpenCB *old = cache->openAssetCB;
-	cache->openAssetCB = cb;
-	return old;
+  AudioCacheOpenCB *old = cache->openAssetCB;
+  cache->openAssetCB = cb;
+  return old;
 }
 
 /******************************************************************/
@@ -304,155 +269,141 @@ AudioCacheOpenCB*		AudioCacheSetOpenCB ( AudioCache *cache, AudioCacheOpenCB *cb
 /*                                                                */
 /******************************************************************/
 
-AudioCacheItem*		AudioCacheLoadItem ( AudioCache *cache, const char *name )
-{
-	AudioCacheItem *item;
-	int			error;
-	
+AudioCacheItem *AudioCacheLoadItem(AudioCache *cache, const char *name) {
+  AudioCacheItem *item;
+  int error;
 
-	DBG_ASSERT_TYPE ( cache, AudioCache );
+  DBG_ASSERT_TYPE(cache, AudioCache);
 
-	if ( (item = AudioCacheGetItem ( cache, name )))
-	{
-		#if DEBUG_CACHE
-			DBGPRINTF (("ACACHE: %10s - Cached\n", item->name ));
-		#endif
+  if ((item = AudioCacheGetItem(cache, name))) {
+#if DEBUG_CACHE
+    DBGPRINTF(("ACACHE: %10s - Cached\n", item->name));
+#endif
 
-		ListNodeRemove ( &item->nd );
-		ListNodeAppend ( &cache->items, &item->nd );
-		ProfCacheHit ( &cache->profile );
+    ListNodeRemove(&item->nd);
+    ListNodeAppend(&cache->items, &item->nd);
+    ProfCacheHit(&cache->profile);
 
-		return item;
-	}
+    return item;
+  }
 
-	ProfCacheMiss ( &cache->profile );
-	//  item is not in the cache so load it 
-	//  see first if the sample exists 
+  ProfCacheMiss(&cache->profile);
+  //  item is not in the cache so load it
+  //  see first if the sample exists
 
-	#if DEBUG_CACHE
-		DBGPRINTF (("ACACHE: %10s - Loading\n", name ));
-	#endif
+#if DEBUG_CACHE
+  DBGPRINTF(("ACACHE: %10s - Loading\n", name));
+#endif
 
-	ProfCacheLoadStart ( &cache->profile, 0 );
+  ProfCacheLoadStart(&cache->profile, 0);
 
-	if ( !audioCacheAssetOpen( cache, name ))
-	{
-		#if DEBUG_CACHE
-			DBGPRINTF (("does not exist\n"));
-		#endif
-		goto none;
-	}
+  if (!audioCacheAssetOpen(cache, name)) {
+#if DEBUG_CACHE
+    DBGPRINTF(("does not exist\n"));
+#endif
+    goto none;
+  }
 
-	item = (AudioCacheItem *) MemoryPoolGetItem ( cache->itemPool );
+  item = (AudioCacheItem *)MemoryPoolGetItem(cache->itemPool);
 
-	if ( !item )
-	{
-		//  free the oldest item so that we can use it's item struct 
-		AudioCacheFreeOldestItem ( cache );
-		item = (AudioCacheItem *) MemoryPoolGetItem ( cache->itemPool );
+  if (!item) {
+    //  free the oldest item so that we can use it's item struct
+    AudioCacheFreeOldestItem(cache);
+    item = (AudioCacheItem *)MemoryPoolGetItem(cache->itemPool);
 
-		if ( !item )
-		{
-			//  the oldest item could not be freed because it was still playing 
-			DBGPRINTF (("Audio cache overflow\n"));
-			audioCacheAssetClose ( cache );
-			goto none;
-		}
-	}
+    if (!item) {
+      //  the oldest item could not be freed because it was still playing
+      DBGPRINTF(("Audio cache overflow\n"));
+      audioCacheAssetClose(cache);
+      goto none;
+    }
+  }
 
-	//  prepare item for use 
-	item->name = name;
-	item->cache = cache;
-	ListNodeInit ( &item->nd );
-	LockInit ( &item->lock );
-	AudioSampleInit ( &item->sample );
-	AudioSampleSetName ( &item->sample, name );
-	AudioFormatInit ( &item->format );
-	item->sample.Format = &item->format;
-	DBG_SET_TYPE ( item, AudioCacheItem );
+  //  prepare item for use
+  item->name = name;
+  item->cache = cache;
+  ListNodeInit(&item->nd);
+  LockInit(&item->lock);
+  AudioSampleInit(&item->sample);
+  AudioSampleSetName(&item->sample, name);
+  AudioFormatInit(&item->format);
+  item->sample.Format = &item->format;
+  DBG_SET_TYPE(item, AudioCacheItem);
 
-	error = FALSE;
+  error = FALSE;
 
-	//  ok load sample data in to cache 
-	{
-		int bytesToTransfer;
-		int bytes;
-		int bytesTransfered;
+  //  ok load sample data in to cache
+  {
+    int bytesToTransfer;
+    int bytes;
+    int bytesTransfered;
 
-		bytesToTransfer = cache->assetBytesLeft;
+    bytesToTransfer = cache->assetBytesLeft;
 
-		while ( bytesToTransfer )
-		{
-			AudioFrame	*frame;
-			void		*data;
+    while (bytesToTransfer) {
+      AudioFrame *frame;
+      void *data;
 
-			if ( (bytes = cache->frameSize ) > bytesToTransfer )
-			{
-				bytes = bytesToTransfer;
-			}
+      if ((bytes = cache->frameSize) > bytesToTransfer) {
+        bytes = bytesToTransfer;
+      }
 
-			while ( ! (frame = (AudioFrame *) MemoryPoolGetItem ( cache->framePool )))
-			{
-				if ( !AudioCacheFreeOldestItem ( cache ) )
-				{
-					break;
-				}
-			}
+      while (!(frame = (AudioFrame *)MemoryPoolGetItem(cache->framePool))) {
+        if (!AudioCacheFreeOldestItem(cache)) {
+          break;
+        }
+      }
 
-			if ( !frame )
-			{
-				error = TRUE;
-				break;
-			}
+      if (!frame) {
+        error = TRUE;
+        break;
+      }
 
-			data = (void *) ( (uint) frame + sizeof ( AudioFrame ));
+      data = (void *)((uint)frame + sizeof(AudioFrame));
 
-			AudioFrameInit ( frame, data, bytes );
-			AudioSampleAddFrame ( &item->sample, frame );
+      AudioFrameInit(frame, data, bytes);
+      AudioSampleAddFrame(&item->sample, frame);
 
-			bytesTransfered = audioCacheAssetRead ( cache, data, bytes );
-			ProfCacheAddLoadBytes ( &cache->profile, bytesTransfered );
-			ProfCacheAddPage ( &cache->profile );
-			ProfCacheFill ( &cache->profile, bytesTransfered );
+      bytesTransfered = audioCacheAssetRead(cache, data, bytes);
+      ProfCacheAddLoadBytes(&cache->profile, bytesTransfered);
+      ProfCacheAddPage(&cache->profile);
+      ProfCacheFill(&cache->profile, bytesTransfered);
 
-			if ( bytesTransfered != bytes )
-			{
-				error = TRUE;
-				break;
-			}
+      if (bytesTransfered != bytes) {
+        error = TRUE;
+        break;
+      }
 
-			bytesToTransfer -= bytesTransfered;
-		}
-	}
+      bytesToTransfer -= bytesTransfered;
+    }
+  }
 
-	if ( error )
-	{
-		#if DEBUG_CACHE
-			DBGPRINTF (("FAILED\n"));
-		#endif
-		AudioCacheItemFree ( item );
-		goto none;
-	}
+  if (error) {
+#if DEBUG_CACHE
+    DBGPRINTF(("FAILED\n"));
+#endif
+    AudioCacheItemFree(item);
+    goto none;
+  }
 
-	#if DEBUG_CACHE
-		DBGPRINTF (("done\n"));
-	#endif
+#if DEBUG_CACHE
+  DBGPRINTF(("done\n"));
+#endif
 
-	//  update the format structure 
-	memcpy ( &item->format, &cache->assetFormat, sizeof ( AudioFormat) );
+  //  update the format structure
+  memcpy(&item->format, &cache->assetFormat, sizeof(AudioFormat));
 
+  ListNodeAppend(&cache->items, &item->nd);
+  item->valid = TRUE;
+  audioCacheAssetClose(cache);
 
-	ListNodeAppend ( &cache->items, &item->nd );
-	item->valid = TRUE;
-	audioCacheAssetClose ( cache );
-
-	ProfCacheLoadEnd ( &cache->profile );
-	return item;
+  ProfCacheLoadEnd(&cache->profile);
+  return item;
 
 none:
 
-	ProfCacheLoadEnd ( &cache->profile );
-	return NULL;
+  ProfCacheLoadEnd(&cache->profile);
+  return NULL;
 }
 
 /******************************************************************/
@@ -465,42 +416,23 @@ none:
 //  towards the end of the list, as old events should expire and unlock.
 //  But not always (e.g. loops), so don't count on it.
 
-int				AudioCacheFreeOldestItem( AudioCache *cache )
-{
-	AudioCacheItem *item;
+int AudioCacheFreeOldestItem(AudioCache *cache) {
+  AudioCacheItem *item;
 
-	DBG_ASSERT_TYPE( cache, AudioCache );
+  DBG_ASSERT_TYPE(cache, AudioCache);
 
-	item = (AudioCacheItem*) ListNodePrev( &cache->items );
+  item = (AudioCacheItem *)ListNodePrev(&cache->items);
 
-	while ( item )
-	{
-		if ( !AudioCacheItemInUse( item ) )
-		{
-			AudioCacheItemFree( item );
-			return TRUE;
-		}
+  while (item) {
+    if (!AudioCacheItemInUse(item)) {
+      AudioCacheItemFree(item);
+      return TRUE;
+    }
 
-		item = (AudioCacheItem*) ListNodePrev( (ListNode*) item );
-	}
+    item = (AudioCacheItem *)ListNodePrev((ListNode *)item);
+  }
 
-	return FALSE;
-}
-
-
-/******************************************************************/
-/*                                                                */
-/*                                                                */
-/******************************************************************/
-
-void				AudioCacheItemLock ( AudioCacheItem *item )
-{
-	
-
-	DBG_ASSERT_TYPE ( item, AudioCacheItem );
-
-	LockAcquire ( &item->lock );
-
+  return FALSE;
 }
 
 /******************************************************************/
@@ -508,13 +440,10 @@ void				AudioCacheItemLock ( AudioCacheItem *item )
 /*                                                                */
 /******************************************************************/
 
-void				AudioCacheItemUnlock ( AudioCacheItem *item )
-{
-	
+void AudioCacheItemLock(AudioCacheItem *item) {
+  DBG_ASSERT_TYPE(item, AudioCacheItem);
 
-	DBG_ASSERT_TYPE ( item, AudioCacheItem );
-
-	LockRelease ( &item->lock );
+  LockAcquire(&item->lock);
 }
 
 /******************************************************************/
@@ -522,13 +451,10 @@ void				AudioCacheItemUnlock ( AudioCacheItem *item )
 /*                                                                */
 /******************************************************************/
 
-int				AudioCacheItemInUse ( AudioCacheItem *item )
-{
-	
+void AudioCacheItemUnlock(AudioCacheItem *item) {
+  DBG_ASSERT_TYPE(item, AudioCacheItem);
 
-	DBG_ASSERT_TYPE ( item, AudioCacheItem );
-
-	return Locked ( &item->lock );
+  LockRelease(&item->lock);
 }
 
 /******************************************************************/
@@ -536,40 +462,10 @@ int				AudioCacheItemInUse ( AudioCacheItem *item )
 /*                                                                */
 /******************************************************************/
 
-void				AudioCacheItemFree ( AudioCacheItem *item )
-{
-	
+int AudioCacheItemInUse(AudioCacheItem *item) {
+  DBG_ASSERT_TYPE(item, AudioCacheItem);
 
-	DBG_ASSERT_TYPE ( item, AudioCacheItem );
-
-	if ( ListNodeInList ( &item->nd ))
-	{
-		ListNodeRemove ( &item->nd );
-	}
-
-	DBG_MSGASSERT ( !AudioCacheItemInUse ( item ), ("cache item is still in use"));
-
-	#if DEBUG_CACHE
-		DBGPRINTF (("ACACHE: %10s - Freeing\n", AudioBagGetItemName ( item->cache->bag, item->id )));
-	#endif
-
-	//  return frames to frame pool 
-	{
-		AudioFrame *frame;
-
-		while ( (frame = (AudioFrame *) ListNodeNext ( &item->sample.Frames )) )
-		{
-			ListNodeRemove ( &frame->nd );
-			ProfCacheRemove ( &item->cache->profile, frame->Bytes );
-			AudioFrameDeinit ( frame );
-			ProfCacheRemovePage ( &item->cache->profile );
-			MemoryPoolReturnItem ( item->cache->framePool, frame );
-		}
-	}
-
-	AudioSampleDeinit ( &item->sample );
-	DBG_INVALIDATE_TYPE ( item );
-	MemoryPoolReturnItem ( item->cache->itemPool, item );
+  return Locked(&item->lock);
 }
 
 /******************************************************************/
@@ -577,10 +473,45 @@ void				AudioCacheItemFree ( AudioCacheItem *item )
 /*                                                                */
 /******************************************************************/
 
-AudioSample*		AudioCacheItemSample ( AudioCacheItem *item )
-{
-	DBG_ASSERT_TYPE ( item, AudioCacheItem );
+void AudioCacheItemFree(AudioCacheItem *item) {
+  DBG_ASSERT_TYPE(item, AudioCacheItem);
 
-	return &item->sample;
+  if (ListNodeInList(&item->nd)) {
+    ListNodeRemove(&item->nd);
+  }
+
+  DBG_MSGASSERT(!AudioCacheItemInUse(item), ("cache item is still in use"));
+
+#if DEBUG_CACHE
+  DBGPRINTF(("ACACHE: %10s - Freeing\n",
+             AudioBagGetItemName(item->cache->bag, item->id)));
+#endif
+
+  //  return frames to frame pool
+  {
+    AudioFrame *frame;
+
+    while ((frame = (AudioFrame *)ListNodeNext(&item->sample.Frames))) {
+      ListNodeRemove(&frame->nd);
+      ProfCacheRemove(&item->cache->profile, frame->Bytes);
+      AudioFrameDeinit(frame);
+      ProfCacheRemovePage(&item->cache->profile);
+      MemoryPoolReturnItem(item->cache->framePool, frame);
+    }
+  }
+
+  AudioSampleDeinit(&item->sample);
+  DBG_INVALIDATE_TYPE(item);
+  MemoryPoolReturnItem(item->cache->itemPool, item);
 }
 
+/******************************************************************/
+/*                                                                */
+/*                                                                */
+/******************************************************************/
+
+AudioSample *AudioCacheItemSample(AudioCacheItem *item) {
+  DBG_ASSERT_TYPE(item, AudioCacheItem);
+
+  return &item->sample;
+}

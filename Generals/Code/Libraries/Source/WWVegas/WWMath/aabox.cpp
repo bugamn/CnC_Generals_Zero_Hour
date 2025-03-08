@@ -17,63 +17,64 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WWMath                                                       *
+ *                 Project Name : WWMath *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/wwmath/aabox.cpp                             $*
+ *                     $Archive:: /Commando/Code/wwmath/aabox.cpp $*
  *                                                                                             *
- *                       Author:: Greg_h                                                       *
+ *                       Author:: Greg_h *
  *                                                                                             *
- *                     $Modtime:: 5/08/01 6:33p                                               $*
+ *                     $Modtime:: 5/08/01 6:33p $*
  *                                                                                             *
- *                    $Revision:: 18                                                          $*
+ *                    $Revision:: 18 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- *   AABoxClass::Init_Random -- initializes this box to a random state                         *
- *   AABoxClass::Contains -- test whether this box contains the given point                    *
- *   AABoxClass::Contains -- Test whether this box contains the given box                      *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: * AABoxClass::Init_Random -- initializes this box to a random
+ *state                         * AABoxClass::Contains -- test whether this box
+ *contains the given point                    * AABoxClass::Contains -- Test
+ *whether this box contains the given box                      *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "aabox.h"
-#include "colmath.h"
-#include "colmathinlines.h"
+
 #include <float.h>
 
+#include "colmath.h"
+#include "colmathinlines.h"
 
 /***********************************************************************************************
- * AABoxClass::Init_Random -- initializes this box to a random state                           *
+ * AABoxClass::Init_Random -- initializes this box to a random state *
  *                                                                                             *
- * INPUT:                                                                                      *
+ * INPUT: *
  *                                                                                             *
- * OUTPUT:                                                                                     *
+ * OUTPUT: *
  *                                                                                             *
- * WARNINGS:                                                                                   *
+ * WARNINGS: *
  *                                                                                             *
- * HISTORY:                                                                                    *
- *   3/17/2000  gth : Created.                                                                 *
+ * HISTORY: * 3/17/2000  gth : Created. *
  *=============================================================================================*/
-void AABoxClass::Init_Random(float min_center,float max_center,float min_extent,float max_extent)
-{
-	Center.X = min_center + WWMath::Random_Float() * (max_center - min_center);
-	Center.Y = min_center + WWMath::Random_Float() * (max_center - min_center);
-	Center.Z = min_center + WWMath::Random_Float() * (max_center - min_center);
-	
-	Extent.X = min_extent + WWMath::Random_Float() * (max_extent - min_extent);
-	Extent.Y = min_extent + WWMath::Random_Float() * (max_extent - min_extent);
-	Extent.Z = min_extent + WWMath::Random_Float() * (max_extent - min_extent);
+void AABoxClass::Init_Random(float min_center, float max_center,
+                             float min_extent, float max_extent) {
+  Center.X = min_center + WWMath::Random_Float() * (max_center - min_center);
+  Center.Y = min_center + WWMath::Random_Float() * (max_center - min_center);
+  Center.Z = min_center + WWMath::Random_Float() * (max_center - min_center);
+
+  Extent.X = min_extent + WWMath::Random_Float() * (max_extent - min_extent);
+  Extent.Y = min_extent + WWMath::Random_Float() * (max_extent - min_extent);
+  Extent.Z = min_extent + WWMath::Random_Float() * (max_extent - min_extent);
 }
 
-
-void AABoxClass::Transform(const Matrix3D & tm,const AABoxClass & in,AABoxClass * out)
-{
-	tm.Transform_Center_Extent_AABox(in.Center,in.Extent,&(out->Center),&(out->Extent));
+void AABoxClass::Transform(const Matrix3D& tm, const AABoxClass& in,
+                           AABoxClass* out) {
+  tm.Transform_Center_Extent_AABox(in.Center, in.Extent, &(out->Center),
+                                   &(out->Extent));
 }
 
-void MinMaxAABoxClass::Init_Empty(void) 
-{ 
-	MinCorner.Set(FLT_MAX,FLT_MAX,FLT_MAX); 
-	MaxCorner.Set(-FLT_MAX,-FLT_MAX,-FLT_MAX); 
+void MinMaxAABoxClass::Init_Empty(void) {
+  MinCorner.Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  MaxCorner.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 }

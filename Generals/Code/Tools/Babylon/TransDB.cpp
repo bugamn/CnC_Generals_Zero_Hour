@@ -20,1886 +20,1560 @@
 // TransDB.cpp
 //
 
-#include "stdAfx.h"
 #include "transdb.h"
-#include "noxstringdlg.h"
-#include "noxstring.h"
+
 #include "assert.h"
 #include "bin.h"
 #include "list.h"
+#include "noxstring.h"
+#include "noxstringdlg.h"
+#include "stdAfx.h"
 
-static char buffer[100*1024];
-
-static List	DataBases;
-
-static LANGINFO langinfo[] = 
-	{  
-		{	LANGID_US, "US", "us", "e"},
-		{ LANGID_UK, "UK", "uk", "e" },
-		{ LANGID_GERMAN, "German", "ge", "g" },
-		{ LANGID_FRENCH, "French", "fr", "f" },
-		{ LANGID_SPANISH, "Spanish", "sp", "s" },
-		{ LANGID_ITALIAN, "Italian", "it", "i" },
-		{ LANGID_JAPANESE, "Japanese", "ja", "j" },
-		{ LANGID_KOREAN, "Korean", "ko", "k" },
-		{ LANGID_CHINESE, "Chinese", "ch", "c" },
-		{ LANGID_JABBER, "Jabberwockie", "jb", "e" },
-		{ LANGID_UNKNOWN, "Unknown", NULL, NULL }
-	};
-
-LANGINFO *GetLangInfo ( int index )
-{
-	
-	if ( (index >= 0) && (index < (sizeof ( langinfo ) / sizeof (LANGINFO )) -1) )
-	{
-		return &langinfo[index];
-	}
+static char buffer[100 * 1024];
 
-	return NULL;
-}
-
-LANGINFO *GetLangInfo ( LangID langid )
-{
-	LANGINFO *item;
+static List DataBases;
 
-	item = langinfo;
+static LANGINFO langinfo[] = {{LANGID_US, "US", "us", "e"},
+                              {LANGID_UK, "UK", "uk", "e"},
+                              {LANGID_GERMAN, "German", "ge", "g"},
+                              {LANGID_FRENCH, "French", "fr", "f"},
+                              {LANGID_SPANISH, "Spanish", "sp", "s"},
+                              {LANGID_ITALIAN, "Italian", "it", "i"},
+                              {LANGID_JAPANESE, "Japanese", "ja", "j"},
+                              {LANGID_KOREAN, "Korean", "ko", "k"},
+                              {LANGID_CHINESE, "Chinese", "ch", "c"},
+                              {LANGID_JABBER, "Jabberwockie", "jb", "e"},
+                              {LANGID_UNKNOWN, "Unknown", NULL, NULL}};
 
-	while ( item->langid != LANGID_UNKNOWN )
-	{
-		if ( item->langid == langid )
-		{
-			return item;
-		}
-		item++;
-	}
+LANGINFO *GetLangInfo(int index) {
+  if ((index >= 0) && (index < (sizeof(langinfo) / sizeof(LANGINFO)) - 1)) {
+    return &langinfo[index];
+  }
 
-	return NULL;
+  return NULL;
 }
 
-char *GetLangName ( LangID langid )
-{
-	LANGINFO *item;
+LANGINFO *GetLangInfo(LangID langid) {
+  LANGINFO *item;
 
-	if ( ( item = GetLangInfo ( langid )) )
-	{
-		return item->name;
-	}
+  item = langinfo;
 
-	return "unknown";
-}
+  while (item->langid != LANGID_UNKNOWN) {
+    if (item->langid == langid) {
+      return item;
+    }
+    item++;
+  }
 
-LANGINFO *GetLangInfo ( char *language )
-{
-	LANGINFO *item;
+  return NULL;
+}
 
-	item = langinfo;
+char *GetLangName(LangID langid) {
+  LANGINFO *item;
 
-	while ( item->langid != LANGID_UNKNOWN )
-	{
-		if ( !stricmp ( language, item->name ) )
-		{
-			return item;
-		}
-		item++;
-	}
+  if ((item = GetLangInfo(langid))) {
+    return item->name;
+  }
 
-	return NULL;
+  return "unknown";
 }
-
-TransDB* FirstTransDB ( void )
-{
-	ListNode *first;
 
-	first = DataBases.Next ();
-	if ( first )
-	{
-		return (TransDB *) first->Item ();
-	}
-	return NULL;
-}
+LANGINFO *GetLangInfo(char *language) {
+  LANGINFO *item;
 
-TransDB::TransDB ( char *cname )
-{
-	text_bin = new Bin ();
-	text_id_bin = new BinID ();
-	label_bin = new Bin ();
-	obsolete_bin = new Bin ();
-	strncpy ( name, cname, sizeof ( name ) -1 );
-	name[sizeof(name)-1] = 0;
-	node.SetItem ( this );
-	DataBases.AddToTail ( &node );
-	next_string_id = -1;
-	valid = TRUE;
-	num_obsolete = 0;
-	checked_for_errors = FALSE;
-	flags = TRANSDB_OPTION_NONE | TRANSDB_OPTION_DUP_TEXT;
-}
+  item = langinfo;
 
-TransDB::	~TransDB ( )
-{
-	Clear ();
-	node.Remove ();
-	delete text_bin;
-	delete text_id_bin;
-	delete label_bin;
-	delete obsolete_bin;
+  while (item->langid != LANGID_UNKNOWN) {
+    if (!stricmp(language, item->name)) {
+      return item;
+    }
+    item++;
+  }
 
+  return NULL;
 }
 
-void					TransDB::AddLabel		( NoxLabel *label )
-{
-	ListNode	*node = new ListNode ();
+TransDB *FirstTransDB(void) {
+  ListNode *first;
 
-	node->SetItem ( label );
-
-	label_bin->Add ( label, label->Name() );
+  first = DataBases.Next();
+  if (first) {
+    return (TransDB *)first->Item();
+  }
+  return NULL;
+}
 
-	labels.AddToTail ( node );
-	label->SetDB ( this );
-	Changed ();
+TransDB::TransDB(char *cname) {
+  text_bin = new Bin();
+  text_id_bin = new BinID();
+  label_bin = new Bin();
+  obsolete_bin = new Bin();
+  strncpy(name, cname, sizeof(name) - 1);
+  name[sizeof(name) - 1] = 0;
+  node.SetItem(this);
+  DataBases.AddToTail(&node);
+  next_string_id = -1;
+  valid = TRUE;
+  num_obsolete = 0;
+  checked_for_errors = FALSE;
+  flags = TRANSDB_OPTION_NONE | TRANSDB_OPTION_DUP_TEXT;
+}
 
+TransDB::~TransDB() {
+  Clear();
+  node.Remove();
+  delete text_bin;
+  delete text_id_bin;
+  delete label_bin;
+  delete obsolete_bin;
 }
+
+void TransDB::AddLabel(NoxLabel *label) {
+  ListNode *node = new ListNode();
 
-void					TransDB::AddText		( NoxText *text )
-{
+  node->SetItem(label);
 
-	text_bin->Add ( text, text->Get() );
-	if ( text->ID () > 0 )
-	{
-		text_id_bin->Add ( text, text->ID ());
-	}
+  label_bin->Add(label, label->Name());
 
+  labels.AddToTail(node);
+  label->SetDB(this);
+  Changed();
 }
 
-void					TransDB::AddObsolete		( NoxText *text )
-{
-	ListNode	*node = new ListNode ();
+void TransDB::AddText(NoxText *text) {
+  text_bin->Add(text, text->Get());
+  if (text->ID() > 0) {
+    text_id_bin->Add(text, text->ID());
+  }
+}
 
-	node->SetItem ( text );
+void TransDB::AddObsolete(NoxText *text) {
+  ListNode *node = new ListNode();
 
-	obsolete_bin->Add ( text, text->Get() );
-	if ( text->ID () > 0 )
-	{
-		text_id_bin->Add ( text, text->ID ());
-	}
+  node->SetItem(text);
 
-	num_obsolete++;
-	text->SetParent ( (DBAttribs *)this );
-	text->Changed ();
+  obsolete_bin->Add(text, text->Get());
+  if (text->ID() > 0) {
+    text_id_bin->Add(text, text->ID());
+  }
 
-	obsolete.AddToTail ( node );
-	Changed ();
+  num_obsolete++;
+  text->SetParent((DBAttribs *)this);
+  text->Changed();
 
+  obsolete.AddToTail(node);
+  Changed();
 }
 
-void					TransDB::RemoveLabel ( NoxLabel *label )
-{
-	ListNode *node;
+void TransDB::RemoveLabel(NoxLabel *label) {
+  ListNode *node;
 
-	if ( (node = labels.Find ( label )) )
-	{
-		node->Remove ();
-		label->SetDB ( NULL );
-		label_bin->Remove ( label );
-		delete node;
-		Changed ();
-	}
+  if ((node = labels.Find(label))) {
+    node->Remove();
+    label->SetDB(NULL);
+    label_bin->Remove(label);
+    delete node;
+    Changed();
+  }
 }
 
-void					TransDB::RemoveText ( NoxText *text )
-{
-	text_bin->Remove ( text );
-	text_id_bin->Remove ( text );
+void TransDB::RemoveText(NoxText *text) {
+  text_bin->Remove(text);
+  text_id_bin->Remove(text);
 }
 
-void					TransDB::RemoveObsolete ( NoxText *text )
-{
-	ListNode *node;
+void TransDB::RemoveObsolete(NoxText *text) {
+  ListNode *node;
 
-	if ( (node = obsolete.Find ( text )) )
-	{
-		node->Remove ();
-		obsolete_bin->Remove ( text );
-		text_id_bin->Remove ( text );
-		num_obsolete--;
-		delete node;
-		Changed ();
-	}
+  if ((node = obsolete.Find(text))) {
+    node->Remove();
+    obsolete_bin->Remove(text);
+    text_id_bin->Remove(text);
+    num_obsolete--;
+    delete node;
+    Changed();
+  }
 }
 
-int					TransDB::NumLabelsChanged ( void )
-{
-	NoxLabel	*label;
-	ListSearch sh;
-	int changed = 0;
+int TransDB::NumLabelsChanged(void) {
+  NoxLabel *label;
+  ListSearch sh;
+  int changed = 0;
 
-	label = FirstLabel ( sh );
+  label = FirstLabel(sh);
 
-	while ( label )
-	{
-		if ( label->IsChanged ())
-		{
-			changed++;
-		}
+  while (label) {
+    if (label->IsChanged()) {
+      changed++;
+    }
 
-		label = NextLabel ( sh );
-	}
+    label = NextLabel(sh);
+  }
 
-	return changed;
+  return changed;
 }
-
-int					TransDB::NumLabels ( void )
-{
 
-	return labels.NumItems();
-}
+int TransDB::NumLabels(void) { return labels.NumItems(); }
 
-NoxLabel*			TransDB::FirstLabel	( ListSearch& sh )
-{
-	ListNode *node;
+NoxLabel *TransDB::FirstLabel(ListSearch &sh) {
+  ListNode *node;
 
-	if ( ( node = sh.FirstNode ( &labels )))
-	{
-		return (NoxLabel *) node->Item ();
-	}
+  if ((node = sh.FirstNode(&labels))) {
+    return (NoxLabel *)node->Item();
+  }
 
-	return NULL;
+  return NULL;
 }
 
-NoxLabel*			TransDB::NextLabel		( ListSearch& sh)
-{
-	ListNode *node;
+NoxLabel *TransDB::NextLabel(ListSearch &sh) {
+  ListNode *node;
 
-	if ( ( node = sh.Next ()))
-	{
-		return (NoxLabel *) node->Item ();
-	}
+  if ((node = sh.Next())) {
+    return (NoxLabel *)node->Item();
+  }
 
-	return NULL;
+  return NULL;
 }
 
-NoxText*			TransDB::FirstObsolete	( ListSearch& sh )
-{
-	ListNode *node;
+NoxText *TransDB::FirstObsolete(ListSearch &sh) {
+  ListNode *node;
 
-	if ( ( node = sh.FirstNode ( &obsolete )))
-	{
-		return (NoxText *) node->Item ();
-	}
+  if ((node = sh.FirstNode(&obsolete))) {
+    return (NoxText *)node->Item();
+  }
 
-	return NULL;
+  return NULL;
 }
 
-NoxText*			TransDB::NextObsolete		( ListSearch& sh)
-{
-	ListNode *node;
+NoxText *TransDB::NextObsolete(ListSearch &sh) {
+  ListNode *node;
 
-	if ( ( node = sh.Next ()))
-	{
-		return (NoxText *) node->Item ();
-	}
+  if ((node = sh.Next())) {
+    return (NoxText *)node->Item();
+  }
 
-	return NULL;
+  return NULL;
 }
 
-NoxLabel*			TransDB::FindLabel		( OLECHAR *name )
-{
-	return (NoxLabel *) label_bin->Get ( name );
+NoxLabel *TransDB::FindLabel(OLECHAR *name) {
+  return (NoxLabel *)label_bin->Get(name);
 }
-
-NoxText*			TransDB::FindText		( OLECHAR *text )
-{
 
-	return (NoxText *) text_bin->Get ( text );
+NoxText *TransDB::FindText(OLECHAR *text) {
+  return (NoxText *)text_bin->Get(text);
 }
-
-NoxText*			TransDB::FindSubText		( OLECHAR *pattern, int item )
-{
-	NoxLabel	*label;
-	ListSearch sh;
-	NoxText		*text;
-	ListSearch sh_text;
-	int plen = wcslen ( pattern );
-
-	label = FirstLabel ( sh );
 
-	while ( label )
-	{
-		text = label->FirstText ( sh_text );
+NoxText *TransDB::FindSubText(OLECHAR *pattern, int item) {
+  NoxLabel *label;
+  ListSearch sh;
+  NoxText *text;
+  ListSearch sh_text;
+  int plen = wcslen(pattern);
 
-		while ( text )
-		{
-			
-			if ( !wcsnicmp ( text->Get (), pattern, 15 ))
-			{
-				if ( !item )
-				{
-					return text;
-				}
+  label = FirstLabel(sh);
 
-				item--;
-			}
+  while (label) {
+    text = label->FirstText(sh_text);
 
-			text = label->NextText ( sh_text );
-		}
+    while (text) {
+      if (!wcsnicmp(text->Get(), pattern, 15)) {
+        if (!item) {
+          return text;
+        }
 
-		label = NextLabel ( sh );
-	}
+        item--;
+      }
 
-	return NULL;
+      text = label->NextText(sh_text);
+    }
 
-}
-
-NoxText*			TransDB::FindText		( int id )
-{
+    label = NextLabel(sh);
+  }
 
-	return (NoxText *) text_id_bin->Get ( id );
+  return NULL;
 }
 
-NoxText*			TransDB::FindNextText		( void )
-{
+NoxText *TransDB::FindText(int id) { return (NoxText *)text_id_bin->Get(id); }
 
-	return (NoxText *) text_bin->GetNext ( );
-}
+NoxText *TransDB::FindNextText(void) { return (NoxText *)text_bin->GetNext(); }
 
-NoxText*			TransDB::FindObsolete		( OLECHAR *name )
-{
-	return (NoxText *) obsolete_bin->Get ( name );
+NoxText *TransDB::FindObsolete(OLECHAR *name) {
+  return (NoxText *)obsolete_bin->Get(name);
 }
-
-NoxText*			TransDB::FindNextObsolete		( void )
-{
 
-	return (NoxText *) obsolete_bin->GetNext ( );
-
+NoxText *TransDB::FindNextObsolete(void) {
+  return (NoxText *)obsolete_bin->GetNext();
 }
 
-int					TransDB::Clear				( void )
-{
-	ListSearch sh;
-	NoxLabel *label;
-	NoxText *text;
-	ListNode *node;
-	int count = 0;
+int TransDB::Clear(void) {
+  ListSearch sh;
+  NoxLabel *label;
+  NoxText *text;
+  ListNode *node;
+  int count = 0;
 
-	text_bin->Clear ();
-	text_id_bin->Clear ();
-	label_bin->Clear ();
-	obsolete_bin->Clear ();
+  text_bin->Clear();
+  text_id_bin->Clear();
+  label_bin->Clear();
+  obsolete_bin->Clear();
 
-	while ( node = sh.FirstNode ( &labels ) )
-	{
-		node->Remove ();
-		label = (NoxLabel *) node->Item ();
-		count++;
-		delete label;
-		delete node;
-	}
+  while (node = sh.FirstNode(&labels)) {
+    node->Remove();
+    label = (NoxLabel *)node->Item();
+    count++;
+    delete label;
+    delete node;
+  }
 
-	while ( node = sh.FirstNode ( &obsolete ) )
-	{
-		node->Remove ();
-		text = (NoxText *) node->Item ();
-		count++;
-		delete text;
-		delete node;
-	}
+  while (node = sh.FirstNode(&obsolete)) {
+    node->Remove();
+    text = (NoxText *)node->Item();
+    count++;
+    delete text;
+    delete node;
+  }
 
-	num_obsolete = 0;
+  num_obsolete = 0;
 
-	if ( next_string_id != -1 )
-	{
-			next_string_id = START_STRING_ID;
-	}	
+  if (next_string_id != -1) {
+    next_string_id = START_STRING_ID;
+  }
 
-	if ( count )
-	{
-		Changed ();
-	}
+  if (count) {
+    Changed();
+  }
 
-	valid = TRUE;
+  valid = TRUE;
 
-	return count;
+  return count;
 }
 
-void					TransDB::ClearChanges				( void )
-{
-	ListSearch sh;
-	NoxLabel *label;
+void TransDB::ClearChanges(void) {
+  ListSearch sh;
+  NoxLabel *label;
 
-	label = FirstLabel ( sh );
-	while ( label )
-	{
-		label->ClearChanges ();
-		label = NextLabel ( sh );
-	}
+  label = FirstLabel(sh);
+  while (label) {
+    label->ClearChanges();
+    label = NextLabel(sh);
+  }
 
-	NoxText *text = FirstObsolete ( sh );
-	while ( text )
-	{
-		text->ClearChanges ();
-		text = NextObsolete ( sh );
-	}
+  NoxText *text = FirstObsolete(sh);
+  while (text) {
+    text->ClearChanges();
+    text = NextObsolete(sh);
+  }
 
-	NotChanged ();
+  NotChanged();
 }
 
-void					TransDB::ClearProcessed				( void )
-{
-	ListSearch sh;
-	NoxLabel *label;
+void TransDB::ClearProcessed(void) {
+  ListSearch sh;
+  NoxLabel *label;
 
-	label = FirstLabel ( sh );
-	while ( label )
-	{
-		label->ClearProcessed ();
-		label = NextLabel ( sh );
-	}
-	NotProcessed ();
+  label = FirstLabel(sh);
+  while (label) {
+    label->ClearProcessed();
+    label = NextLabel(sh);
+  }
+  NotProcessed();
 }
 
-void					TransDB::ClearMatched				( void )
-{
-	ListSearch sh;
-	NoxLabel *label;
+void TransDB::ClearMatched(void) {
+  ListSearch sh;
+  NoxLabel *label;
 
-	label = FirstLabel ( sh );
-	while ( label )
-	{
-		label->ClearMatched ();
-		label = NextLabel ( sh );
-	}
-	NotMatched ();
+  label = FirstLabel(sh);
+  while (label) {
+    label->ClearMatched();
+    label = NextLabel(sh);
+  }
+  NotMatched();
 }
 
-void					TransDB::AddToTree		( CTreeCtrl *tc, HTREEITEM parent, int changes, void (*cb) ( void ) )
-{
-	HTREEITEM		item;
-	HTREEITEM		ilabels, iobsolete;
-	ListSearch	sh;
-	NoxLabel		*label;
-	NoxText			*txt;
-	
-	sprintf ( buffer, "%s%c  (%d/%d)",name, ChangedSymbol(), NumLabelsChanged(), NumLabels() );
-	item = tc->InsertItem ( buffer, parent );
-	ilabels = tc->InsertItem ( "Labels", item );
+void TransDB::AddToTree(CTreeCtrl *tc, HTREEITEM parent, int changes,
+                        void (*cb)(void)) {
+  HTREEITEM item;
+  HTREEITEM ilabels, iobsolete;
+  ListSearch sh;
+  NoxLabel *label;
+  NoxText *txt;
 
-	label = FirstLabel ( sh );
+  sprintf(buffer, "%s%c  (%d/%d)", name, ChangedSymbol(), NumLabelsChanged(),
+          NumLabels());
+  item = tc->InsertItem(buffer, parent);
+  ilabels = tc->InsertItem("Labels", item);
 
-	while ( label )
-	{
-		if ( !changes || label->IsChanged ())
-		{
-			label->AddToTree ( tc, ilabels, changes );
-		}
+  label = FirstLabel(sh);
 
-		if ( cb )
-		{
-			cb ( );
-		}
+  while (label) {
+    if (!changes || label->IsChanged()) {
+      label->AddToTree(tc, ilabels, changes);
+    }
 
-		label = NextLabel ( sh );
-	}
+    if (cb) {
+      cb();
+    }
 
-	if ( num_obsolete )
-	{
-		iobsolete = tc->InsertItem ( "Obsolete Strings", item );
-		
-		txt = FirstObsolete ( sh );
-		
-		while ( txt )
-		{
-			if ( !changes || txt->IsChanged ())
-			{
-				txt->AddToTree ( tc, iobsolete );
-			}
-		
-			if ( cb )
-			{
-				cb ( );
-			}
-		
-			txt = NextObsolete ( sh );
-		}
-	}
+    label = NextLabel(sh);
+  }
 
+  if (num_obsolete) {
+    iobsolete = tc->InsertItem("Obsolete Strings", item);
 
-}
+    txt = FirstObsolete(sh);
 
-TransDB*			TransDB::Next				( void )
-{
-	ListNode *next;
+    while (txt) {
+      if (!changes || txt->IsChanged()) {
+        txt->AddToTree(tc, iobsolete);
+      }
 
-	next = node.Next ();
+      if (cb) {
+        cb();
+      }
 
-	if ( next )
-	{
-		return (TransDB *) next->Item ();
-	}
+      txt = NextObsolete(sh);
+    }
+  }
+}
 
-	return NULL;
+TransDB *TransDB::Next(void) {
+  ListNode *next;
 
-}
+  next = node.Next();
 
-void NoxLabel::init ( void )
-{
-	db = NULL;
-	comment = NULL;
-	line_number = -1;
-	max_len = 0;
-	name = NULL;
-}
+  if (next) {
+    return (TransDB *)next->Item();
+  }
 
-NoxLabel::NoxLabel ( void )
-{
-	init ();
-	name = new OLEString ( );
-	comment = new OLEString ( );
-	context = new OLEString ( );
-	speaker = new OLEString ( );
-	listener = new OLEString ( );
+  return NULL;
+}
 
+void NoxLabel::init(void) {
+  db = NULL;
+  comment = NULL;
+  line_number = -1;
+  max_len = 0;
+  name = NULL;
+}
 
+NoxLabel::NoxLabel(void) {
+  init();
+  name = new OLEString();
+  comment = new OLEString();
+  context = new OLEString();
+  speaker = new OLEString();
+  listener = new OLEString();
 }
 
-NoxLabel::~NoxLabel ( )
-{
-	Clear ();
-	delete name;
-	delete comment;
-	delete context;
-	delete speaker;
-	delete listener;
+NoxLabel::~NoxLabel() {
+  Clear();
+  delete name;
+  delete comment;
+  delete context;
+  delete speaker;
+  delete listener;
 }
 
-void					NoxLabel::Remove			( void )
-{
-	if ( db )
-	{
-		db->RemoveLabel ( this );
-	}
+void NoxLabel::Remove(void) {
+  if (db) {
+    db->RemoveLabel(this);
+  }
 }
 
-void					NoxLabel::RemoveText ( NoxText *txt )
-{
-	ListNode *node;
+void NoxLabel::RemoveText(NoxText *txt) {
+  ListNode *node;
 
-	if ( (node = text.Find ( txt )) )
-	{
-		node->Remove ();
-		txt->SetDB ( NULL );
-		txt->SetLabel ( NULL );
-		txt->SetParent ( NULL );
-		delete node;
-		Changed ();
-	}
+  if ((node = text.Find(txt))) {
+    node->Remove();
+    txt->SetDB(NULL);
+    txt->SetLabel(NULL);
+    txt->SetParent(NULL);
+    delete node;
+    Changed();
+  }
 }
 
-void					NoxLabel::AddText			( NoxText *new_text )
-{
-	TransDB *db = DB();
-	ListNode	*node = new ListNode ();
+void NoxLabel::AddText(NoxText *new_text) {
+  TransDB *db = DB();
+  ListNode *node = new ListNode();
 
-	node->SetItem ( new_text );
+  node->SetItem(new_text);
 
-	text.AddToTail ( node );
-	Changed ();
-	new_text->SetDB ( db );
-	new_text->SetParent ( (DBAttribs *) this );
-	new_text->SetLabel ( this );
+  text.AddToTail(node);
+  Changed();
+  new_text->SetDB(db);
+  new_text->SetParent((DBAttribs *)this);
+  new_text->SetLabel(this);
 }
 
-int					NoxLabel::Clear				( void )
-{
-	ListSearch sh;
-	NoxText *txt;
-	ListNode *node;
-	int count = 0;
+int NoxLabel::Clear(void) {
+  ListSearch sh;
+  NoxText *txt;
+  ListNode *node;
+  int count = 0;
 
-	while ( node = sh.FirstNode ( &text ) )
-	{
-		node->Remove ();
-		txt = (NoxText *) node->Item ();
-		delete txt;
-		delete node;
-		count++;
-	}
+  while (node = sh.FirstNode(&text)) {
+    node->Remove();
+    txt = (NoxText *)node->Item();
+    delete txt;
+    delete node;
+    count++;
+  }
 
-	if ( count )
-	{
-		Changed ();
-	}
+  if (count) {
+    Changed();
+  }
 
-	return count;
+  return count;
 }
 
-NoxLabel*			NoxLabel::Clone				( void )
-{
-	NoxLabel *clone = new NoxLabel();
-	NoxText *txt;
-	ListSearch sh;
+NoxLabel *NoxLabel::Clone(void) {
+  NoxLabel *clone = new NoxLabel();
+  NoxText *txt;
+  ListSearch sh;
 
-	clone->SetName ( Name());
-	clone->SetComment ( Comment ());
-	clone->SetListener ( Listener ());
-	clone->SetSpeaker ( Speaker ());
-	clone->SetMaxLen ( MaxLen ());
-	clone->SetContext ( Context ());
+  clone->SetName(Name());
+  clone->SetComment(Comment());
+  clone->SetListener(Listener());
+  clone->SetSpeaker(Speaker());
+  clone->SetMaxLen(MaxLen());
+  clone->SetContext(Context());
 
-	txt = FirstText ( sh );
+  txt = FirstText(sh);
 
-	while ( txt )
-	{
-		clone->AddText ( txt->Clone ());
+  while (txt) {
+    clone->AddText(txt->Clone());
 
-		txt = NextText ( sh );
-	}
+    txt = NextText(sh);
+  }
 
-	return clone;
+  return clone;
 }
 
-NoxText*			NoxLabel::FirstText		( ListSearch& sh )
-{
-	ListNode *node;
+NoxText *NoxLabel::FirstText(ListSearch &sh) {
+  ListNode *node;
 
-	if ( ( node = sh.FirstNode ( &text )))
-	{
-		return (NoxText *) node->Item ();
-	}
+  if ((node = sh.FirstNode(&text))) {
+    return (NoxText *)node->Item();
+  }
 
-	return NULL;
+  return NULL;
 }
-
-NoxText*			NoxLabel::NextText		( ListSearch& sh)
-{
-	ListNode *node;
 
-	if ( ( node = sh.Next (  )))
-	{
-		return (NoxText *) node->Item ();
-	}
+NoxText *NoxLabel::NextText(ListSearch &sh) {
+  ListNode *node;
 
-	return NULL;
+  if ((node = sh.Next())) {
+    return (NoxText *)node->Item();
+  }
 
+  return NULL;
 }
 
-NoxText*			NoxLabel::FindText ( OLECHAR *find_text )
-{
-	ListSearch sh;
-	NoxText *txt;
+NoxText *NoxLabel::FindText(OLECHAR *find_text) {
+  ListSearch sh;
+  NoxText *txt;
 
-	txt = FirstText ( sh );
+  txt = FirstText(sh);
 
-	while ( txt )
-	{
-		if ( !wcscmp ( txt->Get(), find_text ))
-		{
-			return txt;
-		}
-		txt = NextText ( sh );
-	}
+  while (txt) {
+    if (!wcscmp(txt->Get(), find_text)) {
+      return txt;
+    }
+    txt = NextText(sh);
+  }
 
-	return NULL;
+  return NULL;
 }
 
+void NoxLabel::SetDB(TransDB *new_db) {
+  NoxText *ntext;
+  ListSearch sh;
 
-void					NoxLabel::SetDB				( TransDB *new_db )
-{
-	NoxText *ntext;
-	ListSearch sh;
+  db = new_db;
+  SetParent((DBAttribs *)new_db);
 
-	db = new_db;
-	SetParent ( (DBAttribs *) new_db );
+  ntext = FirstText(sh);
 
-	ntext = FirstText ( sh );
+  while (ntext) {
+    ntext->SetDB(new_db);
 
-	while ( ntext )
-	{
-		ntext->SetDB ( new_db );
-		
-		ntext = NextText ( sh );
-	}
-
+    ntext = NextText(sh);
+  }
 }
 
-void					NoxLabel::ClearChanges				( void )
-{
-	NoxText *ntext;
-	ListSearch sh;
+void NoxLabel::ClearChanges(void) {
+  NoxText *ntext;
+  ListSearch sh;
 
-	ntext = FirstText ( sh );
+  ntext = FirstText(sh);
 
-	while ( ntext )
-	{
-		ntext->ClearChanges();
-		
-		ntext = NextText ( sh );
-	}
+  while (ntext) {
+    ntext->ClearChanges();
 
-	NotChanged();
+    ntext = NextText(sh);
+  }
 
+  NotChanged();
 }
 
-void					NoxLabel::ClearProcessed				( void )
-{
-	NoxText *ntext;
-	ListSearch sh;
+void NoxLabel::ClearProcessed(void) {
+  NoxText *ntext;
+  ListSearch sh;
 
-	ntext = FirstText ( sh );
+  ntext = FirstText(sh);
 
-	while ( ntext )
-	{
-		ntext->ClearProcessed();
-		
-		ntext = NextText ( sh );
-	}
+  while (ntext) {
+    ntext->ClearProcessed();
 
-	NotProcessed();
+    ntext = NextText(sh);
+  }
 
+  NotProcessed();
 }
 
-void					NoxLabel::ClearMatched				( void )
-{
-	NoxText *ntext;
-	ListSearch sh;
+void NoxLabel::ClearMatched(void) {
+  NoxText *ntext;
+  ListSearch sh;
 
-	ntext = FirstText ( sh );
+  ntext = FirstText(sh);
 
-	while ( ntext )
-	{
-		ntext->ClearMatched();
-		
-		ntext = NextText ( sh );
-	}
+  while (ntext) {
+    ntext->ClearMatched();
 
-	NotMatched();
+    ntext = NextText(sh);
+  }
 
+  NotMatched();
 }
-
-int					NoxLabel::AllMatched				( void )
-{
-	NoxText *ntext;
-	ListSearch sh;
 
-	ntext = FirstText ( sh );
+int NoxLabel::AllMatched(void) {
+  NoxText *ntext;
+  ListSearch sh;
 
-	while ( ntext )
-	{
-		if ( !ntext->Matched() )
-		{
-			return FALSE;
-		}
-		
-		ntext = NextText ( sh );
-	}
+  ntext = FirstText(sh);
 
-	return TRUE;
-}
+  while (ntext) {
+    if (!ntext->Matched()) {
+      return FALSE;
+    }
 
-NoxText::NoxText( void )
-{
-	init ();
-	text = new OLEString (  );
-	wavefile = new OLEString (  );
+    ntext = NextText(sh);
+  }
 
+  return TRUE;
 }
 
-int NoxText::IsSent ( void )
-{
-	return sent;
+NoxText::NoxText(void) {
+  init();
+  text = new OLEString();
+  wavefile = new OLEString();
 }
 
-void NoxText::Sent ( int val )
-{
-	sent = val;
-}
+int NoxText::IsSent(void) { return sent; }
 
-void					NoxLabel::AddToTree		( CTreeCtrl *tc, HTREEITEM parent, int changes )
-{
-	HTREEITEM		litem;
-	ListSearch	sh;
-	NoxText			*txt;
+void NoxText::Sent(int val) { sent = val; }
 
-	sprintf ( buffer, "%s%c", NameSB(), ChangedSymbol() );
-																							 
-	litem = tc->InsertItem ( buffer, parent );
+void NoxLabel::AddToTree(CTreeCtrl *tc, HTREEITEM parent, int changes) {
+  HTREEITEM litem;
+  ListSearch sh;
+  NoxText *txt;
 
-	txt = FirstText ( sh );
+  sprintf(buffer, "%s%c", NameSB(), ChangedSymbol());
 
-	while ( txt )
-	{
-		if ( !changes || txt->IsChanged ())
-		{
-			txt->AddToTree ( tc, litem );
-		}
+  litem = tc->InsertItem(buffer, parent);
 
-		txt = NextText ( sh );
-	}
+  txt = FirstText(sh);
 
-	if ( strcmp ( CommentSB(), "" ) )
-	{
-		sprintf ( buffer, "COMMENT : %s", CommentSB() );
-		tc->InsertItem ( buffer, litem );
-	}
+  while (txt) {
+    if (!changes || txt->IsChanged()) {
+      txt->AddToTree(tc, litem);
+    }
 
-	if ( strcmp ( ContextSB(), "" ) )
-	{
-		sprintf ( buffer, "CONTEXT : %s", ContextSB() );
-		tc->InsertItem ( buffer, litem );
-	}
-		
-	if ( strcmp ( SpeakerSB(), "" ) )
-	{
-		sprintf ( buffer, "SPEAKER : %s", SpeakerSB() );
-		tc->InsertItem ( buffer, litem );
-	}
-		
-	if ( strcmp ( ListenerSB(), "" ) )
-	{
-		sprintf ( buffer, "LISTENER: %s", ListenerSB() );
-		tc->InsertItem ( buffer, litem );
-	}
+    txt = NextText(sh);
+  }
 
-	if ( line_number != -1 )
-	{
-		sprintf ( buffer, "LINE    : %d", line_number );
-		tc->InsertItem ( buffer, litem );
-	}
+  if (strcmp(CommentSB(), "")) {
+    sprintf(buffer, "COMMENT : %s", CommentSB());
+    tc->InsertItem(buffer, litem);
+  }
 
-	if ( max_len )
-	{
-		sprintf ( buffer, "MAX LEN : %d", max_len );
-		tc->InsertItem ( buffer, litem );
-	}
+  if (strcmp(ContextSB(), "")) {
+    sprintf(buffer, "CONTEXT : %s", ContextSB());
+    tc->InsertItem(buffer, litem);
+  }
 
-}
+  if (strcmp(SpeakerSB(), "")) {
+    sprintf(buffer, "SPEAKER : %s", SpeakerSB());
+    tc->InsertItem(buffer, litem);
+  }
 
-void NoxText::init ( void )
-{
-	db = NULL;
-	label = NULL;
-	line_number = -1;
-	revision = 1;
-	text = NULL;
-	wavefile = NULL;
-	id = -1;
-	retranslate = FALSE;
-	sent = FALSE;
+  if (strcmp(ListenerSB(), "")) {
+    sprintf(buffer, "LISTENER: %s", ListenerSB());
+    tc->InsertItem(buffer, litem);
+  }
 
+  if (line_number != -1) {
+    sprintf(buffer, "LINE    : %d", line_number);
+    tc->InsertItem(buffer, litem);
+  }
 
+  if (max_len) {
+    sprintf(buffer, "MAX LEN : %d", max_len);
+    tc->InsertItem(buffer, litem);
+  }
 }
 
-NoxText::~NoxText( )
-{
-	Clear();
-	delete text;
-	delete wavefile;
-
+void NoxText::init(void) {
+  db = NULL;
+  label = NULL;
+  line_number = -1;
+  revision = 1;
+  text = NULL;
+  wavefile = NULL;
+  id = -1;
+  retranslate = FALSE;
+  sent = FALSE;
 }
-
-void					NoxText::SetDB				( TransDB *new_db )
-{
-	Translation *trans;
-	ListSearch sh;
 
-	if ( db )
-	{
-		db->RemoveText ( this );
-	}
+NoxText::~NoxText() {
+  Clear();
+  delete text;
+  delete wavefile;
+}
 
+void NoxText::SetDB(TransDB *new_db) {
+  Translation *trans;
+  ListSearch sh;
 
-	if ( (db = new_db) )
-	{
-		AssignID ();
-		db->AddText ( this );
-	}
+  if (db) {
+    db->RemoveText(this);
+  }
 
-	trans = FirstTranslation ( sh );
+  if ((db = new_db)) {
+    AssignID();
+    db->AddText(this);
+  }
 
-	while ( trans )
-	{
-		trans->SetDB ( new_db );
-		
-		trans = NextTranslation ( sh );
-	}
+  trans = FirstTranslation(sh);
 
-}
+  while (trans) {
+    trans->SetDB(new_db);
 
-void					NoxText::Remove			( void )
-{
-	if ( label )
-	{
-		label->RemoveText ( this );
-	}
+    trans = NextTranslation(sh);
+  }
 }
-
-int						NoxText::IsDialog ( void )
-{
-
-	return strcmp (WaveSB(), "" );
 
+void NoxText::Remove(void) {
+  if (label) {
+    label->RemoveText(this);
+  }
 }
 
-int						NoxText::DialogIsValid ( const char *path, LangID langid, int check )
-{
-	LANGINFO	*linfo;
-	CWaveInfo *winfo;
-	DBAttribs *attribs;
+int NoxText::IsDialog(void) { return strcmp(WaveSB(), ""); }
 
-	linfo = GetLangInfo ( langid );
+int NoxText::DialogIsValid(const char *path, LangID langid, int check) {
+  LANGINFO *linfo;
+  CWaveInfo *winfo;
+  DBAttribs *attribs;
 
-	if ( langid == LANGID_US )
-	{
-		winfo = &WaveInfo;
-		attribs = (DBAttribs *) this;
-	}
-	else
-	{
-		Translation *trans = GetTranslation ( langid );
+  linfo = GetLangInfo(langid);
 
-		if ( !trans )
-		{
-			return FALSE;
-		}
+  if (langid == LANGID_US) {
+    winfo = &WaveInfo;
+    attribs = (DBAttribs *)this;
+  } else {
+    Translation *trans = GetTranslation(langid);
 
-		attribs = (DBAttribs *) trans;
-		winfo = &trans->WaveInfo;
-	}
+    if (!trans) {
+      return FALSE;
+    }
 
+    attribs = (DBAttribs *)trans;
+    winfo = &trans->WaveInfo;
+  }
 
-	if ( winfo->Valid () && check )
-	{
-		WIN32_FIND_DATA info;
-		HANDLE	handle;
-		
-		winfo->SetValid ( FALSE );
-		winfo->SetMissing ( TRUE );
+  if (winfo->Valid() && check) {
+    WIN32_FIND_DATA info;
+    HANDLE handle;
 
-		sprintf ( buffer, "%s%s\\%s%s.wav", path, linfo->character, WaveSB(), linfo->character );
-		if ( (handle = FindFirstFile ( buffer, &info )) != INVALID_HANDLE_VALUE )
-		{
-			if ( ! (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
-			{
-				if ( winfo->Lo () == info.nFileSizeLow && winfo->Hi() == info.nFileSizeHigh )
-				{
-					winfo->SetValid ( TRUE );
-				}
-				winfo->SetMissing ( FALSE );
-			}
+    winfo->SetValid(FALSE);
+    winfo->SetMissing(TRUE);
 
-			FindClose ( handle );
-		}
+    sprintf(buffer, "%s%s\\%s%s.wav", path, linfo->character, WaveSB(),
+            linfo->character);
+    if ((handle = FindFirstFile(buffer, &info)) != INVALID_HANDLE_VALUE) {
+      if (!(info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+        if (winfo->Lo() == info.nFileSizeLow &&
+            winfo->Hi() == info.nFileSizeHigh) {
+          winfo->SetValid(TRUE);
+        }
+        winfo->SetMissing(FALSE);
+      }
 
-	}
+      FindClose(handle);
+    }
+  }
 
-	return winfo->Valid ();
+  return winfo->Valid();
 }
 
-int						NoxText::ValidateDialog ( const char *path, LangID langid )
-{
-	WIN32_FIND_DATA info;
-	HANDLE	handle;
-	CWaveInfo *winfo;
-	LANGINFO *linfo;
-	DBAttribs *attribs;
+int NoxText::ValidateDialog(const char *path, LangID langid) {
+  WIN32_FIND_DATA info;
+  HANDLE handle;
+  CWaveInfo *winfo;
+  LANGINFO *linfo;
+  DBAttribs *attribs;
 
-	linfo = GetLangInfo ( langid );
+  linfo = GetLangInfo(langid);
 
-	if ( langid == LANGID_US )
-	{
-		winfo = &WaveInfo;
-		attribs = (DBAttribs *) this;
-	}
-	else
-	{
-		Translation *trans = GetTranslation ( langid );
+  if (langid == LANGID_US) {
+    winfo = &WaveInfo;
+    attribs = (DBAttribs *)this;
+  } else {
+    Translation *trans = GetTranslation(langid);
 
-		if ( !trans )
-		{
-			return FALSE;
-		}
+    if (!trans) {
+      return FALSE;
+    }
 
-		attribs = (DBAttribs *) trans;
-		winfo = &trans->WaveInfo;
-	}
+    attribs = (DBAttribs *)trans;
+    winfo = &trans->WaveInfo;
+  }
 
-	winfo->SetValid  ( FALSE );
-	winfo->SetMissing ( TRUE );
+  winfo->SetValid(FALSE);
+  winfo->SetMissing(TRUE);
 
-	sprintf ( buffer, "%s%s\\%s%s.wav", path, linfo->character , WaveSB(), linfo->character );
-	if ( (handle = FindFirstFile ( buffer, &info )) != INVALID_HANDLE_VALUE )
-	{
-		if ( ! (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
-		{
-			winfo->SetLo ( info.nFileSizeLow );
-			winfo->SetHi ( info.nFileSizeHigh );
-			winfo->SetValid  ( TRUE );
-			winfo->SetMissing ( FALSE );
-			attribs->Changed();
-		}
-		FindClose ( handle );
-	}
+  sprintf(buffer, "%s%s\\%s%s.wav", path, linfo->character, WaveSB(),
+          linfo->character);
+  if ((handle = FindFirstFile(buffer, &info)) != INVALID_HANDLE_VALUE) {
+    if (!(info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+      winfo->SetLo(info.nFileSizeLow);
+      winfo->SetHi(info.nFileSizeHigh);
+      winfo->SetValid(TRUE);
+      winfo->SetMissing(FALSE);
+      attribs->Changed();
+    }
+    FindClose(handle);
+  }
 
-	return winfo->Valid ();
+  return winfo->Valid();
 }
 
-int						NoxText::DialogIsPresent ( const char *path, LangID langid )
-{
-			
-	WIN32_FIND_DATA info;
-	HANDLE	handle;
-	int present = FALSE;
-	LANGINFO	*linfo = GetLangInfo ( langid );
+int NoxText::DialogIsPresent(const char *path, LangID langid) {
+  WIN32_FIND_DATA info;
+  HANDLE handle;
+  int present = FALSE;
+  LANGINFO *linfo = GetLangInfo(langid);
 
-	sprintf ( buffer, "%s%s\\%s%s.wav", path, linfo->character , WaveSB(), linfo->character );
-	if ( (handle = FindFirstFile ( buffer, &info )) != INVALID_HANDLE_VALUE )
-	{
-		if ( ! (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
-		{
-				present = TRUE;
-		}
+  sprintf(buffer, "%s%s\\%s%s.wav", path, linfo->character, WaveSB(),
+          linfo->character);
+  if ((handle = FindFirstFile(buffer, &info)) != INVALID_HANDLE_VALUE) {
+    if (!(info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+      present = TRUE;
+    }
 
-		FindClose ( handle );
-	}
+    FindClose(handle);
+  }
 
-	return present;
+  return present;
 }
 
-void					NoxText::AddTranslation			( Translation *trans )
-{
-	ListNode	*node = new ListNode ();
+void NoxText::AddTranslation(Translation *trans) {
+  ListNode *node = new ListNode();
 
-	node->SetItem ( trans );
+  node->SetItem(trans);
 
-	translations.AddToTail ( node );
-	Changed ();
-	trans->SetDB ( DB() );
-	trans->SetParent ( (DBAttribs *) this );
-
+  translations.AddToTail(node);
+  Changed();
+  trans->SetDB(DB());
+  trans->SetParent((DBAttribs *)this);
 }
 
-Translation*			NoxText::FirstTranslation		( ListSearch& sh )
-{
-	ListNode *node;
+Translation *NoxText::FirstTranslation(ListSearch &sh) {
+  ListNode *node;
 
-	if ( ( node = sh.FirstNode ( &translations )))
-	{
-		return (Translation *) node->Item ();
-	}
+  if ((node = sh.FirstNode(&translations))) {
+    return (Translation *)node->Item();
+  }
 
-	return NULL;
+  return NULL;
 }
 
-Translation*			NoxText::NextTranslation		( ListSearch& sh)
-{
-	ListNode *node;
+Translation *NoxText::NextTranslation(ListSearch &sh) {
+  ListNode *node;
 
-	if ( ( node = sh.Next (  )))
-	{
-		return (Translation *) node->Item ();
-	}
+  if ((node = sh.Next())) {
+    return (Translation *)node->Item();
+  }
 
-	return NULL;
+  return NULL;
 }
-
-Translation*			NoxText::GetTranslation		( LangID langid )
-{
-	ListSearch sh;
-	Translation *trans;
 
-	trans = FirstTranslation ( sh );
+Translation *NoxText::GetTranslation(LangID langid) {
+  ListSearch sh;
+  Translation *trans;
 
-	while ( trans )
-	{
-		if ( langid == trans->GetLangID())
-		{
-			break;
-		}
+  trans = FirstTranslation(sh);
 
-		trans = NextTranslation ( sh );
-	}
+  while (trans) {
+    if (langid == trans->GetLangID()) {
+      break;
+    }
 
+    trans = NextTranslation(sh);
+  }
 
-	return trans;
+  return trans;
 }
 
-int					NoxText::Clear				( void )
-{
-	ListSearch sh;
-	Translation *trans;
-	ListNode *node;
-	int count = 0;
+int NoxText::Clear(void) {
+  ListSearch sh;
+  Translation *trans;
+  ListNode *node;
+  int count = 0;
 
-	while ( node = sh.FirstNode ( &translations ) )
-	{
-		node->Remove ();
-		trans = (Translation *) node->Item ();
-		delete trans;
-		delete node;
-		count++;
-	}
-	if ( count )
-	{
-		Changed ();
-	}
+  while (node = sh.FirstNode(&translations)) {
+    node->Remove();
+    trans = (Translation *)node->Item();
+    delete trans;
+    delete node;
+    count++;
+  }
+  if (count) {
+    Changed();
+  }
 
-	return count;
+  return count;
 }
 
-NoxText*			NoxText::Clone				( void )
-{
-	NoxText *clone = new NoxText();
-	Translation *trans;
-	ListSearch sh;
+NoxText *NoxText::Clone(void) {
+  NoxText *clone = new NoxText();
+  Translation *trans;
+  ListSearch sh;
 
-	clone->Set ( Get ());
-	clone->SetWave ( Wave ());
-	clone->SetRevision ( Revision ());
+  clone->Set(Get());
+  clone->SetWave(Wave());
+  clone->SetRevision(Revision());
 
-	trans = FirstTranslation ( sh );
+  trans = FirstTranslation(sh);
 
-	while ( trans )
-	{
-		clone->AddTranslation ( trans->Clone ());
+  while (trans) {
+    clone->AddTranslation(trans->Clone());
 
-		trans = NextTranslation ( sh );
-	}
+    trans = NextTranslation(sh);
+  }
 
-	return clone;
+  return clone;
 }
 
-void					NoxText::ClearChanges				( void )
-{
-	Translation *trans;
-	ListSearch sh;
+void NoxText::ClearChanges(void) {
+  Translation *trans;
+  ListSearch sh;
 
-	trans = FirstTranslation ( sh );
+  trans = FirstTranslation(sh);
 
-	while ( trans )
-	{
-		trans->ClearChanges();
-		
-		trans = NextTranslation ( sh );
-	}
+  while (trans) {
+    trans->ClearChanges();
 
-	NotChanged();
+    trans = NextTranslation(sh);
+  }
 
+  NotChanged();
 }
 
-void					NoxText::ClearProcessed				( void )
-{
-	Translation *trans;
-	ListSearch sh;
+void NoxText::ClearProcessed(void) {
+  Translation *trans;
+  ListSearch sh;
 
-	trans = FirstTranslation ( sh );
+  trans = FirstTranslation(sh);
 
-	while ( trans )
-	{
-		trans->ClearProcessed();
-		
-		trans = NextTranslation ( sh );
-	}
+  while (trans) {
+    trans->ClearProcessed();
 
-	NotProcessed();
+    trans = NextTranslation(sh);
+  }
 
+  NotProcessed();
 }
 
-void					NoxText::ClearMatched				( void )
-{
-	Translation *trans;
-	ListSearch sh;
+void NoxText::ClearMatched(void) {
+  Translation *trans;
+  ListSearch sh;
 
-	trans = FirstTranslation ( sh );
+  trans = FirstTranslation(sh);
 
-	while ( trans )
-	{
-		trans->ClearMatched();
-		
-		trans = NextTranslation ( sh );
-	}
+  while (trans) {
+    trans->ClearMatched();
 
-	NotMatched();
+    trans = NextTranslation(sh);
+  }
 
+  NotMatched();
 }
 
-void					NoxText::AssignID ( void )
-{
-	if ( id != -1 )
-	{
-		return;	// already assigned
-	}
-	if ( db )
-	{
-		SetID ( db->NewID ());
-	}
+void NoxText::AssignID(void) {
+  if (id != -1) {
+    return;  // already assigned
+  }
+  if (db) {
+    SetID(db->NewID());
+  }
 }
 
-void					NoxText::Set ( OLECHAR *string )
-{
-	if ( db )
-	{
-		db->RemoveText ( this );
-	}
+void NoxText::Set(OLECHAR *string) {
+  if (db) {
+    db->RemoveText(this);
+  }
 
-	text->Set ( string );
-	InvalidateWave ( );
-	if ( db )
-	{
-		db->AddText ( this );
-	}
+  text->Set(string);
+  InvalidateWave();
+  if (db) {
+    db->AddText(this);
+  }
 
-	Changed ();
+  Changed();
 }
 
-void					NoxText::Set ( char *string )
-{
-	if ( db )
-	{
-		db->RemoveText ( this );
-	}
+void NoxText::Set(char *string) {
+  if (db) {
+    db->RemoveText(this);
+  }
 
-	text->Set ( string );
-	InvalidateWave ();
-	if ( db )
-	{
-		db->AddText ( this );
-	}
+  text->Set(string);
+  InvalidateWave();
+  if (db) {
+    db->AddText(this);
+  }
 
-	Changed ();
+  Changed();
 }
-
-void					NoxText::InvalidateAllWaves			( void  )
-{ 
-	Translation *trans;
-	ListSearch sh;
-
-	WaveInfo.SetValid ( FALSE );
 
-	trans = FirstTranslation ( sh );
-	
-	while ( trans )
-	{
-		trans->WaveInfo.SetValid ( FALSE );
-	
-		trans = NextTranslation ( sh );
-	}
+void NoxText::InvalidateAllWaves(void) {
+  Translation *trans;
+  ListSearch sh;
 
-}
+  WaveInfo.SetValid(FALSE);
 
-void					NoxText::InvalidateWave			( void )
-{ 
+  trans = FirstTranslation(sh);
 
-	WaveInfo.SetValid ( FALSE );
+  while (trans) {
+    trans->WaveInfo.SetValid(FALSE);
 
+    trans = NextTranslation(sh);
+  }
 }
 
-void					NoxText::InvalidateWave			( LangID langid  )
-{ 
+void NoxText::InvalidateWave(void) { WaveInfo.SetValid(FALSE); }
 
-	WaveInfo.SetValid ( FALSE );
+void NoxText::InvalidateWave(LangID langid) {
+  WaveInfo.SetValid(FALSE);
 
-	if ( langid == LANGID_US )
-	{
-		InvalidateWave ();
-	}
-	else
-	{
-		Translation *trans = GetTranslation ( langid );
-		
-		if ( trans )
-		{
-			trans->WaveInfo.SetValid ( FALSE );
-		}
+  if (langid == LANGID_US) {
+    InvalidateWave();
+  } else {
+    Translation *trans = GetTranslation(langid);
 
-	}
+    if (trans) {
+      trans->WaveInfo.SetValid(FALSE);
+    }
+  }
 }
-
-void					NoxText::AddToTree		( CTreeCtrl *tc, HTREEITEM parent, int changes )
-{
-	HTREEITEM		item;
-	ListSearch	sh;
-	Translation	*trans;
 
-	sprintf ( buffer, "TEXT %c : %s", ChangedSymbol() ,GetSB ());
-	item = tc->InsertItem ( buffer, parent );
+void NoxText::AddToTree(CTreeCtrl *tc, HTREEITEM parent, int changes) {
+  HTREEITEM item;
+  ListSearch sh;
+  Translation *trans;
 
-	trans = FirstTranslation ( sh );
+  sprintf(buffer, "TEXT %c : %s", ChangedSymbol(), GetSB());
+  item = tc->InsertItem(buffer, parent);
 
-	while ( trans )
-	{
-		if ( !changes || trans->IsChanged ())
-		{
-			trans->AddToTree ( tc, item );
-		}
+  trans = FirstTranslation(sh);
 
-		trans = NextTranslation ( sh );
-	}
+  while (trans) {
+    if (!changes || trans->IsChanged()) {
+      trans->AddToTree(tc, item);
+    }
 
-	if ( ID() != -1 )
-	{
-		sprintf ( buffer, "ID     : %d", ID ());
-		tc->InsertItem ( buffer, item );
-	}
+    trans = NextTranslation(sh);
+  }
 
-	if ( strcmp ( WaveSB(), "" ) )
-	{
-		sprintf ( buffer, "WAVE   : %s", WaveSB() );
-		tc->InsertItem ( buffer, item );
-	}
+  if (ID() != -1) {
+    sprintf(buffer, "ID     : %d", ID());
+    tc->InsertItem(buffer, item);
+  }
 
-	if ( line_number != -1 )
-	{
-		sprintf ( buffer, "LINE   : %d", line_number );
-		tc->InsertItem ( buffer, item );
-	}
+  if (strcmp(WaveSB(), "")) {
+    sprintf(buffer, "WAVE   : %s", WaveSB());
+    tc->InsertItem(buffer, item);
+  }
 
-	sprintf ( buffer, "REV    : %d", revision );
-	tc->InsertItem ( buffer, item );
+  if (line_number != -1) {
+    sprintf(buffer, "LINE   : %d", line_number);
+    tc->InsertItem(buffer, item);
+  }
 
-	sprintf ( buffer, "LEN    : %d", this->Len() );
-	tc->InsertItem ( buffer, item );
+  sprintf(buffer, "REV    : %d", revision);
+  tc->InsertItem(buffer, item);
 
+  sprintf(buffer, "LEN    : %d", this->Len());
+  tc->InsertItem(buffer, item);
 }
 
-Translation::Translation ( void )
-{
-	text = new OLEString (  );
-	comment = new OLEString (  );
-	revision = 0;
-	sent = FALSE;
-	
+Translation::Translation(void) {
+  text = new OLEString();
+  comment = new OLEString();
+  revision = 0;
+  sent = FALSE;
 }
 
-Translation::~Translation ( )
-{
-	delete text;
-	delete comment;
+Translation::~Translation() {
+  delete text;
+  delete comment;
 }
 
-int Translation::IsSent ( void )
-{
-	return sent;
-}
+int Translation::IsSent(void) { return sent; }
 
-void Translation::Sent ( int val )
-{
-	sent = val;
-}
+void Translation::Sent(int val) { sent = val; }
 
-void					Translation::SetDB				( TransDB *new_db )
-{
-	db = new_db;
-}
+void Translation::SetDB(TransDB *new_db) { db = new_db; }
 
-Translation*			Translation::Clone				( void )
-{
-	Translation *clone = new Translation();
+Translation *Translation::Clone(void) {
+  Translation *clone = new Translation();
 
-	clone->Set ( Get ());
-	clone->SetComment ( Comment ());
-	clone->SetLangID ( GetLangID ());
-	clone->SetRevision ( Revision ());
+  clone->Set(Get());
+  clone->SetComment(Comment());
+  clone->SetLangID(GetLangID());
+  clone->SetRevision(Revision());
 
-	return clone;
+  return clone;
 }
-
-void					Translation::AddToTree		( CTreeCtrl *tc, HTREEITEM parent, int changes )
-{
-	HTREEITEM		item;
 
-	sprintf ( buffer, "%s%c   : %s", Language(), ChangedSymbol(), GetSB ());
+void Translation::AddToTree(CTreeCtrl *tc, HTREEITEM parent, int changes) {
+  HTREEITEM item;
 
-	item = tc->InsertItem ( buffer, parent );
+  sprintf(buffer, "%s%c   : %s", Language(), ChangedSymbol(), GetSB());
 
-	if ( strcmp ( CommentSB(), "" ) )
-	{
-		sprintf ( buffer, "COMMENT: %s", CommentSB() );
-		tc->InsertItem ( buffer, item );
-	}
+  item = tc->InsertItem(buffer, parent);
 
-	sprintf ( buffer, "REV    : %d", revision );
-	tc->InsertItem ( buffer, item );
+  if (strcmp(CommentSB(), "")) {
+    sprintf(buffer, "COMMENT: %s", CommentSB());
+    tc->InsertItem(buffer, item);
+  }
 
-	sprintf ( buffer, "LEN    : %d", Len() );
-	tc->InsertItem ( buffer, item );
+  sprintf(buffer, "REV    : %d", revision);
+  tc->InsertItem(buffer, item);
 
+  sprintf(buffer, "LEN    : %d", Len());
+  tc->InsertItem(buffer, item);
 }
 
-int Translation::TooLong ( int maxlen )
-{
-	return maxlen != 0 && text->Len () > maxlen;
-
+int Translation::TooLong(int maxlen) {
+  return maxlen != 0 && text->Len() > maxlen;
 }
-
-int Translation::ValidateFormat ( NoxText *ntext )
-{
-	return SameFormat ( text->Get(), ntext->Get ());
 
+int Translation::ValidateFormat(NoxText *ntext) {
+  return SameFormat(text->Get(), ntext->Get());
 }
 
-int TransDB::Warnings ( CNoxstringDlg *dlg )
-{
-	NoxLabel *label;
-	ListSearch sh_label;
-	int count = 0;
-	int warnings = 0;
-	List	dups;
+int TransDB::Warnings(CNoxstringDlg *dlg) {
+  NoxLabel *label;
+  ListSearch sh_label;
+  int count = 0;
+  int warnings = 0;
+  List dups;
 
-	if ( dlg )
-	{
-		dlg->InitProgress ( NumLabels ());
-		dlg->Log ("");
-		dlg->Log ("Generals.str Warnigs:");
-		dlg->Status ( "Creating warnings report...", FALSE );
-	}
+  if (dlg) {
+    dlg->InitProgress(NumLabels());
+    dlg->Log("");
+    dlg->Log("Generals.str Warnigs:");
+    dlg->Status("Creating warnings report...", FALSE);
+  }
 
-	text_bin->Clear();
+  text_bin->Clear();
 
-	label = FirstLabel ( sh_label );
+  label = FirstLabel(sh_label);
 
-	while ( label )
-	{
-		NoxText *text;
-		NoxText *existing_text;
-		ListSearch sh_text;
+  while (label) {
+    NoxText *text;
+    NoxText *existing_text;
+    ListSearch sh_text;
 
-		text = label->FirstText ( sh_text );
+    text = label->FirstText(sh_text);
 
-		while ( text )
-		{
-			if ( text->Len ( ) == 0 )
-			{
-				if ( dlg )
-				{
-					sprintf ( buffer, "Warning:: text at line %5d is NULL", 
-								text->LineNumber());
-					dlg->Log ( buffer );
-				}
-				warnings++;
-			}
-			else if ( !DuplicatesAllowed() && ( existing_text = FindText ( text->Get () )))
-			{
-				warnings++;
-				if ( dlg )
-				{
-					DupNode *dup = new DupNode ( text, existing_text );
-					dups.Add ( dup );
-				}
-			}
-			else
-			{
-				text_bin->Add ( text, text->Get() );
-			}
+    while (text) {
+      if (text->Len() == 0) {
+        if (dlg) {
+          sprintf(buffer, "Warning:: text at line %5d is NULL",
+                  text->LineNumber());
+          dlg->Log(buffer);
+        }
+        warnings++;
+      } else if (!DuplicatesAllowed() &&
+                 (existing_text = FindText(text->Get()))) {
+        warnings++;
+        if (dlg) {
+          DupNode *dup = new DupNode(text, existing_text);
+          dups.Add(dup);
+        }
+      } else {
+        text_bin->Add(text, text->Get());
+      }
 
-			text = label->NextText ( sh_text );
-		}
+      text = label->NextText(sh_text);
+    }
 
-		count++;
-		if ( dlg )
-		{
-			dlg->SetProgress ( count );
-		}
-		label = NextLabel ( sh_label );
-	}
+    count++;
+    if (dlg) {
+      dlg->SetProgress(count);
+    }
+    label = NextLabel(sh_label);
+  }
 
-	if ( dlg )
-	{
-		DupNode *dup;
+  if (dlg) {
+    DupNode *dup;
 
-		while ( (dup = (DupNode*)dups.LastNode ()))
-		{
-			sprintf ( buffer, "Warning:: text at line %5d is a duplicate of text on line %5d", 
-									dup->Duplicate()->LineNumber(), dup->Original()->LineNumber());
-			dlg->Log ( buffer );
+    while ((dup = (DupNode *)dups.LastNode())) {
+      sprintf(buffer,
+              "Warning:: text at line %5d is a duplicate of text on line %5d",
+              dup->Duplicate()->LineNumber(), dup->Original()->LineNumber());
+      dlg->Log(buffer);
 
-			dup->Remove ();
-			delete dup;
-		}
-		sprintf ( buffer, "Total warnings: %d", warnings );
-		dlg->Log ( buffer );
-		dlg->Ready();
-	}
+      dup->Remove();
+      delete dup;
+    }
+    sprintf(buffer, "Total warnings: %d", warnings);
+    dlg->Log(buffer);
+    dlg->Ready();
+  }
 
-	return warnings;
+  return warnings;
 }
 
-int TransDB::Errors ( CNoxstringDlg *dlg )
-{
-	NoxLabel *label;
-	NoxLabel *existing_label;
-	ListSearch sh_label;
-	Bin	*tbin = new Bin ();
-	int count = 0;
-	int errors = 0;
+int TransDB::Errors(CNoxstringDlg *dlg) {
+  NoxLabel *label;
+  NoxLabel *existing_label;
+  ListSearch sh_label;
+  Bin *tbin = new Bin();
+  int count = 0;
+  int errors = 0;
 
-	if ( dlg )
-	{
-		dlg->InitProgress ( NumLabels ());
-		dlg->Log ("");
-		dlg->Log ("Generals.str Errors:");
-		dlg->Status ( "Creating error report...", FALSE );
-	}
+  if (dlg) {
+    dlg->InitProgress(NumLabels());
+    dlg->Log("");
+    dlg->Log("Generals.str Errors:");
+    dlg->Status("Creating error report...", FALSE);
+  }
 
+  label_bin->Clear();
 
+  label = FirstLabel(sh_label);
 
-	label_bin->Clear();
+  while (label) {
+    NoxText *text;
+    NoxText *existing_text;
+    ListSearch sh_text;
 
-	label = FirstLabel ( sh_label );
+    if (!MultiTextAllowed() && label->NumStrings() > 1) {
+      errors++;
+      if (dlg) {
+        sprintf(buffer,
+                "Error  : Label \"%s\" at line %d is has more than 1 string "
+                "defined",
+                label->NameSB(), label->LineNumber());
+        dlg->Log(buffer);
+      }
+    }
 
-	while ( label )
-	{
-		NoxText *text;
-		NoxText *existing_text;
-		ListSearch sh_text;
+    if ((existing_label = FindLabel(label->Name()))) {
+      errors++;
+      if (dlg) {
+        sprintf(
+            buffer,
+            "Error  : Label \"%s\" at line %d is already defined on line %d",
+            label->NameSB(), label->LineNumber(), existing_label->LineNumber());
+        dlg->Log(buffer);
+      }
+    }
 
-		if ( !MultiTextAllowed () && label->NumStrings () > 1 )
-		{
-			errors++;
-			if ( dlg )
-			{
-				sprintf ( buffer, "Error  : Label \"%s\" at line %d is has more than 1 string defined", 
-							label->NameSB(), label->LineNumber());
-				dlg->Log ( buffer );
-			}
-	
-		}
+    label_bin->Add(label, label->Name());
 
-		if ( ( existing_label = FindLabel ( label->Name () )))
-		{
-			errors++;
-			if ( dlg )
-			{
-				sprintf ( buffer, "Error  : Label \"%s\" at line %d is already defined on line %d", 
-							label->NameSB(), label->LineNumber(), existing_label->LineNumber());
-				dlg->Log ( buffer );
-			}
-		}
+    tbin->Clear();
 
-		label_bin->Add ( label, label->Name());
+    text = label->FirstText(sh_text);
 
-		tbin->Clear ();
+    while (text) {
+      if ((existing_text = (NoxText *)tbin->Get(text->Get()))) {
+        errors++;
+        if (dlg) {
+          sprintf(buffer, "Error  : Label \"%s\" has duplicate text at line %d",
+                  label->NameSB(), text->LineNumber());
+          dlg->Log(buffer);
+        }
+      }
 
-		text = label->FirstText ( sh_text );
+      tbin->Add(text, text->Get());
 
-		while ( text )
-		{
-				if ( ( existing_text = (NoxText *) tbin->Get ( text->Get () )))
-				{
-					errors++;
-					if ( dlg )
-					{
-						sprintf ( buffer, "Error  : Label \"%s\" has duplicate text at line %d",
-									label->NameSB(), text->LineNumber());
-						dlg->Log ( buffer );
-					}
-				}
+      // check string length against max len
 
-			tbin->Add ( text, text->Get() );
+      if (label->MaxLen()) {
+        if (text->Len() > label->MaxLen()) {
+          errors++;
+          if (dlg) {
+            sprintf(buffer,
+                    "Error  : The US text at line %d (for label \"%s\") "
+                    "exceeds the max length",
+                    text->LineNumber(), label->NameSB());
+            dlg->Log(buffer);
+          }
+        }
+      }
 
-			// check string length against max len
+      text = label->NextText(sh_text);
+    }
 
-			if ( label->MaxLen () )
-			{
-				if ( text->Len () > label->MaxLen ())
-				{
-					errors++;
-					if ( dlg )
-					{
-						sprintf ( buffer, "Error  : The US text at line %d (for label \"%s\") exceeds the max length",
-									text->LineNumber(), label->NameSB());
-						dlg->Log ( buffer );
-					}
-				}
-			}
+    count++;
+    if (dlg) {
+      dlg->SetProgress(count);
+    }
+    label = NextLabel(sh_label);
+  }
 
-			text = label->NextText ( sh_text );
-		}
+  if (dlg) {
+    sprintf(buffer, "Total errors: %d", errors);
+    dlg->Log(buffer);
 
-		count++;
-		if ( dlg )
-		{
-			dlg->SetProgress ( count );
-		}
-		label = NextLabel ( sh_label );
-	}
+    dlg->Ready();
+  }
 
-	if ( dlg )
-	{
-		sprintf ( buffer, "Total errors: %d", errors );
-		dlg->Log ( buffer );
-
-		dlg->Ready();
-	}
-
-	delete tbin;
-	last_error_count = errors;
-	checked_for_errors = TRUE;
-	return errors;
+  delete tbin;
+  last_error_count = errors;
+  checked_for_errors = TRUE;
+  return errors;
 }
 
-CWaveInfo::CWaveInfo ( void )
-{
-	wave_valid = FALSE;
-	missing = TRUE;
+CWaveInfo::CWaveInfo(void) {
+  wave_valid = FALSE;
+  missing = TRUE;
 }
 
-void TransDB::VerifyDialog( LangID langid, void (*cb) (void) ) 
-{
-	NoxLabel *label;
-	ListSearch sh_label;
-	int count = 0;
-	LANGINFO *linfo = GetLangInfo ( langid );
+void TransDB::VerifyDialog(LangID langid, void (*cb)(void)) {
+  NoxLabel *label;
+  ListSearch sh_label;
+  int count = 0;
+  LANGINFO *linfo = GetLangInfo(langid);
 
-	label = FirstLabel ( sh_label );
+  label = FirstLabel(sh_label);
 
-	while ( label )
-	{
-		NoxText *text;
-		ListSearch sh_text;
+  while (label) {
+    NoxText *text;
+    ListSearch sh_text;
 
-		text = label->FirstText ( sh_text );
+    text = label->FirstText(sh_text);
 
-		while ( text )
-		{
-			if ( text->IsDialog ())
-			{
-				if ( text->DialogIsPresent ( DialogPath, langid ))
-				{
-					text->DialogIsValid ( DialogPath, langid );
-				}
-			}
+    while (text) {
+      if (text->IsDialog()) {
+        if (text->DialogIsPresent(DialogPath, langid)) {
+          text->DialogIsValid(DialogPath, langid);
+        }
+      }
 
-			text = label->NextText ( sh_text );
-		}
+      text = label->NextText(sh_text);
+    }
 
-		if ( cb )
-		{
-			cb();
-		}
-		label = NextLabel ( sh_label );
-	}
-
+    if (cb) {
+      cb();
+    }
+    label = NextLabel(sh_label);
+  }
 }
-
-void TransDB::InvalidateDialog( LangID langid ) 
-{
-	NoxLabel *label;
-	ListSearch sh_label;
 
-	label = FirstLabel ( sh_label );
+void TransDB::InvalidateDialog(LangID langid) {
+  NoxLabel *label;
+  ListSearch sh_label;
 
-	while ( label )
-	{
-		NoxText *text;
-		ListSearch sh_text;
+  label = FirstLabel(sh_label);
 
-		text = label->FirstText ( sh_text );
+  while (label) {
+    NoxText *text;
+    ListSearch sh_text;
 
-		while ( text )
-		{
-			if ( text->IsDialog ())
-			{
-				text->InvalidateWave ( langid );
-			}
+    text = label->FirstText(sh_text);
 
-			text = label->NextText ( sh_text );
-		}
+    while (text) {
+      if (text->IsDialog()) {
+        text->InvalidateWave(langid);
+      }
 
-		label = NextLabel ( sh_label );
-	}
+      text = label->NextText(sh_text);
+    }
 
+    label = NextLabel(sh_label);
+  }
 }
 
-int TransDB::ReportDialog( DLGREPORT *report, LangID langid, void (*print) ( const char *), PMASK pmask ) 
-{
-	NoxLabel *label;
-	ListSearch sh_label;
-	int count = 0;
-	DLGREPORT _info;
-	DLGREPORT *info = &_info;
-	int skip_verify = FALSE;
-	LANGINFO *linfo = GetLangInfo ( langid );
+int TransDB::ReportDialog(DLGREPORT *report, LangID langid,
+                          void (*print)(const char *), PMASK pmask) {
+  NoxLabel *label;
+  ListSearch sh_label;
+  int count = 0;
+  DLGREPORT _info;
+  DLGREPORT *info = &_info;
+  int skip_verify = FALSE;
+  LANGINFO *linfo = GetLangInfo(langid);
 
-	if ( report )
-	{
-		info = report;
-	}
+  if (report) {
+    info = report;
+  }
 
-	memset ( info, 0, sizeof ( DLGREPORT ));
+  memset(info, 0, sizeof(DLGREPORT));
 
+  label = FirstLabel(sh_label);
 
-	label = FirstLabel ( sh_label );
+  while (label) {
+    NoxText *text;
+    ListSearch sh_text;
 
-	while ( label )
-	{
-		NoxText *text;
-		ListSearch sh_text;
+    text = label->FirstText(sh_text);
 
-		text = label->FirstText ( sh_text );
+    while (text) {
+      if (text->IsDialog()) {
+        if (text->DialogIsPresent(DialogPath, langid)) {
+          if (!text->DialogIsValid(DialogPath, langid, FALSE)) {
+            if (print && pmask & PMASK_UNRESOLVED) {
+              sprintf(buffer, "%d: audio file \"%s%s.wav\" not verified",
+                      text->ID(), text->WaveSB(), linfo->character);
 
-		while ( text )
-		{
-			if ( text->IsDialog ())
-			{
-				if ( text->DialogIsPresent ( DialogPath, langid))
-				{
-					if ( !text->DialogIsValid ( DialogPath, langid, FALSE ) )
-					{
-						if ( print && pmask & PMASK_UNRESOLVED )
-						{
-							sprintf ( buffer, "%d: audio file \"%s%s.wav\" not verified", text->ID(), text->WaveSB (), linfo->character);
-							
-							print ( buffer );
-						}
-						info->unresolved++;
-					}
-					else
-					{
-						info->resolved++;
-					}
-				}
-				else
-				{
-					if ( print && pmask & PMASK_MISSING )
-					{
-						sprintf ( buffer, "%d: audio file \"%s%s.wav\" missing", text->ID(), text->WaveSB (), linfo->character);
-						
-						print ( buffer );
-					}
-					info->missing++;
-				}
-				
-				info->numdialog++;
-			}
+              print(buffer);
+            }
+            info->unresolved++;
+          } else {
+            info->resolved++;
+          }
+        } else {
+          if (print && pmask & PMASK_MISSING) {
+            sprintf(buffer, "%d: audio file \"%s%s.wav\" missing", text->ID(),
+                    text->WaveSB(), linfo->character);
 
-			text = label->NextText ( sh_text );
-		}
+            print(buffer);
+          }
+          info->missing++;
+        }
 
-		label = NextLabel ( sh_label );
-	}
+        info->numdialog++;
+      }
 
-	return info->missing + info->unresolved + info->errors ;
+      text = label->NextText(sh_text);
+    }
+
+    label = NextLabel(sh_label);
+  }
+
+  return info->missing + info->unresolved + info->errors;
 }
+
+int TransDB::ReportTranslations(TRNREPORT *report, LangID langid,
+                                void (*print)(const char *buffer),
+                                PMASK pmask) {
+  NoxLabel *label;
+  ListSearch sh_label;
+  int count = 0;
+  int first_error = FALSE;
+  TRNREPORT _info;
+  TRNREPORT *info = &_info;
+
+  if (report) {
+    info = report;
+  }
+
+  memset(info, 0, sizeof(TRNREPORT));
+
+  label = FirstLabel(sh_label);
+
+  while (label) {
+    NoxText *text;
+    ListSearch sh_text;
+    int maxlen = label->MaxLen();
+
+    text = label->FirstText(sh_text);
 
-int TransDB::ReportTranslations( TRNREPORT *report, LangID langid, void (*print) ( const char *buffer), PMASK pmask ) 
-{
-	NoxLabel *label;
-	ListSearch sh_label;
-	int count = 0;
-	int first_error = FALSE;
-	TRNREPORT _info;
-	TRNREPORT *info = &_info;
+    while (text) {
+      int textnum = 0;
+      Translation *trans;
+      int too_big = FALSE;
 
-	if ( report )
-	{
-		info = report;
-	}
+      if (text->Len()) {
+        info->numstrings++;
+        if (langid != LANGID_US) {
+          if ((trans = text->GetTranslation(langid))) {
+            if (maxlen && trans->Len() > maxlen) {
+              if (print && pmask & PMASK_TOOLONG) {
+                sprintf(buffer, "%d: translation is too long by %d characters",
+                        text->ID(), trans->Len() - maxlen);
 
-	memset ( info, 0, sizeof ( TRNREPORT ));
+                print(buffer);
+              }
+              too_big = TRUE;
+            }
 
-	label = FirstLabel ( sh_label );
+            if (text->Revision() > trans->Revision()) {
+              if (print && pmask & PMASK_RETRANSLATE) {
+                sprintf(buffer, "%d: needs re-translation", text->ID());
 
-	while ( label )
-	{
-		NoxText *text;
-		ListSearch sh_text;
-		int maxlen = label->MaxLen ();
+                print(buffer);
+              }
+              info->retranslate++;
+            } else {
+              info->translated++;
+              if (!trans->ValidateFormat(text)) {
+                if (print && pmask & PMASK_BADFORMAT) {
+                  sprintf(
+                      buffer,
+                      "%d: translation has differring formating to original",
+                      text->ID());
 
-		text = label->FirstText ( sh_text );
+                  print(buffer);
+                }
+                info->bad_format++;
+              }
+            }
+          } else {
+            if (print && pmask & PMASK_MISSING) {
+              sprintf(buffer, "%d: not translated", text->ID());
 
-		while ( text )
-		{
-			int textnum = 0;
-			Translation *trans;
-			int too_big = FALSE;
+              print(buffer);
+            }
+            info->missing++;
+          }
+        } else {
+          // check maxlen
+          if (maxlen) {
+            if (text->Len() > maxlen) {
+              if (print && pmask & PMASK_TOOLONG) {
+                sprintf(buffer, "%d: is too long by %d characters", text->ID(),
+                        text->Len() - maxlen);
 
-			if ( text->Len ())
-			{
-				info->numstrings++;
-				if ( langid != LANGID_US )
-				{
-					if ( (trans = text->GetTranslation ( langid ) ))
-					{
-						if ( maxlen && trans->Len() > maxlen )
-						{
-							if ( print && pmask & PMASK_TOOLONG )
-							{
-								sprintf ( buffer, "%d: translation is too long by %d characters", text->ID (), trans->Len() - maxlen);
-							
-								print ( buffer );
-							}
-							too_big = TRUE;
-						}
-				
-						if ( text->Revision () > trans->Revision ())
-						{
-							if ( print && pmask & PMASK_RETRANSLATE )
-							{
-								sprintf ( buffer, "%d: needs re-translation", text->ID () );
-							
-								print ( buffer );
-							}
-							info->retranslate++;
-						}
-						else
-						{
-							info->translated++;
-							if ( !trans->ValidateFormat ( text ) )
-							{
-								if ( print && pmask & PMASK_BADFORMAT )
-								{
-									sprintf ( buffer, "%d: translation has differring formating to original", text->ID () );
-						
-									print ( buffer );
-								}
-								info->bad_format++;
-							}
-						}
-					}
-					else
-					{
-						if ( print && pmask & PMASK_MISSING )
-						{
-							sprintf ( buffer, "%d: not translated", text->ID ());
-						
-							print ( buffer );
-						}
-						info->missing++;
-					}
-				}
-				else
-				{
-					// check maxlen
-					if ( maxlen )
-					{
-						if ( text->Len() > maxlen )
-						{
-							if ( print && pmask & PMASK_TOOLONG )
-							{
-								sprintf ( buffer, "%d: is too long by %d characters", text->ID (), text->Len() - maxlen);
-							
-								print ( buffer );
-							}
-							too_big = TRUE;
-						}
-					}
-				}
-				
-			}
+                print(buffer);
+              }
+              too_big = TRUE;
+            }
+          }
+        }
+      }
 
-			if ( too_big )
-			{
-				info->too_big++;
-			}
-			text = label->NextText ( sh_text );
-		}
+      if (too_big) {
+        info->too_big++;
+      }
+      text = label->NextText(sh_text);
+    }
 
-		info->numlabels++;
+    info->numlabels++;
 
-		label = NextLabel ( sh_label );
-	}
+    label = NextLabel(sh_label);
+  }
 
-	info->errors = info->too_big + info->bad_format;
+  info->errors = info->too_big + info->bad_format;
 
-	return info->missing + info->too_big + info->retranslate + info->bad_format;
+  return info->missing + info->too_big + info->retranslate + info->bad_format;
 }

@@ -18,13 +18,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
 #include "Common/CriticalSection.h"
+
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 // Definitions.
 CriticalSection *TheAsciiStringCriticalSection = NULL;
@@ -36,4 +37,3 @@ CriticalSection *TheDebugLogCriticalSection = NULL;
 #ifdef PERF_TIMERS
 PerfGather TheCritSecPerfGather("CritSec");
 #endif
-

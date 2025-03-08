@@ -18,7 +18,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -31,17 +32,17 @@
 //-----------------------------------------------------------------------------
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-----------------------------------------------------------------------------
 // USER INCLUDES //////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-#include "Common/UserPreferences.h"
-#include "Common/SkirmishBattleHonors.h"
+#include "Common/MultiplayerSettings.h"
 #include "Common/Player.h"
 #include "Common/PlayerTemplate.h"
 #include "Common/QuotedPrintable.h"
-#include "Common/MultiplayerSettings.h"
+#include "Common/SkirmishBattleHonors.h"
+#include "Common/UserPreferences.h"
 #include "GameClient/MapUtil.h"
 
 //-----------------------------------------------------------------------------
@@ -72,142 +73,97 @@
 // PUBLIC FUNCTIONS ///////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
 
-
 //-----------------------------------------------------------------------------
-// SkirmishBattleHonors base class 
+// SkirmishBattleHonors base class
 //-----------------------------------------------------------------------------
 
-SkirmishBattleHonors::SkirmishBattleHonors()
-{
-	load("SkirmishStats.ini");
+SkirmishBattleHonors::SkirmishBattleHonors() { load("SkirmishStats.ini"); }
+
+SkirmishBattleHonors::~SkirmishBattleHonors() {}
+
+void SkirmishBattleHonors::setWins(Int val) { setInt("Wins", val); }
+
+Int SkirmishBattleHonors::getWins(void) const { return getInt("Wins", 0); }
+
+void SkirmishBattleHonors::setLosses(Int val) { setInt("Losses", val); }
+
+Int SkirmishBattleHonors::getLosses(void) const { return getInt("Losses", 0); }
+
+void SkirmishBattleHonors::setWinStreak(Int val) { setInt("WinStreak", val); }
+
+Int SkirmishBattleHonors::getWinStreak(void) const {
+  return getInt("WinStreak", 0);
 }
 
-SkirmishBattleHonors::~SkirmishBattleHonors()
-{
+void SkirmishBattleHonors::setBestWinStreak(Int val) {
+  setInt("BestWinStreak", val);
 }
 
-void SkirmishBattleHonors::setWins(Int val)
-{
-	setInt("Wins", val);
+Int SkirmishBattleHonors::getBestWinStreak(void) const {
+  return getInt("BestWinStreak", 0);
 }
 
-Int SkirmishBattleHonors::getWins(void) const
-{
-	return getInt("Wins", 0);
+void SkirmishBattleHonors::setChallengeMedals(Int val) {
+  setInt("Challenge", val);
 }
 
-void SkirmishBattleHonors::setLosses(Int val)
-{
-	setInt("Losses", val);
+Int SkirmishBattleHonors::getChallengeMedals(void) const {
+  return getInt("Challenge", 0);
 }
 
-Int SkirmishBattleHonors::getLosses(void) const
-{
-	return getInt("Losses", 0);
+void SkirmishBattleHonors::setBuiltSCUD(void) { setBool("SCUD", TRUE); }
+
+Bool SkirmishBattleHonors::builtSCUD(void) const {
+  return getBool("SCUD", FALSE);
 }
 
-void SkirmishBattleHonors::setWinStreak(Int val)
-{
-	setInt("WinStreak", val);
+void SkirmishBattleHonors::setBuiltParticleCannon(void) {
+  setBool("PPC", TRUE);
 }
 
-Int SkirmishBattleHonors::getWinStreak(void) const
-{
-	return getInt("WinStreak", 0);
+Bool SkirmishBattleHonors::builtParticleCannon(void) const {
+  return getBool("PPC", FALSE);
 }
 
-void SkirmishBattleHonors::setBestWinStreak(Int val)
-{
-	setInt("BestWinStreak", val);
+void SkirmishBattleHonors::setBuiltNuke(void) { setBool("Nuke", TRUE); }
+
+Bool SkirmishBattleHonors::builtNuke(void) const {
+  return getBool("Nuke", FALSE);
 }
 
-Int SkirmishBattleHonors::getBestWinStreak(void) const
-{
-	return getInt("BestWinStreak", 0);
+void SkirmishBattleHonors::setHonors(Int which) {
+  Int honors = getInt("Honors", 0);
+  setInt("Honors", honors | which);
 }
 
-void SkirmishBattleHonors::setChallengeMedals(Int val)
-{
-	setInt("Challenge", val);
+Int SkirmishBattleHonors::getHonors(void) const { return getInt("Honors", 0); }
+
+void SkirmishBattleHonors::setEnduranceMedal(AsciiString mapName,
+                                             Int difficulty, int numAIs) {
+  AsciiString key;
+  key.format("%s_%d", mapName.str(), difficulty);
+  setInt(key, numAIs);
 }
 
-Int SkirmishBattleHonors::getChallengeMedals(void) const
-{
-	return getInt("Challenge", 0);
+Int SkirmishBattleHonors::getEnduranceMedal(AsciiString mapName,
+                                            Int difficulty) const {
+  AsciiString key;
+  key.format("%s_%d", mapName.str(), difficulty);
+  return getInt(key, 0);
 }
 
-void SkirmishBattleHonors::setBuiltSCUD(void)
-{
-	setBool("SCUD", TRUE);
+void SkirmishBattleHonors::setLastGeneral(AsciiString val) {
+  setAsciiString("LastHouse", val);
 }
 
-Bool SkirmishBattleHonors::builtSCUD(void) const
-{
-	return getBool("SCUD", FALSE);
+AsciiString SkirmishBattleHonors::getLastGeneral(void) const {
+  return getAsciiString("LastHouse", AsciiString::TheEmptyString);
 }
 
-void SkirmishBattleHonors::setBuiltParticleCannon(void)
-{
-	setBool("PPC", TRUE);
+void SkirmishBattleHonors::setNumGamesLoyal(Int val) {
+  setInt("LoyalGames", val);
 }
 
-Bool SkirmishBattleHonors::builtParticleCannon(void) const
-{
-	return getBool("PPC", FALSE);
+Int SkirmishBattleHonors::getNumGamesLoyal(void) const {
+  return getInt("LoyalGames", 0);
 }
-
-void SkirmishBattleHonors::setBuiltNuke(void)
-{
-	setBool("Nuke", TRUE);
-}
-
-Bool SkirmishBattleHonors::builtNuke(void) const
-{
-	return getBool("Nuke", FALSE);
-}
-
-void SkirmishBattleHonors::setHonors(Int which)
-{
-	Int honors = getInt("Honors", 0);
-	setInt("Honors", honors | which);
-}
-
-Int SkirmishBattleHonors::getHonors(void) const
-{
-	return getInt("Honors", 0);
-}
-
-void SkirmishBattleHonors::setEnduranceMedal(AsciiString mapName, Int difficulty, int numAIs)
-{
-	AsciiString key;
-	key.format("%s_%d", mapName.str(), difficulty);
-	setInt(key, numAIs);
-}
-
-Int SkirmishBattleHonors::getEnduranceMedal(AsciiString mapName, Int difficulty) const
-{
-	AsciiString key;
-	key.format("%s_%d", mapName.str(), difficulty);
-	return getInt(key, 0);
-}
-
-void SkirmishBattleHonors::setLastGeneral(AsciiString val)
-{
-	setAsciiString("LastHouse", val);
-}
-
-AsciiString SkirmishBattleHonors::getLastGeneral(void) const
-{
-	return getAsciiString("LastHouse", AsciiString::TheEmptyString);
-}
-
-void SkirmishBattleHonors::setNumGamesLoyal(Int val)
-{
-	setInt("LoyalGames", val);
-}
-
-Int SkirmishBattleHonors::getNumGamesLoyal(void) const
-{
-	return getInt("LoyalGames", 0);
-}
-

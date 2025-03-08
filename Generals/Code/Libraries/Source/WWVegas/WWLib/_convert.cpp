@@ -17,30 +17,32 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : Command & Conquer                                            *
+ *                 Project Name : Command & Conquer *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/Library/_Convert.cpp                         $*
+ *                     $Archive:: /Commando/Code/Library/_Convert.cpp $*
  *                                                                                             *
- *                      $Author:: Byon_g                                                      $*
+ *                      $Author:: Byon_g $*
  *                                                                                             *
- *                     $Modtime:: 2/10/98 4:20p                                               $*
+ *                     $Modtime:: 2/10/98 4:20p $*
  *                                                                                             *
- *                    $Revision:: 2                                                           $*
+ *                    $Revision:: 2 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
-#include	"always.h"
-#include	"_convert.h"
+#include "_convert.h"
 
-ConvertClass * VoxelDrawer = NULL;
-ConvertClass * UnitDrawer = NULL;
-ConvertClass * TerrainDrawer = NULL;
-ConvertClass * AnimDrawer = NULL;
-ConvertClass * NormalDrawer = NULL;
-ConvertClass * IsometricDrawer = NULL;
+#include "always.h"
 
+ConvertClass* VoxelDrawer = NULL;
+ConvertClass* UnitDrawer = NULL;
+ConvertClass* TerrainDrawer = NULL;
+ConvertClass* AnimDrawer = NULL;
+ConvertClass* NormalDrawer = NULL;
+ConvertClass* IsometricDrawer = NULL;

@@ -16,21 +16,21 @@
 **	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/*************************************************************************** 
- *                                                                         * 
- *                 Project Name : Westwood Auto Registration App           * 
- *                                                                         * 
- *                    File Name : FIELD.CPP                                * 
- *                                                                         * 
- *                   Programmer : Philip W. Gorrow                         * 
- *                                                                         * 
- *                   Start Date : 04/22/96                                 * 
- *                                                                         * 
- *                  Last Update : April 22, 1996 [PWG]                     * 
- *                                                                         * 
- *  Actual member function for the field class.                            * 
- *-------------------------------------------------------------------------* 
- * Functions:                                                              * 
+/***************************************************************************
+ *                                                                         *
+ *                 Project Name : Westwood Auto Registration App           *
+ *                                                                         *
+ *                    File Name : FIELD.CPP                                *
+ *                                                                         *
+ *                   Programmer : Philip W. Gorrow                         *
+ *                                                                         *
+ *                   Start Date : 04/22/96                                 *
+ *                                                                         *
+ *                  Last Update : April 22, 1996 [PWG]                     *
+ *                                                                         *
+ *  Actual member function for the field class.                            *
+ *-------------------------------------------------------------------------*
+ * Functions:                                                              *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 #include <string.h>
 #include <sys/types.h>
@@ -42,202 +42,168 @@
 #endif
 #include "field.h"
 
-
 // private member func
-void FieldClass::Clear(void)
-{
-  delete[](Data);
+void FieldClass::Clear(void) {
+  delete[] (Data);
 
-  strcpy(ID,"");
-  DataType=0;
-  Size=0;
-  Data=NULL;
-  Next=NULL;
-}
-
-
-FieldClass::FieldClass(char *id, char data)
-{
-  Data=NULL;
-  Set(id,data);
-}
- 
-FieldClass::FieldClass(char *id, unsigned char data)
-{
-  Data=NULL;
-  Set(id,data);
-}
- 
-FieldClass::FieldClass(char *id, short data)
-{
-  Data=NULL;
-  Set(id,data);
-}
- 
-FieldClass::FieldClass(char *id, unsigned short data)
-{
-  Data=NULL;
-  Set(id,data);
-}
- 
-FieldClass::FieldClass(char *id, long data)
-{
-  Data=NULL;
-  Set(id,data);
-}
- 
-FieldClass::FieldClass(char *id, unsigned long data)
-{
-  Data=NULL;
-  Set(id,data);
-}
- 
-FieldClass::FieldClass(char *id, char *data)
-{
-  Data=NULL;
-  Set(id,data);
+  strcpy(ID, "");
+  DataType = 0;
+  Size = 0;
+  Data = NULL;
+  Next = NULL;
 }
 
-FieldClass::FieldClass(char *id, void *data, int length)
-{
-  Data=NULL;
-  Set(id,data,length);
+FieldClass::FieldClass(char *id, char data) {
+  Data = NULL;
+  Set(id, data);
 }
 
-void FieldClass::Set(char *id, char data)
-{
-  FieldClass     *Nextsave=Next;
+FieldClass::FieldClass(char *id, unsigned char data) {
+  Data = NULL;
+  Set(id, data);
+}
+
+FieldClass::FieldClass(char *id, short data) {
+  Data = NULL;
+  Set(id, data);
+}
+
+FieldClass::FieldClass(char *id, unsigned short data) {
+  Data = NULL;
+  Set(id, data);
+}
+
+FieldClass::FieldClass(char *id, long data) {
+  Data = NULL;
+  Set(id, data);
+}
+
+FieldClass::FieldClass(char *id, unsigned long data) {
+  Data = NULL;
+  Set(id, data);
+}
+
+FieldClass::FieldClass(char *id, char *data) {
+  Data = NULL;
+  Set(id, data);
+}
+
+FieldClass::FieldClass(char *id, void *data, int length) {
+  Data = NULL;
+  Set(id, data, length);
+}
+
+void FieldClass::Set(char *id, char data) {
+  FieldClass *Nextsave = Next;
 
   Clear();
   strncpy(ID, id, sizeof(ID));
-  DataType      = TYPE_CHAR;
-  Size		= sizeof(data);
-  Data		= new char[Size];
+  DataType = TYPE_CHAR;
+  Size = sizeof(data);
+  Data = new char[Size];
   memcpy(Data, &data, Size);
-  Next		= Nextsave;
+  Next = Nextsave;
 }
 
-void FieldClass::Set(char *id, unsigned char data)
-{
-  FieldClass     *Nextsave=Next;
+void FieldClass::Set(char *id, unsigned char data) {
+  FieldClass *Nextsave = Next;
   Clear();
   strncpy(ID, id, sizeof(ID));
   DataType = TYPE_UNSIGNED_CHAR;
-  Size     = sizeof(data);
-  Data     = new char[Size];
+  Size = sizeof(data);
+  Data = new char[Size];
   memcpy(Data, &data, Size);
-  Next     = Nextsave;
+  Next = Nextsave;
 }
 
-void FieldClass::Set(char *id, short data)
-{
-  FieldClass     *Nextsave=Next;
+void FieldClass::Set(char *id, short data) {
+  FieldClass *Nextsave = Next;
   Clear();
   strncpy(ID, id, sizeof(ID));
   DataType = TYPE_SHORT;
-  Size    = sizeof(data);
-  Data    = new char[Size];
+  Size = sizeof(data);
+  Data = new char[Size];
   memcpy(Data, &data, Size);
-  Next    = Nextsave;
+  Next = Nextsave;
 }
 
-void FieldClass::Set(char *id, unsigned short data)
-{
-  FieldClass     *Nextsave=Next;
+void FieldClass::Set(char *id, unsigned short data) {
+  FieldClass *Nextsave = Next;
   Clear();
   strncpy(ID, id, sizeof(ID));
   DataType = TYPE_UNSIGNED_SHORT;
-  Size    = sizeof(data);
-  Data    = new char[Size];
+  Size = sizeof(data);
+  Data = new char[Size];
   memcpy(Data, &data, Size);
-  Next    = Nextsave;
+  Next = Nextsave;
 }
 
-void FieldClass::Set(char *id, long data)
-{
-  FieldClass     *Nextsave=Next;
+void FieldClass::Set(char *id, long data) {
+  FieldClass *Nextsave = Next;
   Clear();
   strncpy(ID, id, sizeof(ID));
   DataType = TYPE_LONG;
-  Size    = sizeof(data);
-  Data    = new char[Size];
+  Size = sizeof(data);
+  Data = new char[Size];
   memcpy(Data, &data, Size);
-  Next    = Nextsave;
+  Next = Nextsave;
 }
 
-void FieldClass::Set(char *id, unsigned long data)
-{
-  FieldClass     *Nextsave=Next;
+void FieldClass::Set(char *id, unsigned long data) {
+  FieldClass *Nextsave = Next;
   Clear();
   strncpy(ID, id, sizeof(ID));
   DataType = TYPE_UNSIGNED_LONG;
-  Size    = sizeof(data);
-  Data    = new char[Size];
+  Size = sizeof(data);
+  Data = new char[Size];
   memcpy(Data, &data, Size);
-  Next    = Nextsave;
+  Next = Nextsave;
 }
 
-void FieldClass::Set(char *id, char *data)
-{
-  FieldClass     *Nextsave=Next;
+void FieldClass::Set(char *id, char *data) {
+  FieldClass *Nextsave = Next;
   Clear();
   strncpy(ID, id, sizeof(ID));
   DataType = TYPE_STRING;
-  Size    = (unsigned short)(strlen(data)+1);
-  Data    = new char[Size];
+  Size = (unsigned short)(strlen(data) + 1);
+  Data = new char[Size];
   memcpy(Data, data, Size);
-  Next    = Nextsave;
+  Next = Nextsave;
 }
 
-
-void FieldClass::Set(char *id, void *data, int length)
-{
-  FieldClass     *Nextsave=Next;
+void FieldClass::Set(char *id, void *data, int length) {
+  FieldClass *Nextsave = Next;
   Clear();
   strncpy(ID, id, sizeof(ID));
   DataType = TYPE_CHUNK;
-  Size    = (unsigned short)length;
-  Data    = new char[Size];
+  Size = (unsigned short)length;
+  Data = new char[Size];
   memcpy(Data, data, Size);
-  Next    = Nextsave;
+  Next = Nextsave;
 }
 
-
-FieldClass::~FieldClass()
-{
-  Clear();
-}
+FieldClass::~FieldClass() { Clear(); }
 
 // Fetch the datatype
-int FieldClass::Get_Type(void)
-{
-  return(DataType);
-}
+int FieldClass::Get_Type(void) { return (DataType); }
 
-void *FieldClass::Get_Data(void)
-{
-return(Data);
-}
+void *FieldClass::Get_Data(void) { return (Data); }
 
-char *FieldClass::Get_ID(void)
-{
-return(ID);
-}
+char *FieldClass::Get_ID(void) { return (ID); }
 
-/************************************************************************** 
+/**************************************************************************
  * PACKETCLASS::HOST_TO_NET_FIELD -- Converts host field to net format    *
- *                                                                        * 
+ *                                                                        *
  * INPUT:    FIELD   * to the data field we need to convert               *
- *                                                                        * 
+ *                                                                        *
  * OUTPUT:     none                                                       *
- *                                                                        * 
- * HISTORY:                                                               * 
- *   04/22/1996 PWG : Created.                                            * 
+ *                                                                        *
+ * HISTORY:                                                               *
+ *   04/22/1996 PWG : Created.                                            *
  *========================================================================*/
-void FieldClass::Host_To_Net(void)
-{
+void FieldClass::Host_To_Net(void) {
   //
-  // Before we convert the data type, we should convert the actual data 
+  // Before we convert the data type, we should convert the actual data
   //  sent.
   //
   switch (DataType) {
@@ -267,29 +233,28 @@ void FieldClass::Host_To_Net(void)
   // Finally convert over the data type and the size of the packet.
   //
   DataType = htons(DataType);
-  Size      = htons(Size);
+  Size = htons(Size);
 }
 
-/************************************************************************** 
+/**************************************************************************
  * PACKETCLASS::NET_TO_HOST_FIELD -- Converts net field to host format    *
- *                                                                        * 
+ *                                                                        *
  * INPUT:    FIELD   * to the data field we need to convert               *
- *                                                                        * 
+ *                                                                        *
  * OUTPUT:     none                                                       *
- *                                                                        * 
- * HISTORY:                                                               * 
- *   04/22/1996 PWG : Created.                                            * 
+ *                                                                        *
+ * HISTORY:                                                               *
+ *   04/22/1996 PWG : Created.                                            *
  *========================================================================*/
-void FieldClass::Net_To_Host(void)
-{
+void FieldClass::Net_To_Host(void) {
   //
   // Finally convert over the data type and the size of the packet.
   //
   DataType = ntohs(DataType);
-  Size      = ntohs(Size);
+  Size = ntohs(Size);
 
   //
-  // Before we convert the data type, we should convert the actual data 
+  // Before we convert the data type, we should convert the actual data
   //  sent.
   //
   switch (DataType) {
@@ -316,4 +281,3 @@ void FieldClass::Net_To_Host(void)
       break;
   }
 }
-

@@ -17,25 +17,25 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : WWLib                                                        *
+ *                 Project Name : WWLib *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/wwlib/slnode.cpp               $*
+ *                     $Archive:: /Commando/Code/wwlib/slnode.cpp $*
  *                                                                                             *
- *                       Author:: Philip W. Gorrow                                             *
+ *                       Author:: Philip W. Gorrow *
  *                                                                                             *
- *                     $Modtime:: 8/28/01 5:23p                                               $*
+ *                     $Modtime:: 8/28/01 5:23p $*
  *                                                                                             *
- *                    $Revision:: 1                                                           $*
+ *                    $Revision:: 1 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "slnode.h"
 
-
-
-DEFINE_AUTO_POOL (GenericSLNode, 256);
+DEFINE_AUTO_POOL(GenericSLNode, 256);

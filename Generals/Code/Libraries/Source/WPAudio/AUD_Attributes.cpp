@@ -20,7 +20,8 @@
 **                                                                          **
 **                       Westwood Studios Pacific.                          **
 **                                                                          **
-**                       Confidential Information					                  **
+**                       Confidential Information
+***
 **                Copyright (C) 2000 - All Rights Reserved                  **
 **                                                                          **
 ******************************************************************************
@@ -43,54 +44,39 @@
 **            Includes                                                      **
 *****************************************************************************/
 
-#include <wpaudio/altypes.h>						
-#include <wpaudio/level.h>
+#include <wpaudio/altypes.h>
 #include <wpaudio/attributes.h>
+#include <wpaudio/level.h>
 
-
-DBG_DECLARE_TYPE ( AudioAttribs )
+DBG_DECLARE_TYPE(AudioAttribs)
 
 /*****************************************************************************
 **          Externals                                                       **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **           Defines                                                        **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **        Private Types                                                     **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **         Private Data                                                     **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **         Public Data                                                      **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **         Private Prototypes                                               **
 *****************************************************************************/
 
-
-
 /*****************************************************************************
 **          Private Functions                                               **
 *****************************************************************************/
-
-
 
 /*****************************************************************************
 **          Public Functions                                                **
@@ -101,20 +87,18 @@ DBG_DECLARE_TYPE ( AudioAttribs )
 /*                                                                */
 /******************************************************************/
 
-void 			AudioAttribsInit ( AudioAttribs *attr )
-{
+void AudioAttribsInit(AudioAttribs *attr) {
+  DBG_ASSERT(attr != NULL);
+  DBG_SET_TYPE(attr, AudioAttribs);
 
-	DBG_ASSERT ( attr != NULL);
-	DBG_SET_TYPE ( attr, AudioAttribs );
+  AudioLevelInit(&attr->VolumeLevel, AUDIO_VOLUME_MAX);
+  AudioLevelInit(&attr->PitchLevel, 100);
+  AudioLevelInit(&attr->PanPosition, AUDIO_PAN_CENTER);
+  AudioAttribsSetPitchDuration(attr, SECONDS(1), 10);
+  AudioAttribsSetVolumeDuration(attr, SECONDS(1), AUDIO_LEVEL_MAX);
+  AudioAttribsSetPanDuration(attr, SECONDS(1), AUDIO_LEVEL_MAX);
 
-	AudioLevelInit ( &attr->VolumeLevel, AUDIO_VOLUME_MAX );
-	AudioLevelInit ( &attr->PitchLevel, 100);
-	AudioLevelInit ( &attr->PanPosition, AUDIO_PAN_CENTER);
-	AudioAttribsSetPitchDuration (attr, SECONDS(1), 10 );
-	AudioAttribsSetVolumeDuration (attr, SECONDS(1), AUDIO_LEVEL_MAX );
-	AudioAttribsSetPanDuration (attr, SECONDS(1), AUDIO_LEVEL_MAX );
-
-	AudioLevelSet ( &attr->VolumeLevel, AUDIO_VOLUME_MAX );
+  AudioLevelSet(&attr->VolumeLevel, AUDIO_VOLUME_MAX);
 }
 
 /******************************************************************/
@@ -122,14 +106,12 @@ void 			AudioAttribsInit ( AudioAttribs *attr )
 /*                                                                */
 /******************************************************************/
 
-void			AudioAttribsUpdate ( AudioAttribs *attr )
-{
+void AudioAttribsUpdate(AudioAttribs *attr) {
+  DBG_ASSERT_TYPE(attr, AudioAttribs);
 
-	DBG_ASSERT_TYPE ( attr, AudioAttribs );
-
-	AudioLevelUpdate ( &attr->VolumeLevel );
-	AudioLevelUpdate ( &attr->PitchLevel );
-	AudioLevelUpdate ( &attr->PanPosition );
+  AudioLevelUpdate(&attr->VolumeLevel);
+  AudioLevelUpdate(&attr->PitchLevel);
+  AudioLevelUpdate(&attr->PanPosition);
 }
 
 /******************************************************************/
@@ -137,12 +119,12 @@ void			AudioAttribsUpdate ( AudioAttribs *attr )
 /*                                                                */
 /******************************************************************/
 
-int			AudioAttribsChanged ( AudioAttribs *attr )
-{
+int AudioAttribsChanged(AudioAttribs *attr) {
+  DBG_ASSERT_TYPE(attr, AudioAttribs);
 
-	DBG_ASSERT_TYPE ( attr, AudioAttribs );
-
-	return AudioLevelChanged ( &attr->VolumeLevel ) || AudioLevelChanged ( &attr->PitchLevel ) || AudioLevelChanged ( &attr->PanPosition );
+  return AudioLevelChanged(&attr->VolumeLevel) ||
+         AudioLevelChanged(&attr->PitchLevel) ||
+         AudioLevelChanged(&attr->PanPosition);
 }
 
 /******************************************************************/
@@ -150,52 +132,44 @@ int			AudioAttribsChanged ( AudioAttribs *attr )
 /*                                                                */
 /******************************************************************/
 
-void			AudioAttribsApply ( AudioAttribs *attr, AudioAttribs *mod )
-{
+void AudioAttribsApply(AudioAttribs *attr, AudioAttribs *mod) {
+  DBG_ASSERT_TYPE(attr, AudioAttribs);
+  DBG_ASSERT_TYPE(mod, AudioAttribs);
 
+  AudioLevelSet(
+      &attr->VolumeLevel,
+      AudioLevelApply(&mod->VolumeLevel, AudioAttribsGetVolume(attr)));
+  AudioLevelUpdate(&attr->VolumeLevel);
 
-	DBG_ASSERT_TYPE ( attr, AudioAttribs );
-	DBG_ASSERT_TYPE ( mod, AudioAttribs );
+  {
+    //  apply pitch
+    int level;
+    int change;
 
+    level = AudioAttribsGetPitch(attr);
+    change = AudioAttribsGetPitch(mod);
 
-	AudioLevelSet ( &attr->VolumeLevel, AudioLevelApply ( &mod->VolumeLevel, AudioAttribsGetVolume ( attr ) ));
-	AudioLevelUpdate ( &attr->VolumeLevel );
+    level = (level * change) / 100;
 
-	{
-		//  apply pitch 
-		int	level;
-		int	change;
+    AudioAttribsSetPitch(attr, level);
+    AudioLevelUpdate(&attr->PitchLevel);
+  }
 
+  {
+    //  apply pan
+    int pos;
 
-		level = AudioAttribsGetPitch ( attr );
-		change = AudioAttribsGetPitch ( mod );
+    if ((pos = AudioAttribsGetPan(mod) - AUDIO_PAN_CENTER) != 0) {
+      if ((pos = pos + AudioAttribsGetPan(attr)) < AUDIO_PAN_LEFT) {
+        pos = AUDIO_PAN_LEFT;
+      } else if (pos > AUDIO_PAN_RIGHT) {
+        pos = AUDIO_PAN_RIGHT;
+      }
 
-
-		level = (level * change) / 100;
-
-		AudioAttribsSetPitch ( attr, level );
-		AudioLevelUpdate ( &attr->PitchLevel );
-	}
-
-	{
-		//  apply pan 
-		int	pos;
-
-		if ( (pos = AudioAttribsGetPan ( mod ) - AUDIO_PAN_CENTER) != 0 )
-		{
-			if ( ( pos = pos + AudioAttribsGetPan ( attr )) < AUDIO_PAN_LEFT )
-			{
-				pos = AUDIO_PAN_LEFT ;
-			}
-			else if ( pos > AUDIO_PAN_RIGHT )
-			{
-				pos = AUDIO_PAN_RIGHT ;
-			}
-
-			AudioAttribsSetPan ( attr, pos );
-		}
-		AudioLevelUpdate ( &attr->PanPosition );
-	}
+      AudioAttribsSetPan(attr, pos);
+    }
+    AudioLevelUpdate(&attr->PanPosition);
+  }
 }
 
 /******************************************************************/
@@ -203,11 +177,10 @@ void			AudioAttribsApply ( AudioAttribs *attr, AudioAttribs *mod )
 /*                                                                */
 /******************************************************************/
 
-void			AudioAttribsUsed ( AudioAttribs *attr )
-{
-	AudioLevelUsed ( &attr->VolumeLevel );
-	AudioLevelUsed ( &attr->PanPosition );
-	AudioLevelUsed ( &attr->PitchLevel );
+void AudioAttribsUsed(AudioAttribs *attr) {
+  AudioLevelUsed(&attr->VolumeLevel);
+  AudioLevelUsed(&attr->PanPosition);
+  AudioLevelUsed(&attr->PitchLevel);
 }
 
 /******************************************************************/
@@ -215,16 +188,12 @@ void			AudioAttribsUsed ( AudioAttribs *attr )
 /*                                                                */
 /******************************************************************/
 
-int		AudioAttribsCalcPitch ( AudioAttribs *attr, int pitch )
-{
-	int	level;
+int AudioAttribsCalcPitch(AudioAttribs *attr, int pitch) {
+  int level;
 
+  DBG_ASSERT_TYPE(attr, AudioAttribs);
 
-	DBG_ASSERT_TYPE ( attr, AudioAttribs );
+  level = AudioAttribsGetPitch(attr);
 
-	level = AudioAttribsGetPitch ( attr );
-
-	return ( pitch * level ) / 100;
-
+  return (pitch * level) / 100;
 }
-

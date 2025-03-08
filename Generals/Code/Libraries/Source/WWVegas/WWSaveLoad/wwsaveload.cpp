@@ -17,36 +17,31 @@
 */
 
 /***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S
+ ****
  ***********************************************************************************************
  *                                                                                             *
- *                 Project Name : wwsaveload                                                   *
+ *                 Project Name : wwsaveload *
  *                                                                                             *
- *                     $Archive:: /Commando/Code/wwsaveload/wwsaveload.cpp                    $*
+ *                     $Archive:: /Commando/Code/wwsaveload/wwsaveload.cpp $*
  *                                                                                             *
- *              Original Author:: Greg Hjelstrom                                               *
+ *              Original Author:: Greg Hjelstrom *
  *                                                                                             *
- *                      $Author:: Greg_h                                                      $*
+ *                      $Author:: Greg_h $*
  *                                                                                             *
- *                     $Modtime:: 3/28/00 9:18a                                               $*
+ *                     $Modtime:: 3/28/00 9:18a $*
  *                                                                                             *
- *                    $Revision:: 2                                                           $*
+ *                    $Revision:: 2 $*
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ * Functions: *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ *- - - - - - - */
 
 #include "wwsaveload.h"
+
 #include "definitionmgr.h"
 
+void WWSaveLoad::Init(void) {}
 
-void WWSaveLoad::Init(void)
-{
-}
-
-void WWSaveLoad::Shutdown(void)
-{
-	_TheDefinitionMgr.Free_Definitions();
-}
-
-
+void WWSaveLoad::Shutdown(void) { _TheDefinitionMgr.Free_Definitions(); }

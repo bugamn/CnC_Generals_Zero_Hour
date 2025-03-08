@@ -18,28 +18,26 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: INIUpgrade.cpp ///////////////////////////////////////////////////////////////////////////
+// FILE: INIUpgrade.cpp
+// ///////////////////////////////////////////////////////////////////////////
 // Author: Colin Day, March 2002
 // Desc:   Upgrade database
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// USER INCLUDES //////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
-
+// USER INCLUDES
+// //////////////////////////////////////////////////////////////////////////////////
 #include "Common/INI.h"
 #include "Common/Upgrade.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-------------------------------------------------------------------------------------------------
 /** Parse an upgrade definition */
 //-------------------------------------------------------------------------------------------------
-void INI::parseUpgradeDefinition( INI *ini )
-{
-	UpgradeCenter::parseUpgradeDefinition(ini);
+void INI::parseUpgradeDefinition(INI *ini) {
+  UpgradeCenter::parseUpgradeDefinition(ini);
 }
-
-
-

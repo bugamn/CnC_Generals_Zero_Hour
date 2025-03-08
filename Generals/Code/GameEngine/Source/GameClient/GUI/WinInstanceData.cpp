@@ -18,18 +18,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: WinInstanceData.cpp //////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 // Project:    RTS3
@@ -44,13 +45,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // SYSTEM INCLUDES ////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 // USER INCLUDES //////////////////////////////////////////////////////////////
-#include "GameClient/WinInstanceData.h"
-#include "GameClient/GameWindow.h"
-#include "GameClient/DisplayStringManager.h"
 #include "Common/Debug.h"
+#include "GameClient/DisplayStringManager.h"
+#include "GameClient/GameWindow.h"
+#include "GameClient/WinInstanceData.h"
 
 // DEFINES ////////////////////////////////////////////////////////////////////
 
@@ -70,135 +71,116 @@
 
 // WinInstanceData::WinInstanceData ===========================================
 //=============================================================================
-WinInstanceData::WinInstanceData( void )
-{
-
-	// we don't allocate strings unless we need them
-	m_text = NULL;
-	m_tooltip = NULL;
-	m_videoBuffer = NULL;
-	init();
+WinInstanceData::WinInstanceData(void) {
+  // we don't allocate strings unless we need them
+  m_text = NULL;
+  m_tooltip = NULL;
+  m_videoBuffer = NULL;
+  init();
 
 }  // end WinInstanceData
 
 // WinInstanceData::~WinInstanceData ==========================================
 //=============================================================================
-WinInstanceData::~WinInstanceData( void )
-{
+WinInstanceData::~WinInstanceData(void) {
+  if (m_text) TheDisplayStringManager->freeDisplayString(m_text);
 
-	if( m_text )
-		TheDisplayStringManager->freeDisplayString( m_text );
+  if (m_tooltip) TheDisplayStringManager->freeDisplayString(m_tooltip);
 
-	if( m_tooltip )
-		TheDisplayStringManager->freeDisplayString( m_tooltip );
-
-	m_videoBuffer = NULL; //Video Buffer needs to be clean up by the control that is in charge of the video.
+  m_videoBuffer = NULL;  // Video Buffer needs to be clean up by the control
+                         // that is in charge of the video.
 
 }  // end ~WinInstanceData
 
 // WinInstanceData::init ======================================================
 /** Set initial values for instance data if desired */
 //=============================================================================
-void WinInstanceData::init( void )
-{
-	Int i;
+void WinInstanceData::init(void) {
+  Int i;
 
-	// init our draw data images/colors for the states
-	for( i = 0; i < MAX_DRAW_DATA; i++ )
-	{
+  // init our draw data images/colors for the states
+  for (i = 0; i < MAX_DRAW_DATA; i++) {
+    m_enabledDrawData[i].image = NULL;
+    m_enabledDrawData[i].color = WIN_COLOR_UNDEFINED;
+    m_enabledDrawData[i].borderColor = WIN_COLOR_UNDEFINED;
 
-		m_enabledDrawData[ i ].image = NULL;
-		m_enabledDrawData[ i ].color = WIN_COLOR_UNDEFINED;
-		m_enabledDrawData[ i ].borderColor = WIN_COLOR_UNDEFINED;
+    m_disabledDrawData[i].image = NULL;
+    m_disabledDrawData[i].color = WIN_COLOR_UNDEFINED;
+    m_disabledDrawData[i].borderColor = WIN_COLOR_UNDEFINED;
 
-		m_disabledDrawData[ i ].image = NULL;
-		m_disabledDrawData[ i ].color = WIN_COLOR_UNDEFINED;
-		m_disabledDrawData[ i ].borderColor = WIN_COLOR_UNDEFINED;
+    m_hiliteDrawData[i].image = NULL;
+    m_hiliteDrawData[i].color = WIN_COLOR_UNDEFINED;
+    m_hiliteDrawData[i].borderColor = WIN_COLOR_UNDEFINED;
 
-		m_hiliteDrawData[ i ].image = NULL;
-		m_hiliteDrawData[ i ].color = WIN_COLOR_UNDEFINED;
-		m_hiliteDrawData[ i ].borderColor = WIN_COLOR_UNDEFINED;
+  }  // end for i
 
-	}  // end for i
+  // initialize text colors
+  m_enabledText.color = WIN_COLOR_UNDEFINED;
+  m_enabledText.borderColor = WIN_COLOR_UNDEFINED;
+  m_disabledText.color = WIN_COLOR_UNDEFINED;
+  m_disabledText.borderColor = WIN_COLOR_UNDEFINED;
+  m_hiliteText.color = WIN_COLOR_UNDEFINED;
+  m_hiliteText.borderColor = WIN_COLOR_UNDEFINED;
 
-	// initialize text colors
-	m_enabledText.color					= WIN_COLOR_UNDEFINED;
-	m_enabledText.borderColor		= WIN_COLOR_UNDEFINED;
-	m_disabledText.color				= WIN_COLOR_UNDEFINED;
-	m_disabledText.borderColor	= WIN_COLOR_UNDEFINED;
-	m_hiliteText.color					= WIN_COLOR_UNDEFINED;
-	m_hiliteText.borderColor		= WIN_COLOR_UNDEFINED;
+  m_id = 0;
+  m_state = 0;
+  m_style = 0;
+  m_status = WIN_STATUS_NONE;
+  m_owner = NULL;
+  m_textLabelString.clear();
+  m_tooltipString.clear();
+  m_tooltipDelay = -1;  ///< default value
+  m_decoratedNameString.clear();
 
-	m_id = 0;
-	m_state = 0;
-	m_style = 0;
-	m_status = WIN_STATUS_NONE;
-	m_owner = NULL;
-	m_textLabelString.clear();
-	m_tooltipString.clear();
-  m_tooltipDelay = -1; ///< default value
-	m_decoratedNameString.clear();
+  m_imageOffset.x = 0;
+  m_imageOffset.y = 0;
 
-	m_imageOffset.x = 0;
-	m_imageOffset.y = 0;
+  // reset all data for the text display strings and font for window
+  m_font = NULL;
+  if (m_text) {
+    TheDisplayStringManager->freeDisplayString(m_text);
+    m_text = NULL;
 
-	// reset all data for the text display strings and font for window
-	m_font = NULL;
-	if( m_text )
-	{
+  }  // end if
+  if (m_tooltip) {
+    TheDisplayStringManager->freeDisplayString(m_tooltip);
+    m_tooltip = NULL;
 
-		TheDisplayStringManager->freeDisplayString( m_text );
-		m_text = NULL;
+  }  // end if
 
-	}  // end if
-	if( m_tooltip )
-	{
-
-		TheDisplayStringManager->freeDisplayString( m_tooltip );
-		m_tooltip = NULL;
-
-	}  // end if
-
-	m_videoBuffer = NULL;
-
+  m_videoBuffer = NULL;
 
 }  // end init
 
 // WinInstanceData::setTooltipText ============================================
 //=============================================================================
-void WinInstanceData::setTooltipText( UnicodeString tip )
-{
+void WinInstanceData::setTooltipText(UnicodeString tip) {
+  // allocate a text tooltip string if needed
+  if (m_tooltip == NULL)
+    m_tooltip = TheDisplayStringManager->newDisplayString();
+  DEBUG_ASSERTCRASH(m_tooltip, ("no tooltip"));
 
-	// allocate a text tooltip string if needed
-	if( m_tooltip == NULL )
-		m_tooltip = TheDisplayStringManager->newDisplayString();
-	DEBUG_ASSERTCRASH( m_tooltip, ("no tooltip") );
-
-	// set text
-	m_tooltip->setText( tip );
+  // set text
+  m_tooltip->setText(tip);
 
 }  // end setTooltipText
 
 // WinInstanceData:setText ====================================================
 /** Set the text for this window instance data */
 //=============================================================================
-void WinInstanceData::setText( UnicodeString text )
-{
+void WinInstanceData::setText(UnicodeString text) {
+  // allocate a text instance if needed
+  if (m_text == NULL) m_text = TheDisplayStringManager->newDisplayString();
+  DEBUG_ASSERTCRASH(m_text, ("no text"));
 
-	// allocate a text instance if needed
-	if( m_text == NULL )
-		m_text = TheDisplayStringManager->newDisplayString();
-	DEBUG_ASSERTCRASH( m_text, ("no text") );
-
-	// set the text
-	m_text->setText( text );
+  // set the text
+  m_text->setText(text);
 
 }  // end set text
 
 // WinInstanceData:setText ====================================================
 /** Set the text for this window instance data */
 //=============================================================================
-void WinInstanceData::setVideoBuffer( VideoBuffer * videoBuffer )
-{
-	m_videoBuffer = videoBuffer;
+void WinInstanceData::setVideoBuffer(VideoBuffer* videoBuffer) {
+  m_videoBuffer = videoBuffer;
 }

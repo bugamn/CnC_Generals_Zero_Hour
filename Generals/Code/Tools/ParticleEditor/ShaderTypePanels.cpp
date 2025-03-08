@@ -16,10 +16,10 @@
 **	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// FILE: ShaderTypePanels.cpp 
+// FILE: ShaderTypePanels.cpp
 /*---------------------------------------------------------------------------*/
 /* EA Pacific                                                                */
-/* Confidential Information	                                                 */
+/* Confidential Information */
 /* Copyright (C) 2001 - All Rights Reserved                                  */
 /* DO NOT DISTRIBUTE                                                         */
 /*---------------------------------------------------------------------------*/
@@ -28,8 +28,9 @@
 /* Created:    John K. McDonald, Jr., 3/21/2002                              */
 /* Desc:       // @todo                                                      */
 /* Revision History:                                                         */
-/*		3/21/2002 : Initial creation                                           */
+/*		3/21/2002 : Initial creation */
 /*---------------------------------------------------------------------------*/
 
-#include "StdAfx.h"
 #include "ShaderTypePanels.h"
+
+#include "StdAfx.h"

@@ -18,31 +18,32 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
+//  (c) 2001-2003 Electronic Arts Inc.
+//  //
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: RadarUpdate.cpp //////////////////////////////////////////////////////////////////////////
+// FILE: RadarUpdate.cpp
+// //////////////////////////////////////////////////////////////////////////
 // Author: Colin Day, April 2002
 // Desc:   Updating a radar on an object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// USER INCLUDES //////////////////////////////////////////////////////////////////////////////////
-#include "PreRTS.h"	// This must go first in EVERY cpp file int the GameEngine
+// USER INCLUDES
+// //////////////////////////////////////////////////////////////////////////////////
+#include "GameLogic/Module/RadarUpdate.h"
 
 #include "Common/ModelState.h"
 #include "Common/Xfer.h"
 #include "GameClient/Drawable.h"
 #include "GameLogic/GameLogic.h"
 #include "GameLogic/Object.h"
-#include "GameLogic/Module/RadarUpdate.h"
+#include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-RadarUpdateModuleData::RadarUpdateModuleData( void )
-{
-
-	m_radarExtendTime = 0.0f;
+RadarUpdateModuleData::RadarUpdateModuleData(void) {
+  m_radarExtendTime = 0.0f;
 
 }  // end RadarUpdateModuleData
 
@@ -52,122 +53,103 @@ RadarUpdateModuleData::RadarUpdateModuleData( void )
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-RadarUpdate::RadarUpdate( Thing *thing, const ModuleData *moduleData )
-												: UpdateModule( thing, moduleData )
-{
-
-	m_radarActive = FALSE;
-	m_extendDoneFrame = 0;
-	m_extendComplete = FALSE;
+RadarUpdate::RadarUpdate(Thing *thing, const ModuleData *moduleData)
+    : UpdateModule(thing, moduleData) {
+  m_radarActive = FALSE;
+  m_extendDoneFrame = 0;
+  m_extendComplete = FALSE;
 
 }  // end RadarUpdate
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-RadarUpdate::~RadarUpdate( void )
-{
-
-}  // end RadarUpdate
+RadarUpdate::~RadarUpdate(void) {}  // end RadarUpdate
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-void RadarUpdate::extendRadar( void )
-{
-	const RadarUpdateModuleData *modData = getRadarUpdateModuleData();
+void RadarUpdate::extendRadar(void) {
+  const RadarUpdateModuleData *modData = getRadarUpdateModuleData();
 
-	// set the model condition for radar extension
-	Drawable *draw = getObject()->getDrawable();
-	if( draw )
-		draw->setModelConditionState( MODELCONDITION_RADAR_EXTENDING );
+  // set the model condition for radar extension
+  Drawable *draw = getObject()->getDrawable();
+  if (draw) draw->setModelConditionState(MODELCONDITION_RADAR_EXTENDING);
 
-	// mark the frame that the extension will be done on
-	m_extendDoneFrame = TheGameLogic->getFrame() + modData->m_radarExtendTime;
+  // mark the frame that the extension will be done on
+  m_extendDoneFrame = TheGameLogic->getFrame() + modData->m_radarExtendTime;
 
-	//Change this to make the radar active after extension...
-	m_radarActive = true;
+  // Change this to make the radar active after extension...
+  m_radarActive = true;
 
 }  // end extendRadar
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
-UpdateSleepTime RadarUpdate::update( void )
-{
-/// @todo srj use SLEEPY_UPDATE here
+UpdateSleepTime RadarUpdate::update(void) {
+  /// @todo srj use SLEEPY_UPDATE here
 
-	// if no extend frame nothing to do
-	if( m_extendDoneFrame == 0 )
-		return UPDATE_SLEEP_NONE;
+  // if no extend frame nothing to do
+  if (m_extendDoneFrame == 0) return UPDATE_SLEEP_NONE;
 
-	// check to see if our extension is already done
-	if( m_extendComplete == TRUE )
-		return UPDATE_SLEEP_NONE;
+  // check to see if our extension is already done
+  if (m_extendComplete == TRUE) return UPDATE_SLEEP_NONE;
 
-	// see if it's time to stop the extension
-	if( TheGameLogic->getFrame() > m_extendDoneFrame )
-	{
+  // see if it's time to stop the extension
+  if (TheGameLogic->getFrame() > m_extendDoneFrame) {
+    // mark extend as done
+    m_extendComplete = TRUE;
+    m_extendDoneFrame = 0;  // just to be clean
 
-		// mark extend as done
-		m_extendComplete = TRUE;
-		m_extendDoneFrame = 0;  // just to be clean
+    // remove the extending condition and set the extened condition
+    Drawable *draw = getObject()->getDrawable();
+    if (draw)
+      draw->clearAndSetModelConditionState(MODELCONDITION_RADAR_EXTENDING,
+                                           MODELCONDITION_RADAR_UPGRADED);
 
-		// remove the extending condition and set the extened condition
-		Drawable *draw = getObject()->getDrawable();
-		if( draw )
-			draw->clearAndSetModelConditionState( MODELCONDITION_RADAR_EXTENDING,
-																						MODELCONDITION_RADAR_UPGRADED );
+  }  // end if
 
-	}  // end if
-	
-	return UPDATE_SLEEP_NONE;
+  return UPDATE_SLEEP_NONE;
 
 }  // end update
 
 // ------------------------------------------------------------------------------------------------
 /** CRC */
 // ------------------------------------------------------------------------------------------------
-void RadarUpdate::crc( Xfer *xfer )
-{
-
-	// extend base class
-	UpdateModule::crc( xfer );
+void RadarUpdate::crc(Xfer *xfer) {
+  // extend base class
+  UpdateModule::crc(xfer);
 
 }  // end crc
 
 // ------------------------------------------------------------------------------------------------
 /** Xfer method
-	* Version Info:
-	* 1: Initial version */
+ * Version Info:
+ * 1: Initial version */
 // ------------------------------------------------------------------------------------------------
-void RadarUpdate::xfer( Xfer *xfer )
-{
+void RadarUpdate::xfer(Xfer *xfer) {
+  // version
+  XferVersion currentVersion = 1;
+  XferVersion version = currentVersion;
+  xfer->xferVersion(&version, currentVersion);
 
-	// version
-	XferVersion currentVersion = 1;
-	XferVersion version = currentVersion;
-	xfer->xferVersion( &version, currentVersion );
+  // extend base class
+  UpdateModule::xfer(xfer);
 
-	// extend base class
-	UpdateModule::xfer( xfer );
+  // extend done frame
+  xfer->xferUnsignedInt(&m_extendDoneFrame);
 
-	// extend done frame
-	xfer->xferUnsignedInt( &m_extendDoneFrame );
+  // extend complete
+  xfer->xferBool(&m_extendComplete);
 
-	// extend complete
-	xfer->xferBool( &m_extendComplete );
-
-	// radar active
-	xfer->xferBool( &m_radarActive );
+  // radar active
+  xfer->xferBool(&m_radarActive);
 
 }  // end xfer
 
 // ------------------------------------------------------------------------------------------------
 /** Load post process */
 // ------------------------------------------------------------------------------------------------
-void RadarUpdate::loadPostProcess( void )
-{
-
-	// extend base class
-	UpdateModule::loadPostProcess();
+void RadarUpdate::loadPostProcess(void) {
+  // extend base class
+  UpdateModule::loadPostProcess();
 
 }  // end loadPostProcess
-
