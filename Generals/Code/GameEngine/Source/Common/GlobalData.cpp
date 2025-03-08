@@ -708,7 +708,7 @@ GlobalData* GlobalData::m_theOriginal = NULL;
 
     // you cannot set this; it always has a value of 100%.
     //{ "HealthBonus_Regular",				INI::parsePercentToReal,
-    //NULL,	offsetof( GlobalData, m_healthBonus[LEVEL_REGULAR]) },
+    // NULL,	offsetof( GlobalData, m_healthBonus[LEVEL_REGULAR]) },
     {"HealthBonus_Veteran", INI::parsePercentToReal, NULL,
      offsetof(GlobalData, m_healthBonus[LEVEL_VETERAN])},
     {"HealthBonus_Elite", INI::parsePercentToReal, NULL,
@@ -823,8 +823,8 @@ GlobalData* GlobalData::m_theOriginal = NULL;
     // from the GameData.ini file. It is now set in the constructor according to
     // the windows parameter.
     //	{ "DoubleClickTimeMS",
-    //INI::parseUnsignedInt,			NULL, offsetof( GlobalData,
-    //m_doubleClickTimeMS ) },
+    // INI::parseUnsignedInt,			NULL, offsetof( GlobalData,
+    // m_doubleClickTimeMS ) },
 
     {"ShroudColor", INI::parseRGBColor, NULL,
      offsetof(GlobalData, m_shroudColor)},

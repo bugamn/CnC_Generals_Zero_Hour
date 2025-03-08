@@ -31,11 +31,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "PreRTS.h"	// This must go first in EVERY cpp file in the
+#include "PreRTS.h"  // This must go first in EVERY cpp file in the
 // GameEngine
 
 #include "Common/BitFlags.h"
-
 #include "Common/BitFlagsIO.h"
 #include "Common/ModelState.h"
 #include "GameLogic/ArmorSet.h"

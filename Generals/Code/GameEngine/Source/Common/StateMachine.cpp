@@ -45,7 +45,7 @@
 #endif
 
 //------------------------------------------------------------------------------
-//Performance Timers #include "Common/PerfMetrics.h" #include
+// Performance Timers #include "Common/PerfMetrics.h" #include
 // "Common/PerfTimer.h"
 
 // static PerfTimer s_stateMachineTimer("StateMachine::update", false,
