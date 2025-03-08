@@ -22,7 +22,7 @@
 //																																						//
 ////////////////////////////////////////////////////////////////////////////////
 
-// FILE: Statistics.h 
+// FILE: Statistics.h
 /*---------------------------------------------------------------------------*/
 /* EA Pacific                                                                */
 /* Confidential Information	                                                 */
@@ -42,6 +42,7 @@
 #define _H_PARTITIONSOLVER_
 
 // INCLUDES ///////////////////////////////////////////////////////////////////
+#include <utility>
 
 // DEFINES ////////////////////////////////////////////////////////////////////
 // TYPE DEFINES ///////////////////////////////////////////////////////////////
@@ -78,7 +79,7 @@ class PartitionSolver
 
 	public:
 		PartitionSolver(const EntriesVec& elements, const SpacesVec& spaces, SolutionType solveHow);
-		
+
 		// Solve could potentially take a LONG TIME (as in NEVER complete). This problem is NP-complete.
 		void solve(void);
 		const SolutionVec& getSolution( void ) const;

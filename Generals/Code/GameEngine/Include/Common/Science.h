@@ -40,7 +40,7 @@
 class Player;
 
 //-------------------------------------------------------------------------------------------------
-enum ScienceType
+enum ScienceType : int
 {
 	SCIENCE_INVALID = -1
 };
@@ -96,8 +96,8 @@ public:
 	/**
 		this is a subtle call, and should ALMOST NEVER be called by external code...
 		this is used to determine if you have the "root" requirements for a given science,
-		and thus could *potentially* obtain it if you got extra prereqs. 
-		
+		and thus could *potentially* obtain it if you got extra prereqs.
+
 		Generally, you should call getPurchasableSciences() instead of this!
 	*/
 	Bool playerHasRootPrereqsForScience(const Player* player, ScienceType st) const;
@@ -107,7 +107,7 @@ public:
 	ScienceType getScienceFromInternalName(const AsciiString& name) const;
 	AsciiString getInternalNameForScience(ScienceType science) const;
 
-	/** return a list of the sciences the given player can purchase now, and a list he might be able to purchase in the future, 
+	/** return a list of the sciences the given player can purchase now, and a list he might be able to purchase in the future,
 		but currently lacks prereqs or points for. (either might be an empty list) */
 	void getPurchasableSciences(const Player* player, ScienceVec& purchasable, ScienceVec& potentiallyPurchasable) const;
 
@@ -135,4 +135,3 @@ extern ScienceStore* TheScienceStore;
 
 
 #endif // __SCIENCE_H_
-

@@ -24,12 +24,12 @@
 
 // FILE: Thing.h //////////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information					         
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 // Project:    RTS3
@@ -54,12 +54,12 @@
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-//           Includes                                                      
+//           Includes
 //-----------------------------------------------------------------------------
 #include "Common/GameMemory.h"
 #include "Common/KindOf.h"
-#include "Common/OVERRIDE.h"
-#include "WWMath/Matrix3D.h"							///< @todo Decide if we're keeping the WWMath libs (MSB)
+#include "Common/Override.h"
+#include "WWMath/matrix3d.h"							///< @todo Decide if we're keeping the WWMath libs (MSB)
 
 //-----------------------------------------------------------------------------
 //           Forward References
@@ -98,7 +98,7 @@ public:
 
 	Thing( const ThingTemplate *thingTemplate );
 
-	/** 
+	/**
 		return the thing template for this thing.
 	*/
 	const ThingTemplate *getTemplate() const;
@@ -188,12 +188,11 @@ private:
 	mutable Real			m_cachedAltitudeAboveTerrainOrWater;
 	mutable Int				m_cacheFlags;
 
-}; 
+};
 
 
 //-----------------------------------------------------------------------------
-//           Externals                                                     
+//           Externals
 //-----------------------------------------------------------------------------
 
 #endif // $label
-

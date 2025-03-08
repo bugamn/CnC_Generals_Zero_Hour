@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // This file contains all the header files that shouldn't change frequently.
-// Be careful what you stick in here, because putting files that change often in here will 
+// Be careful what you stick in here, because putting files that change often in here will
 // tend to cheese people's goats.
 
 #ifndef __PRERTS_H__
@@ -36,55 +36,55 @@
 class STLSpecialAlloc;
 
 
-// We actually don't use Windows for much other than timeGetTime, but it was included in 40 
+// We actually don't use Windows for much other than timeGetTime, but it was included in 40
 // different .cpp files, so I bit the bullet and included it here.
 // PLEASE DO NOT ABUSE WINDOWS OR IT WILL BE REMOVED ENTIRELY. :-)
-//--------------------------------------------------------------------------------- System Includes 
-#define WIN32_LEAN_AND_MEAN
-#include <atlbase.h>
-#include <windows.h>
+//--------------------------------------------------------------------------------- System Includes
+// #define WIN32_LEAN_AND_MEAN
+// #include <atlbase.h>
+// #include <windows.h>
 
-#include <assert.h>
-#include <ctype.h>
-#include <direct.h>
-#include <EXCPT.H>
-#include <float.h>
-#include <fstream.h>
-#include <imagehlp.h>
-#include <io.h>
-#include <limits.h>
-#include <lmcons.h>
-#include <mapicode.h>
-#include <math.h>
-#include <memory.h>
-#include <mmsystem.h>
-#include <objbase.h>
-#include <ocidl.h>
-#include <process.h>
-#include <shellapi.h>
-#include <shlobj.h>
-#include <shlguid.h>
-#include <snmp.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/timeb.h>
-#include <sys/types.h>
-#include <TCHAR.H>
-#include <time.h>
-#include <vfw.h>
-#include <winerror.h>
-#include <wininet.h>
-#include <winreg.h>
+// #include <assert.h>
+// #include <ctype.h>
+// #include <direct.h>
+// #include <EXCPT.H>
+// #include <float.h>
+// #include <fstream.h>
+// #include <imagehlp.h>
+// #include <io.h>
+// #include <limits.h>
+// #include <lmcons.h>
+// #include <mapicode.h>
+// #include <math.h>
+// #include <memory.h>
+// #include <mmsystem.h>
+// #include <objbase.h>
+// #include <ocidl.h>
+// #include <process.h>
+// #include <shellapi.h>
+// #include <shlobj.h>
+// #include <shlguid.h>
+// #include <snmp.h>
+// #include <stdarg.h>
+// #include <stddef.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <string.h>
+// #include <sys/stat.h>
+// #include <sys/timeb.h>
+// #include <sys/types.h>
+// #include <TCHAR.H>
+// #include <time.h>
+// #include <vfw.h>
+// #include <winerror.h>
+// #include <wininet.h>
+// #include <winreg.h>
 
-#ifndef DIRECTINPUT_VERSION
-#	define DIRECTINPUT_VERSION	0x800
-#endif
+// #ifndef DIRECTINPUT_VERSION
+// #	define DIRECTINPUT_VERSION	0x800
+// #endif
 
-#include <dinput.h>
+// #include <dinput.h>
 
 //------------------------------------------------------------------------------------ STL Includes
 // srj sez: no, include STLTypesdefs below, instead, thanks
@@ -101,7 +101,7 @@ class STLSpecialAlloc;
 
 //------------------------------------------------------------------------------------ RTS Includes
 // Icky. These have to be in this order.
-#include "Lib/Basetype.h"
+#include "Lib/BaseType.h"
 #include "Common/STLTypedefs.h"
 #include "Common/Errors.h"
 #include "Common/Debug.h"
