@@ -1,11 +1,11 @@
 add_library(Common
+  BitFlags.cpp
   CommandLine.cpp
   crc.cpp
   DiscreteCircle.cpp
   PartitionSolver.cpp
-  Version.cpp
-  BitFlags.cpp
   RandomValue.cpp
+  Version.cpp
 )
 
 target_include_directories(Common PUBLIC
