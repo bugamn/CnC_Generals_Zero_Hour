@@ -17,9 +17,9 @@
 */
 
 ////////////////////////////////////////////////////////////////////////////////
-//																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
-//																																						//
+//                                                                            //
+//  (c) 2001-2003 Electronic Arts Inc.                                        //
+//                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 // EA Pacific
@@ -49,7 +49,7 @@ struct AudioRequest : public MemoryPoolObject
 
 public:
 	RequestType m_request;
-	union 
+	union
 	{
 		AudioEventRTS *m_pendingEvent;
 		AudioHandle m_handleToInteractOn;

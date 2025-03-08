@@ -17,9 +17,9 @@
 */
 
 ////////////////////////////////////////////////////////////////////////////////
-//																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
-//																																						//
+//                                                                            //
+//  (c) 2001-2003 Electronic Arts Inc.                                        //
+//                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: MultiplayerSettings.h /////////////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ public:
 	inline Bool showRandomStartPos( void ) { return m_showRandomStartPos; }
 	inline Bool showRandomColor( void ) { return m_showRandomColor; }
 
-	inline Int getNumColors( void ) 
+	inline Int getNumColors( void )
 	{
 		if (m_numColors == 0) {
 			m_numColors = m_colorList.size();

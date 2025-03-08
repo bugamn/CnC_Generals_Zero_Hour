@@ -17,9 +17,9 @@
 */
 
 ////////////////////////////////////////////////////////////////////////////////
-//																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
-//																																						//
+//                                                                            //
+//  (c) 2001-2003 Electronic Arts Inc.                                        //
+//                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: TerrainTypes.h ///////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ typedef enum
 
 } TerrainClass;
 #ifdef DEFINE_TERRAIN_TYPE_NAMES
-static char *terrainTypeNames[] = 
+static char *terrainTypeNames[] =
 {
 	"NONE",
 	"DESERT_1",
@@ -100,7 +100,7 @@ static char *terrainTypeNames[] =
 	"SAND",
 	"CLIFF",
 	"WOOD",
-	"BLEND_EDGE", 
+	"BLEND_EDGE",
 
 	NULL
 };
@@ -188,7 +188,7 @@ public:
 	void update() { }
 
 	TerrainType *findTerrain( AsciiString name );		///< find terrain by name
-	TerrainType *newTerrain( AsciiString name );			///< allocate a new terrain 
+	TerrainType *newTerrain( AsciiString name );			///< allocate a new terrain
 
 	/// get first terrain in list
 	TerrainType *firstTerrain( void ) { return m_terrainList; }
@@ -206,4 +206,3 @@ protected:
 extern TerrainTypeCollection *TheTerrainTypes;
 
 #endif // __TERRAINTYPE_H_
-

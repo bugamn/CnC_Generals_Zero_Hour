@@ -17,9 +17,9 @@
 */
 
 ////////////////////////////////////////////////////////////////////////////////
-//																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
-//																																						//
+//                                                                            //
+//  (c) 2001-2003 Electronic Arts Inc.                                        //
+//                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: CopyProtection.h ////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ class CopyProtect
 		static Bool validate(void);
 		static void shutdown(void);
 
-	private:	
+	private:
 		static LPVOID s_protectedData;
 	};
 

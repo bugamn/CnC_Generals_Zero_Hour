@@ -17,9 +17,9 @@
 */
 
 ////////////////////////////////////////////////////////////////////////////////
-//																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
-//																																						//
+//                                                                            //
+//  (c) 2001-2003 Electronic Arts Inc.                                        //
+//                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 // CRCDebug.h ///////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@
 
 	extern Int lastCRCDebugFrame;
 	extern Int lastCRCDebugIndex;
-	
+
 	extern Bool g_verifyClientCRC;
 	extern Bool g_clientDeepCRC;
 
@@ -97,7 +97,7 @@
 	extern Bool g_crcModuleDataFromLogic;
 
 	extern Bool g_keepCRCSaves;
-	
+
 	extern Bool g_logObjectCRCs;
 
 #else // DEBUG_CRC

@@ -17,19 +17,19 @@
 */
 
 ////////////////////////////////////////////////////////////////////////////////
-//																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
-//																																						//
+//                                                                            //
+//  (c) 2001-2003 Electronic Arts Inc.                                        //
+//                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: Language.h ///////////////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Westwood Studios Pacific.                          
-//                                                                          
-//                       Confidential Information					         
-//                Copyright (C) 2001 - All Rights Reserved                  
-//                                                                          
+//
+//                       Westwood Studios Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2001 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 // Project:    RTS3
@@ -91,7 +91,7 @@ typedef enum
 #define GameAtod(S) wcstod( (S), NULL )
 #define GameItoa _itow
 #define GameSscanf swscanf
-#define GameStrstr wcsstr 
+#define GameStrstr wcsstr
 #define GameStrchr wcschr
 #define GameIsDigit iswdigit
 #define GameIsAscii iswascii
@@ -105,4 +105,3 @@ typedef enum
 extern LanguageID OurLanguage;  ///< our current language definition
 
 #endif // __LANGUAGE_H_
-

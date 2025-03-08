@@ -17,9 +17,9 @@
 */
 
 ////////////////////////////////////////////////////////////////////////////////
-//																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
-//																																						//
+//                                                                            //
+//  (c) 2001-2003 Electronic Arts Inc.                                        //
+//                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: ModuleFactory.h //////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@
 // Desc:	 TheModuleFactory is where we actually instance modules for objects
 //				 and drawbles.  Those modules are things such as an UpdateModule
 //			   or DamageModule or DrawModule etc.
-//	
+//
 //				 TheModuleFactory will contain a list of ModuleTemplates, when we
 //				 request a new module, we will look for that template in our
 //				 list and create it
@@ -79,7 +79,7 @@ public:
 
 	Module *newModule( Thing *thing, const AsciiString& name, const ModuleData* data, ModuleType type );  ///< allocate a new module
 
-	// module-data 
+	// module-data
 	ModuleData* newModuleDataFromINI(INI* ini, const AsciiString& name, ModuleType type, const AsciiString& moduleTag);
 
 	Int findModuleInterfaceMask(const AsciiString& name, ModuleType type);
@@ -128,4 +128,3 @@ protected:
 extern ModuleFactory *TheModuleFactory;  ///< singleton definition
 
 #endif // __MODULEFACTORY_H_
-

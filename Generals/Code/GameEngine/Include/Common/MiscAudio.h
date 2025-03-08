@@ -17,9 +17,9 @@
 */
 
 ////////////////////////////////////////////////////////////////////////////////
-//																																						//
-//  (c) 2001-2003 Electronic Arts Inc.																				//
-//																																						//
+//                                                                            //
+//  (c) 2001-2003 Electronic Arts Inc.                                        //
+//                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 ///MiscAudio.h/////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@
 struct MiscAudio
 {
 	static const FieldParse m_fieldParseTable[];
-	
+
 	AudioEventRTS m_radarUnitUnderAttackSound;						///< radar sounds to play when unit under attack
 	AudioEventRTS m_radarHarvesterUnderAttackSound;				///< radar sounds to play when harvester under attack
 	AudioEventRTS m_radarStructureUnderAttackSound;				///< radar sounds to play when structure under attack

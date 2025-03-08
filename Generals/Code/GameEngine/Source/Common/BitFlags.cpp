@@ -17,10 +17,9 @@
 */
 
 ////////////////////////////////////////////////////////////////////////////////
-//																																						//
-//  (c) 2001-2003 Electronic Arts Inc.
-//  //
-//																																						//
+//                                                                            //
+//  (c) 2001-2003 Electronic Arts Inc.                                        //
+//                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 // FILE: BitFlags.cpp
@@ -32,7 +31,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-// #include "PreRTS.h"	// This must go first in EVERY cpp file in the
+#include "PreRTS.h"	// This must go first in EVERY cpp file in the
 // GameEngine
 
 #include "Common/BitFlags.h"
