@@ -42,7 +42,7 @@ enum ParticlePriorityType;
 #define MAX_BENCH_PROFILES	16
 
 //Make sure this enum stays in sync with GameLODNames[]
-enum StaticGameLODLevel
+enum StaticGameLODLevel : int
 {
 	STATIC_GAME_LOD_UNKNOWN=-1,
 	STATIC_GAME_LOD_LOW,
@@ -52,7 +52,7 @@ enum StaticGameLODLevel
 	STATIC_GAME_LOD_COUNT
 };
 
-enum DynamicGameLODLevel
+enum DynamicGameLODLevel : int
 {
 	DYNAMIC_GAME_LOD_UNKNOWN=-1,
 	DYNAMIC_GAME_LOD_LOW,
@@ -63,7 +63,7 @@ enum DynamicGameLODLevel
 };
 
 //Make sure this stays in sync with CPUNames[] in gamelod.cpp
-enum CpuType
+enum CpuType : int
 {
 	XX,	//unknown type
 	P3,
@@ -72,7 +72,7 @@ enum CpuType
 };
 
 //Keep this in sync with VideoNames in Gamelod.cpp
-enum ChipsetType
+enum ChipsetType : int
 {	DC_UNKNOWN,
 	DC_VOODOO2,
 	DC_VOODOO3,
@@ -112,7 +112,7 @@ struct StaticGameLODInfo
 	Int m_maxTankTrackFadeDelay;	///<maximum amount of time a tank track segment remains visible.
 	Bool m_useBuildupScaffolds;		///<draw scaffold during structure building.
 	Bool m_useTreeSway;		///<sway trees to simulate wind.
-	Bool m_useEmissiveNightMaterials; ///<perform second lighting pass on night buildings. 
+	Bool m_useEmissiveNightMaterials; ///<perform second lighting pass on night buildings.
 	Int m_textureReduction;	///<reduce texture resolution by dividing in half n times.
 	Bool m_useFpsLimit;	///<don't lock fps to 30hz
 	Bool m_enableDynamicLOD;	///<don't do dynamic lod based on current fps.

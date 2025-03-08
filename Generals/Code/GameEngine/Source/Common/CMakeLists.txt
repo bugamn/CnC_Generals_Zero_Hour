@@ -4,6 +4,7 @@ add_library(Common
   PartitionSolver.cpp
   version.cpp
   BitFlags.cpp
+  RandomValue.cpp
 )
 
 target_include_directories(Common PUBLIC
