@@ -39,11 +39,11 @@
 	#endif
 #endif
 
+#include "Lib/BaseType.h"
 #ifdef DEBUG_CRC
 
 #include "Common/AsciiString.h"
 #include "GameLogic/GameLogic.h"
-#include "Lib/BaseType.h"
 #include "wwmath/vector3.h"
 #include "wwmath/matrix3d.h"
 

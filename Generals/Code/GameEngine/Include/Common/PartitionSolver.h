@@ -25,16 +25,16 @@
 // FILE: Statistics.h
 /*---------------------------------------------------------------------------*/
 /* EA Pacific                                                                */
-/* Confidential Information	                                                 */
+/* Confidential Information                                                  */
 /* Copyright (C) 2001 - All Rights Reserved                                  */
 /* DO NOT DISTRIBUTE                                                         */
 /*---------------------------------------------------------------------------*/
 /* Project:    RTS3                                                          */
 /* File name:  PartitionSolver.h                                             */
 /* Created:    John K. McDonald, Jr., 4/2/2002                               */
-/* Desc:       General purpose partition problem-solver											 */
+/* Desc:       General purpose partition problem-solver                      */
 /* Revision History:                                                         */
-/*		4/12/2002 : Initial creation                                           */
+/*		4/12/2002 : Initial creation                                 */
 /*---------------------------------------------------------------------------*/
 
 #pragma once
@@ -42,7 +42,9 @@
 #define _H_PARTITIONSOLVER_
 
 // INCLUDES ///////////////////////////////////////////////////////////////////
+#include "GameType.h"
 #include <utility>
+#include <vector>
 
 // DEFINES ////////////////////////////////////////////////////////////////////
 // TYPE DEFINES ///////////////////////////////////////////////////////////////

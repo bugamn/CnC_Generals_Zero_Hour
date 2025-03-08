@@ -32,6 +32,7 @@
 #ifndef __DISCRETECIRCLE_H__
 #define __DISCRETECIRCLE_H__
 
+#include "Lib/BaseType.h"
 #include <vector>
 
 //-------------------------------------------------------------------------------------------------
