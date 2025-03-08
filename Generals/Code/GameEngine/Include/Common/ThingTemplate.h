@@ -63,7 +63,7 @@ class INI;
 enum RadarPriorityType;
 enum ScienceType;
 enum EditorSortingType;
-enum ShadowType;
+enum ShadowType : unsigned int;
 class WeaponTemplateSet;
 class ArmorTemplateSet;
 class FXList;

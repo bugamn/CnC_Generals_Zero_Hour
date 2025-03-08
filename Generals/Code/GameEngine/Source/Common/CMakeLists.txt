@@ -2,6 +2,7 @@ add_library(Common
   BitFlags.cpp
   CommandLine.cpp
   crc.cpp
+  CRCDebug.cpp
   DiscreteCircle.cpp
   PartitionSolver.cpp
   RandomValue.cpp

@@ -34,7 +34,7 @@
 #include "Common/GameType.h"
 #include "GameClient/Color.h"
 
-enum ShadowType;
+enum ShadowType : unsigned int;
 class Player;
 class Shadow;
 class RadiusDecalTemplate;
@@ -56,7 +56,7 @@ public:
 	void xferRadiusDecal( Xfer *xfer );
 
 	// please note: it is very important, for game/net sync reasons, to ensure that
-	// isEmpty() returns the same value, regardless of whether this decal will 
+	// isEmpty() returns the same value, regardless of whether this decal will
 	// be visible to the local player or not.
 	Bool isEmpty() const { return m_empty; }
 	void clear();
