@@ -267,7 +267,7 @@ Int GetGameAudioRandomValue(int lo, int hi, char *file, int line) {
 //
 // Real valued random value
 //
-Real GetGameLogicRandomValueReal(Real lo, Real hi, char *file, int line) {
+Real GetGameLogicRandomValueReal(Real lo, Real hi, const char *file, int line) {
   Real delta = hi - lo;
   Real rval;
 
@@ -289,7 +289,7 @@ Real GetGameLogicRandomValueReal(Real lo, Real hi, char *file, int line) {
 //
 // Real valued random value
 //
-Real GetGameClientRandomValueReal(Real lo, Real hi, char *file, int line) {
+Real GetGameClientRandomValueReal(Real lo, Real hi, const char *file, int line) {
   Real delta = hi - lo;
   Real rval;
 

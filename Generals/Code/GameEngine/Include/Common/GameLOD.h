@@ -36,7 +36,11 @@
 #ifndef _GAME_LOD_H_
 #define _GAME_LOD_H_
 
+#include "Lib/BaseType.h"
+#include "Common/AsciiString.h"
+
 enum ParticlePriorityType : unsigned int;
+struct FieldParse;
 
 #define MAX_LOD_PRESETS_PER_LEVEL	32	//number of hardware configs preset for each low,medium,high
 #define MAX_BENCH_PROFILES	16

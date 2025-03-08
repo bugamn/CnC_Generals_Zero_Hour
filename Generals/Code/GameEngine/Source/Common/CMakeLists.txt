@@ -6,6 +6,7 @@ add_library(Common
   DamageFX.cpp
   Dict.cpp
   DiscreteCircle.cpp
+  GameLOD.cpp
   PartitionSolver.cpp
   RandomValue.cpp
   Version.cpp

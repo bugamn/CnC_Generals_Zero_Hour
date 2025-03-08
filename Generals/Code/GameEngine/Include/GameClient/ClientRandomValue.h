@@ -35,8 +35,8 @@
 #include "Lib/BaseType.h"
 
 // do NOT use these functions directly, rather use the macros below
-extern Int GetGameClientRandomValue( int lo, int hi, char *file, int line );
-extern Real GetGameClientRandomValueReal( Real lo, Real hi, char *file, int line );
+extern Int GetGameClientRandomValue( int lo, int hi, const char *file, int line );
+extern Real GetGameClientRandomValueReal( Real lo, Real hi, const char *file, int line );
 
 // use these macros to access the random value functions
 #define GameClientRandomValue( lo, hi ) GetGameClientRandomValue( lo, hi, __FILE__, __LINE__ )
@@ -66,12 +66,12 @@ public:
 	 * HIGH_BIAS represents a distribution of random values with
 	 *		zero probability at low, and maximum probability at high.
 	 */
-	enum DistributionType 
-	{ 
+	enum DistributionType
+	{
 		CONSTANT, UNIFORM, GAUSSIAN, TRIANGULAR, LOW_BIAS, HIGH_BIAS
 	};
 
-	static const char *DistributionTypeNames[]; 
+	static const char *DistributionTypeNames[];
 
 	/// define the range of random values, and the distribution of values
 	void setRange( Real low, Real high, DistributionType type = UNIFORM );
