@@ -642,7 +642,7 @@ protected: \
 		instead -- it'd be nice if we could catch this at compile time, but catching it at \
 		runtime seems to be the best we can do... \
 	*/ \
-	inline void *operator new(size_t s) \
+ inline void *operator new(size_t s) throw()	\
 	{ \
 		DEBUG_CRASH(("This operator new should normally never be called... please use new(char*) instead.")); \
 		DEBUG_ASSERTCRASH(s == sizeof(ARGCLASS), ("The wrong operator new is being called; ensure all objects in the hierarchy have MemoryPoolGlue set up correctly")); \
@@ -678,13 +678,14 @@ public: /* include this line at the end to reset visibility to 'public' */
 
 // ----------------------------------------------------------------------------
 // this is the version for an Abstract Base Class, which will never be instantiated...
+// TODO: throw() is considered bad, review this later
 #define MEMORY_POOL_GLUE_ABC(ARGCLASS) \
 protected: \
 	virtual ~ARGCLASS(); \
 public: \
 	enum ARGCLASS##MagicEnum { ARGCLASS##_GLUE_NOT_IMPLEMENTED = 0 }; \
 protected: \
-	inline void *operator new(size_t s, ARGCLASS##MagicEnum e DECLARE_LITERALSTRING_ARG2) \
+ inline void *operator new(size_t s, ARGCLASS##MagicEnum e DECLARE_LITERALSTRING_ARG2) throw()  \
 	{ \
 		DEBUG_CRASH(("this should be impossible to call (abstract base class)")); \
 		DEBUG_ASSERTCRASH(s == sizeof(ARGCLASS), ("The wrong operator new is being called; ensure all objects in the hierarchy have MemoryPoolGlue set up correctly")); \
@@ -697,7 +698,7 @@ protected: \
 		DEBUG_CRASH(("this should be impossible to call (abstract base class)")); \
 	} \
 protected: \
-	inline void *operator new(size_t s) \
+ inline void *operator new(size_t s) throw()	\
 	{ \
 		DEBUG_CRASH(("this should be impossible to call (abstract base class)")); \
 		DEBUG_ASSERTCRASH(s == sizeof(ARGCLASS), ("The wrong operator new is being called; ensure all objects in the hierarchy have MemoryPoolGlue set up correctly")); \

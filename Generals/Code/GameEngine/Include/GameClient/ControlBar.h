@@ -60,14 +60,14 @@ class UpgradeTemplate;
 class ControlBarResizer;
 class GameWindowTransitionsHandler;
 
-enum ProductionID;
+enum ProductionID : unsigned int;
 
-enum CommandSourceType;
-enum ProductionType;
-enum GadgetGameMessage;
-enum ScienceType;
-enum TimeOfDay;
-enum RadiusCursorType;
+enum CommandSourceType : unsigned int;
+enum ProductionType : unsigned int;
+enum GadgetGameMessage : unsigned int;
+enum ScienceType : int;
+enum TimeOfDay : unsigned int;
+enum RadiusCursorType : unsigned int;
 
 //-------------------------------------------------------------------------------------------------
 /** Command options */
@@ -161,7 +161,7 @@ const UnsignedInt COMMAND_OPTION_NEED_OBJECT_TARGET =
 	* IMPORTANT: Make sure the GUICommandType enum and the TheGuiCommandNames[] have the same
 	*						 entries in the same order */
 //-------------------------------------------------------------------------------------------------
-enum GUICommandType
+enum GUICommandType : unsigned int
 {
 	GUI_COMMAND_NONE = 0,									///< invalid command
 	GUI_COMMAND_DOZER_CONSTRUCT,					///< dozer construct

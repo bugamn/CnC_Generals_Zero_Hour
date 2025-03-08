@@ -28,7 +28,7 @@
 #ifndef __W3DWaterTracks_H_
 #define __W3DWaterTracks_H_
 
-enum waveType;	//forward reference
+enum waveType : unsigned int;	//forward reference
 
 /// Custom render object that draws animated tracks/waves on the water.
 /**
@@ -36,7 +36,7 @@ enum waveType;	//forward reference
 	to be managed/accessed only by the WaterTracksRenderObjClassSystem
 */
 class WaterTracksObj
-{	
+{
 	friend class WaterTracksRenderSystem;
 
 public:

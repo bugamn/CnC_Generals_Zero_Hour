@@ -24,12 +24,12 @@
 
 // FILE: BaikonurLaunchPower.h /////////////////////////////////////////////////
 //-----------------------------------------------------------------------------
-//                                                                          
-//                       Electronic Arts Pacific.                          
-//                                                                          
-//                       Confidential Information                           
-//                Copyright (C) 2002 - All Rights Reserved                  
-//                                                                          
+//
+//                       Electronic Arts Pacific.
+//
+//                       Confidential Information
+//                Copyright (C) 2002 - All Rights Reserved
+//
 //-----------------------------------------------------------------------------
 //
 //	Created:	November 2002
@@ -53,7 +53,7 @@
 class Object;
 class SpecialPowerTemplate;
 struct FieldParse;
-enum ScienceType;
+enum ScienceType : int;
 
 class BaikonurLaunchPowerModuleData : public SpecialPowerModuleData
 {
@@ -64,7 +64,7 @@ public:
 
 	static void buildFieldParse( MultiIniFieldParse& p );
 
-	AsciiString m_detonationObject;		
+	AsciiString m_detonationObject;
 };
 
 

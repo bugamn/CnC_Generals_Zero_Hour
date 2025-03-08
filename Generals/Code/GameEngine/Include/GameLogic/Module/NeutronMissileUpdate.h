@@ -39,7 +39,7 @@
 #include "Common/INI.h"
 #include "WWMath/Matrix3D.h"
 
-enum ParticleSystemID;
+enum ParticleSystemID : unsigned int;
 class FXList;
 
 //-------------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ class NeutronMissileUpdateModuleData : public UpdateModuleData
 {
 public:
 	Real					m_initialDist;
-	Real					m_maxTurnRate;		
+	Real					m_maxTurnRate;
 	Real					m_forwardDamping;
 	Real					m_relativeSpeed;
 	Real					m_targetFromDirectlyAbove;	///< aim first for dest+offset, then dest
@@ -70,7 +70,7 @@ public:
 /**
  * This module encapsulates missile behavior.
  */
-class NeutronMissileUpdate : public UpdateModule, 
+class NeutronMissileUpdate : public UpdateModule,
 	public DieModuleInterface,
 	public ProjectileUpdateInterface
 {
@@ -122,7 +122,7 @@ private:
 	Coord3D m_vel;
 
 	UnsignedInt m_stateTimestamp;				///< time of state change
-	Bool m_isLaunched;							
+	Bool m_isLaunched;
 	Bool m_isArmed;											///< if true, missile will explode on contact
 	Real m_noTurnDistLeft;				///< when zero, ok to start turning
 	Bool m_reachedIntermediatePos;
@@ -140,4 +140,3 @@ private:
 };
 
 #endif // _MISSILE_UPDATE_H_
-

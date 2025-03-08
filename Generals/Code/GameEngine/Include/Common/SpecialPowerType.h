@@ -37,7 +37,7 @@
 // Note: these values are saved in save files, so you MUST NOT REMOVE OR CHANGE
 // existing values!
 //
-enum SpecialPowerType
+enum SpecialPowerType : unsigned int
 {
 	SPECIAL_INVALID,
 	// don't forget to add new strings to SpecialPowerMaskType::s_bitNameList[]
@@ -91,7 +91,7 @@ enum SpecialPowerType
 	SPECIAL_CLEANUP_AREA,
 	// don't forget to add new strings to SpecialPowerMaskType::s_bitNameList[]
 	SPECIAL_LAUNCH_BAIKONUR_ROCKET,
-		
+
 	SPECIALPOWER_COUNT,
 	// don't forget to add new strings to SpecialPowerMaskType::s_bitNameList[]
 };

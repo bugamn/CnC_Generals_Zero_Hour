@@ -33,7 +33,7 @@
 #define __THINGSORT_H_
 
 //-------------------------------------------------------------------------------------------------
-enum EditorSortingType
+enum EditorSortingType : unsigned int
 {
 	ES_FIRST = 0,
 
@@ -56,7 +56,7 @@ enum EditorSortingType
 
 };
 #ifdef DEFINE_EDITOR_SORTING_NAMES
-static char *EditorSortingNames[] = 
+static char *EditorSortingNames[] =
 {
 	"NONE",
 	"STRUCTURE",
@@ -78,4 +78,3 @@ static char *EditorSortingNames[] =
 #endif
 
 #endif // __THINGSORT_H_
-

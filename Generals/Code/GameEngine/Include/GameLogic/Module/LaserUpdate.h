@@ -39,7 +39,7 @@
 // FORWARD REFERENCES /////////////////////////////////////////////////////////////////////////////
 class Thing;
 class Vector3;
-enum ParticleSystemID;
+enum ParticleSystemID : unsigned int;
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ public:
 	LaserUpdateModuleData();
 	static void buildFieldParse(MultiIniFieldParse& p);
 
-private: 
+private:
 
 };
 
@@ -109,4 +109,3 @@ protected:
 
 
 #endif
-

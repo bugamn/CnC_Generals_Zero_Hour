@@ -44,9 +44,9 @@
 class Object;
 class Player;
 class SpecialPowerTemplate;
-enum SpecialPowerType;
-enum WeaponSlotType;
-enum CommandSourceType;
+enum SpecialPowerType : unsigned int;
+enum WeaponSlotType : unsigned int;
+enum CommandSourceType : unsigned int;
 enum CanAttackResult : unsigned int;
 
 enum CanEnterType

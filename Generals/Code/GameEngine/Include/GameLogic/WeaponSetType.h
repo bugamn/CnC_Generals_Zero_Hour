@@ -35,10 +35,10 @@
 // state is defined by the bit being off. That is, the typical "normal" condition
 // has all condition flags set to zero.
 //
-// IMPORTANT NOTE #2: if you add or modify this list, be sure to update TheWeaponSetNames, 
+// IMPORTANT NOTE #2: if you add or modify this list, be sure to update TheWeaponSetNames,
 // *and* TheWeaponSetTypeToModelConditionTypeMap!
 //
-enum WeaponSetType
+enum WeaponSetType : unsigned int
 {
 	// The access and use of this enum has the bit shifting built in, so this is a 0,1,2,3,4,5 enum
 	WEAPONSET_VETERAN		= 0,

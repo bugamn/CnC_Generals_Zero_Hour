@@ -37,11 +37,11 @@
 #define __W3DSHADERMANAGER_H_
 
 #include "WW3D2/Texture.h"
-enum FilterTypes;
-enum CustomScenePassModes;
-enum StaticGameLODLevel;
-enum ChipsetType;
-enum CpuType;
+enum FilterTypes : unsigned int;
+enum CustomScenePassModes : unsigned int;
+enum StaticGameLODLevel : int;
+enum ChipsetType : int;
+enum CpuType : int;
 
 class TextureClass;	///forward reference
 /** System for managing complex rendering settings which are either not handled by
@@ -153,7 +153,7 @@ public:
 	static void setZoomToPos(const Coord3D *pos) {m_zoomToPos = *pos; m_zoomToValid = true;}
 
 protected:
-	enum {MAX_COUNT = 60, 
+	enum {MAX_COUNT = 60,
 				MAX_LIMIT = 30,
 				COUNT_STEP = 5,
 				DEFAULT_PAN_FACTOR = 30};

@@ -54,7 +54,7 @@ class TracerDrawInterface;
 class RopeDrawInterface;
 class LaserDrawInterface;
 class FXList;
-enum TerrainDecalType;
+enum TerrainDecalType : unsigned int;
 enum ShadowType : unsigned int;
 
 //class ModelConditionFlags;

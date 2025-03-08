@@ -100,17 +100,16 @@ class ObjectRepulsorHelper;
 class ObjectWeaponStatusHelper;
 class ObjectDefectionHelper;
 
-enum CommandSourceType;
-enum DamageType;
-enum HackerAttackMode;
-enum NameKeyType;
-enum SpecialPowerType;
-enum WeaponBonusConditionType;
-enum WeaponChoiceCriteria;
-enum WeaponSetConditionType;
-enum WeaponSetType;
-enum WeaponStatus;
-enum RadarPriorityType;
+enum CommandSourceType : unsigned int;
+enum DamageType : unsigned int;
+enum NameKeyType : unsigned int;
+enum SpecialPowerType : unsigned int;
+enum WeaponBonusConditionType : int;
+enum WeaponChoiceCriteria : unsigned int;
+enum WeaponSetConditionType : int;
+enum WeaponSetType : unsigned int;
+enum WeaponStatus : unsigned int;
+enum RadarPriorityType : unsigned int;
 enum CanAttackResult : unsigned int;
 
 // For ObjectStatusBits and TheObjectStatusBitNames

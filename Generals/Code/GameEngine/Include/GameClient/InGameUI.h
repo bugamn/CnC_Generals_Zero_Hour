@@ -65,7 +65,7 @@ enum ShadowType : unsigned int;
 enum CanAttackResult : unsigned int;
 
 // ------------------------------------------------------------------------------------------------
-enum RadiusCursorType
+enum RadiusCursorType : unsigned int
 {
 	RADIUSCURSOR_NONE = 0,
 	RADIUSCURSOR_ATTACK_DAMAGE_AREA,

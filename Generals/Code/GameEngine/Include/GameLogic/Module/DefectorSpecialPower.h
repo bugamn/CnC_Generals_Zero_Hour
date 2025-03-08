@@ -24,7 +24,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// FILE: DefectorSpecialPower.h 
+// FILE: DefectorSpecialPower.h
 // Author: Mark Lorenzen, JULY 2002
 // Desc:   General can click command cursor on any enemy, and it becomes his
 //
@@ -42,7 +42,7 @@
 class Object;
 class SpecialPowerTemplate;
 struct FieldParse;
-enum ScienceType;
+enum ScienceType : int;
 
 
 
@@ -82,4 +82,3 @@ protected:
 
 };
 #endif  // end DefectorSpecialPower
-
