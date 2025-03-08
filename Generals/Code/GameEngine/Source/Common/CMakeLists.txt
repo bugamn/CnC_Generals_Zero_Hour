@@ -2,6 +2,7 @@ add_library(Common
   crc.cpp
   DiscreteCircle.cpp
   PartitionSolver.cpp
+  version.cpp
 )
 
 target_include_directories(Common PUBLIC
