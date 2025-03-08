@@ -2,7 +2,7 @@ add_library(Common
   crc.cpp
   DiscreteCircle.cpp
   PartitionSolver.cpp
-  version.cpp
+  Version.cpp
   BitFlags.cpp
   RandomValue.cpp
 )
