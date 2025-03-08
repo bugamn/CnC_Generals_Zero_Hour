@@ -3,6 +3,7 @@ add_library(Common
   DiscreteCircle.cpp
   PartitionSolver.cpp
   version.cpp
+  BitFlags.cpp
 )
 
 target_include_directories(Common PUBLIC

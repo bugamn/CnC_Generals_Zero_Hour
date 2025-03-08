@@ -24,7 +24,7 @@
 
 // FILE: SparseMatchFinder.h /////////////////////////////////////////////////////////////////////////
 // Author: Steven Johnson, March 2002
-// Desc:   
+// Desc:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -35,6 +35,8 @@
 // INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
 #include "Common/BitFlags.h"
 #include "Common/STLTypedefs.h"
+
+#include <unordered_map>
 
 #if defined(_DEBUG) || defined(_INTERNAL)
 	#define SPARSEMATCH_DEBUG
@@ -73,12 +75,12 @@ private:
 	};
 
 	//-------------------------------------------------------------------------------------------------
-	typedef std::hash_map< BITSET, const MATCHABLE*, HashMapHelper, HashMapHelper > MatchMap;
+	typedef std::unordered_map< BITSET, const MATCHABLE*, HashMapHelper, HashMapHelper > MatchMap;
 
 	//-------------------------------------------------------------------------------------------------
 	// MEMBER VARS
 	//-------------------------------------------------------------------------------------------------
-	
+
 	mutable MatchMap m_bestMatches;
 
 	//-------------------------------------------------------------------------------------------------
@@ -89,13 +91,13 @@ private:
 	inline static Int countConditionIntersection(const BITSET& a, const BITSET& b)
 	{
 		return a.countIntersection(b);
-	} 
+	}
 
 	//-------------------------------------------------------------------------------------------------
 	inline static Int countConditionInverseIntersection(const BITSET& a, const BITSET& b)
 	{
 		return a.countInverseIntersection(b);
-	} 
+	}
 
 	//-------------------------------------------------------------------------------------------------
 	const MATCHABLE* findBestInfoSlow(const std::vector<MATCHABLE>& v, const BITSET& bits) const
@@ -104,12 +106,12 @@ private:
 		Int bestYesMatch = 0;							// want to maximize this
 		Int bestYesExtraneousBits = 999;	// want to minimize this
 
-	#ifdef SPARSEMATCH_DEBUG 
-		Int numDupMatches = 0; 
+	#ifdef SPARSEMATCH_DEBUG
+		Int numDupMatches = 0;
 		AsciiString curBestMatchStr, dupMatchStr;
 	#endif
 
-		for (std::vector<MATCHABLE>::const_iterator it = v.begin(); it != v.end(); ++it)
+		for (auto& it = v.begin(); it != v.end(); ++it)
 		{
 			for (Int i = it->getConditionsYesCount()-1; i >= 0; --i)
 			{
@@ -124,7 +126,7 @@ private:
 				Int yesExtraneousBits = countConditionInverseIntersection(bits, yesFlags);
 
 	#ifdef SPARSEMATCH_DEBUG
-				if (yesMatch == bestYesMatch && 
+				if (yesMatch == bestYesMatch &&
 						yesExtraneousBits == bestYesExtraneousBits)
 				{
 					++numDupMatches;
@@ -151,7 +153,7 @@ private:
 		if (numDupMatches > 0)
 		{
 			AsciiString curConditionStr;
-			bits.buildDescription(&curConditionStr); 
+			bits.buildDescription(&curConditionStr);
 			DEBUG_CRASH(("ambiguous model match in findBestInfoSlow \n\nbetween \n(%s)\n<and>\n(%s)\n\n(%d extra matches found)\n\ncurrent bits are (\n%s)\n",
 					curBestMatchStr.str(),
 					dupMatchStr.str(),
@@ -175,7 +177,7 @@ public:
 	//-------------------------------------------------------------------------------------------------
 	const MATCHABLE* findBestInfo(const std::vector<MATCHABLE>& v, const BITSET& bits) const
 	{
-		MatchMap::const_iterator it = m_bestMatches.find(bits);
+		auto& it = m_bestMatches.find(bits);
 		if (it != m_bestMatches.end())
 		{
 			return (*it).second;
@@ -193,4 +195,3 @@ public:
 };
 
 #endif // __SparseMatchFinder_H_
-
