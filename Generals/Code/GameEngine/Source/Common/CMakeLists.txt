@@ -22,7 +22,7 @@ add_library(Common
   # SkirmishBattleHonors.cpp
   # StateMachine.cpp
   # StatsCollector.cpp
-  # TerrainTypes.cpp
+  TerrainTypes.cpp
   # UserPreferences.cpp
   Version.cpp
 )
