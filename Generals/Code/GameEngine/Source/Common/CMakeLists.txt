@@ -10,13 +10,13 @@ add_library(Common
   GameLOD.cpp
   # GameMain.cpp
   # GlobalData.cpp
-  # Language.cpp
+  Language.cpp
   # MessageStream.cpp
-  # MiniLog.cpp
+  MiniLog.cpp
   # MultiplayerSettings.cpp
-  # NameKeyGenerator.cpp
+  NameKeyGenerator.cpp
   PartitionSolver.cpp
-  # PerfTimer.cpp
+  PerfTimer.cpp
   RandomValue.cpp
   # Recorder.cpp
   # SkirmishBattleHonors.cpp
