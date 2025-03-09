@@ -34,11 +34,13 @@
 #ifndef _SLAVED_UPDATE_H_
 #define _SLAVED_UPDATE_H_
 
-const Int SLAVED_UPDATE_RATE = LOGICFRAMES_PER_SECOND/4; ///< This is a low priority module that only needs to be called every this many frames
-
 // INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
+#include "Lib/BaseType.h"
 #include "Common/INI.h"
 #include "GameLogic/Module/UpdateModule.h"
+
+const Int SLAVED_UPDATE_RATE = LOGICFRAMES_PER_SECOND/4; ///< This is a low priority module that only needs to be called every this many frames
+
 class DamageInfo;
 enum ModelConditionFlagType : int;
 

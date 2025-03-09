@@ -128,9 +128,9 @@ const FieldParse TerrainRoadType::m_terrainBridgeFieldParseTable[] = {
   // which transition is this
   Bool damageTransition;
   token = ini->getNextSubToken("Transition");
-  if (stricmp(token, "Damage") == 0)
+  if (strcasecmp(token, "Damage") == 0)
     damageTransition = TRUE;
-  else if (stricmp(token, "Repair") == 0)
+  else if (strcasecmp(token, "Repair") == 0)
     damageTransition = FALSE;
   else {
     DEBUG_CRASH(("Expected Damage/Repair transition keyword\n"));
@@ -183,9 +183,9 @@ const FieldParse TerrainRoadType::m_terrainBridgeFieldParseTable[] = {
   // which transition is this
   Bool damageTransition;
   token = ini->getNextSubToken("Transition");
-  if (stricmp(token, "Damage") == 0)
+  if (strcasecmp(token, "Damage") == 0)
     damageTransition = TRUE;
-  else if (stricmp(token, "Repair") == 0)
+  else if (strcasecmp(token, "Repair") == 0)
     damageTransition = FALSE;
   else {
     DEBUG_CRASH(("Expected Damage/Repair transition keyword\n"));

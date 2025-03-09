@@ -25,7 +25,7 @@
 
 #include "GameNetwork/Transport.h"
 
-#include "Common/CRC.h"
+#include "Common/crc.h"
 #include "GameNetwork/NetworkInterface.h"
 #include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 

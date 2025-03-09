@@ -1,30 +1,30 @@
 add_library(GameClient
-  Line2D.cpp
+  # Line2D.cpp
   Color.cpp
-  SelectionInfo.cpp
-  GlobalLanguage.cpp
-  Eva.cpp
-  FXList.cpp
-  Credits.cpp
-  GameClient.cpp
-  GameText.cpp
-  Water.cpp
+  # SelectionInfo.cpp
+  # GlobalLanguage.cpp
+  # Eva.cpp
+  # FXList.cpp
+  # Credits.cpp
+  # GameClient.cpp
+  # GameText.cpp
+  # Water.cpp
   View.cpp
   DisplayStringManager.cpp
   VideoStream.cpp
-  DrawGroupInfo.cpp
+  # DrawGroupInfo.cpp
   GameClientDispatch.cpp
-  Display.cpp
+  # Display.cpp
   GraphDraw.cpp
-  Drawable.cpp
+  # Drawable.cpp
   DrawableManager.cpp
   DisplayString.cpp
   Statistics.cpp
-  LanguageFilter.cpp
-  InGameUI.cpp
+  # LanguageFilter.cpp
+  # InGameUI.cpp
   VideoPlayer.cpp
-  MapUtil.cpp
-  RadiusDecal.cpp
+  # MapUtil.cpp
+  # RadiusDecal.cpp
 )
 
 target_include_directories(GameClient PUBLIC
@@ -36,8 +36,8 @@ target_include_directories(GameClient PUBLIC
 )
 
 add_subdirectory(Terrain)
-add_subdirectory(GUI)
-add_subdirectory(MessageStream)
+# add_subdirectory(GUI)
+# add_subdirectory(MessageStream)
 add_subdirectory(Drawable)
-add_subdirectory(Input)
+# add_subdirectory(Input)
 add_subdirectory(System)

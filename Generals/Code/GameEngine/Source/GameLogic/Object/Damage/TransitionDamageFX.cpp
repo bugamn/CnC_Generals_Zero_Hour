@@ -83,7 +83,7 @@ TransitionDamageFXModuleData::TransitionDamageFXModuleData(void) {
 static void parseFXLocInfo(INI *ini, void *instance, FXLocInfo *locInfo) {
   const char *token = ini->getNextToken(ini->getSepsColon());
 
-  if (stricmp(token, "bone") == 0) {
+  if (strcasecmp(token, "bone") == 0) {
     // save bone name and location type
     locInfo->boneName = AsciiString(ini->getNextToken());
     locInfo->locType = FX_DAMAGE_LOC_TYPE_BONE;
@@ -95,7 +95,7 @@ static void parseFXLocInfo(INI *ini, void *instance, FXLocInfo *locInfo) {
     // bone name is assumed to be explicit
     //
     token = ini->getNextToken(ini->getSepsColon());
-    if (stricmp(token, "randombone") != 0) {
+    if (strcasecmp(token, "randombone") != 0) {
       DEBUG_CRASH(
           ("parseFXLocInfo: Bone name not followed by RandomBone "
            "specifier\nPress IGNORE to see which INI file and line # is "
@@ -108,7 +108,7 @@ static void parseFXLocInfo(INI *ini, void *instance, FXLocInfo *locInfo) {
     ini->parseBool(ini, instance, &locInfo->randomBone, NULL);
 
   }  // end if
-  else if (stricmp(token, "loc") == 0) {
+  else if (strcasecmp(token, "loc") == 0) {
     // save location and location type
     locInfo->loc.x = ini->scanReal(ini->getNextSubToken("X"));
     locInfo->loc.y = ini->scanReal(ini->getNextSubToken("Y"));
@@ -140,7 +140,7 @@ void TransitionDamageFXModuleData::parseFXList(INI *ini, void *instance,
 
   // make sure we have an "FXList:" token
   token = ini->getNextToken(ini->getSepsColon());
-  if (stricmp(token, "fxlist") != 0) {
+  if (strcasecmp(token, "fxlist") != 0) {
     // error
     throw INI_INVALID_DATA;
 
@@ -166,7 +166,7 @@ void TransitionDamageFXModuleData::parseObjectCreationList(
 
   // make sure we have an "OCL:" token
   token = ini->getNextToken(ini->getSepsColon());
-  if (stricmp(token, "ocl") != 0) {
+  if (strcasecmp(token, "ocl") != 0) {
     // error
     throw INI_INVALID_DATA;
 
@@ -193,7 +193,7 @@ void TransitionDamageFXModuleData::parseParticleSystem(INI *ini, void *instance,
 
   // make sure we have an "PSys:" token
   token = ini->getNextToken(ini->getSepsColon());
-  if (stricmp(token, "psys") != 0) {
+  if (strcasecmp(token, "psys") != 0) {
     // error
     throw INI_INVALID_DATA;
 

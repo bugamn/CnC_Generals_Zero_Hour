@@ -12,4 +12,3 @@ target_include_directories(ProductionExitUpdate PUBLIC
   "${PROJECT_SOURCE_DIR}/Libraries/Source/WWVegas/"
   "${PROJECT_SOURCE_DIR}/Libraries/Source/WWVegas/WWLib/"
 )
-

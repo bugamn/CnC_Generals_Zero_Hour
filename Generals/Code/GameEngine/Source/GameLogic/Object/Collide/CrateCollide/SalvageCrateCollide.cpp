@@ -37,7 +37,7 @@
 #include "GameLogic/Module/SalvageCrateCollide.h"
 
 #include "Common/AudioEventRTS.h"
-#include "Common/Kindof.h"
+#include "Common/KindOf.h"
 #include "Common/MiscAudio.h"
 #include "Common/Player.h"
 #include "Common/RandomValue.h"

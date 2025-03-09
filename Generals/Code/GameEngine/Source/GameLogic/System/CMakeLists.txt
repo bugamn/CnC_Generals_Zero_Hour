@@ -1,10 +1,10 @@
 add_library(GameLogicSystem
-  GameLogic.cpp
+  # GameLogic.cpp
   CrateSystem.cpp
-  CaveSystem.cpp
-  Damage.cpp
-  GameLogicDispatch.cpp
-  RankInfo.cpp
+  # CaveSystem.cpp
+  # Damage.cpp
+  # GameLogicDispatch.cpp
+  # RankInfo.cpp
 )
 
 target_include_directories(GameLogicSystem PUBLIC

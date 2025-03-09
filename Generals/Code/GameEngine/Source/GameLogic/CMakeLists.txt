@@ -1,5 +1,5 @@
-add_subdirectory(ScriptEngine)
-add_subdirectory(Map)
+# add_subdirectory(ScriptEngine)
+# add_subdirectory(Map)
 add_subdirectory(System)
 add_subdirectory(Object)
 add_subdirectory(AI)

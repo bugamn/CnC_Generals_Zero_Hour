@@ -64,7 +64,7 @@
 #include "GameClient/View.h"
 #include "GameLogic/GameLogic.h"
 #include "GameLogic/TerrainLogic.h"
-#include "Lib/Basetype.h"
+#include "Lib/BaseType.h"
 
 #ifdef _INTERNAL
 // #pragma optimize("", off)

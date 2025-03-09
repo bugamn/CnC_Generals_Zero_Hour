@@ -40,14 +40,14 @@
 #include "Common/RandomValue.h"
 #include "Common/ThingTemplate.h"
 #include "Common/Xfer.h"
-#include "GameClient\Drawable.h"
-#include "GameLogic\GameLogic.h"
-#include "GameLogic\Module\AIUpdate.h"
-#include "GameLogic\Module\CollideModule.h"
-#include "GameLogic\Module\PilotFindVehicleUpdate.h"
-#include "GameLogic\Object.h"
-#include "GameLogic\ObjectIter.h"
-#include "GameLogic\PartitionManager.h"
+#include "GameClient/Drawable.h"
+#include "GameLogic/GameLogic.h"
+#include "GameLogic/Module/AIUpdate.h"
+#include "GameLogic/Module/CollideModule.h"
+#include "GameLogic/Module/PilotFindVehicleUpdate.h"
+#include "GameLogic/Object.h"
+#include "GameLogic/ObjectIter.h"
+#include "GameLogic/PartitionManager.h"
 
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------

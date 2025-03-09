@@ -1,59 +1,59 @@
 add_library(GameLogicUpdate
   PowerPlantUpdate.cpp
-  AssistedTargetingUpdate.cpp
+  # AssistedTargetingUpdate.cpp
   LaserUpdate.cpp
-  StructureToppleUpdate.cpp
-  SpyVisionUpdate.cpp
+  # StructureToppleUpdate.cpp
+  # SpyVisionUpdate.cpp
   CleanupHazardUpdate.cpp
-  EMPUpdate.cpp
+  # EMPUpdate.cpp
   FlammableUpdate.cpp
   FloatUpdate.cpp
-  PilotFindVehicleUpdate.cpp
-  AutoFindHealingUpdate.cpp
-  MobMemberSlavedUpdate.cpp
-  NeutronMissileUpdate.cpp
+  # PilotFindVehicleUpdate.cpp
+  # AutoFindHealingUpdate.cpp
+  # MobMemberSlavedUpdate.cpp
+  # NeutronMissileUpdate.cpp
   RadiusDecalUpdate.cpp
   HelicopterSlowDeathUpdate.cpp
-  ToppleUpdate.cpp
+  # ToppleUpdate.cpp
   HeightDieUpdate.cpp
   DeletionUpdate.cpp
-  StructureCollapseUpdate.cpp
-  ParticleUplinkCannonUpdate.cpp
+  # StructureCollapseUpdate.cpp
+  # ParticleUplinkCannonUpdate.cpp
   CheckpointUpdate.cpp
-  WaveGuideUpdate.cpp
+  # WaveGuideUpdate.cpp
   OCLUpdate.cpp
-  FireOCLAfterWeaponCooldownUpdate.cpp
+  # FireOCLAfterWeaponCooldownUpdate.cpp
   StickyBombUpdate.cpp
   DelayedWeaponSetUpgradeUpdate.cpp
   ProneUpdate.cpp
-  BattlePlanUpdate.cpp
-  SlavedUpdate.cpp
+  # BattlePlanUpdate.cpp
+  # SlavedUpdate.cpp
   DynamicGeometryInfoUpdate.cpp
-  FireSpreadUpdate.cpp
-  AIUpdate.cpp
+  # FireSpreadUpdate.cpp
+  # AIUpdate.cpp
   DemoTrapUpdate.cpp
-  AutoDepositUpdate.cpp
-  HijackerUpdate.cpp
-  FirestormDynamicGeometryInfoUpdate.cpp
-  ProductionUpdate.cpp
+  # AutoDepositUpdate.cpp
+  # HijackerUpdate.cpp
+  # FirestormDynamicGeometryInfoUpdate.cpp
+  # ProductionUpdate.cpp
   LifetimeUpdate.cpp
-  BoneFXUpdate.cpp
+  # BoneFXUpdate.cpp
   BaseRenerateUpdate.cpp
   DynamicShroudClearingRangeUpdate.cpp
   FireWeaponUpdate.cpp
-  NeutronMissileSlowDeathUpdate.cpp
-  StealthDetectorUpdate.cpp
+  # NeutronMissileSlowDeathUpdate.cpp
+  # StealthDetectorUpdate.cpp
   ProjectileStreamUpdate.cpp
-  CommandButtonHuntUpdate.cpp
+  # CommandButtonHuntUpdate.cpp
   RadarUpdate.cpp
-  HordeUpdate.cpp
-  StealthUpdate.cpp
-  PhysicsUpdate.cpp
+  # HordeUpdate.cpp
+  # StealthUpdate.cpp
+  # PhysicsUpdate.cpp
   UpdateModule.cpp
   EnemyNearUpdate.cpp
-  SpecialAbilityUpdate.cpp
+  # SpecialAbilityUpdate.cpp
   MissileLauncherBuildingUpdate.cpp
-  TensileFormationUpdate.cpp
+  # TensileFormationUpdate.cpp
   PointDefenseLaserUpdate.cpp
 )
 
@@ -67,4 +67,4 @@ target_include_directories(GameLogicUpdate PUBLIC
 
 add_subdirectory(AIUpdate)
 add_subdirectory(DockUpdate)
-add_subdirectory(ProductionExitUpdate)
+# add_subdirectory(ProductionExitUpdate)

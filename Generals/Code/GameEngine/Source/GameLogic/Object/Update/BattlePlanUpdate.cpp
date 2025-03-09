@@ -61,7 +61,7 @@
 #include "GameLogic/PartitionManager.h"
 #include "GameLogic/TerrainLogic.h"
 #include "GameLogic/Weapon.h"
-#include "GameLogic/Weaponset.h"
+#include "GameLogic/WeaponSet.h"
 
 #ifdef _INTERNAL
 // for occasional debugging...

@@ -33,7 +33,7 @@
 // ///////////////////////////////////////////////////////////////////////////////////////
 #include "GameClient/MapUtil.h"
 
-#include "Common/CRC.h"
+#include "Common/crc.h"
 #include "Common/DataChunk.h"
 #include "Common/File.h"
 #include "Common/FileSystem.h"

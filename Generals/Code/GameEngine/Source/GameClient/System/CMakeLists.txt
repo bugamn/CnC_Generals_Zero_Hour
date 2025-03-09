@@ -1,10 +1,10 @@
 add_library(GameClientSystem
   RayEffect.cpp
-  Image.cpp
+  # Image.cpp
   DebugDisplay.cpp
   CampaignManager.cpp
-  Anim2D.cpp
-  ParticleSys.cpp
+  # Anim2D.cpp
+  # ParticleSys.cpp
 )
 
 target_include_directories(GameClientSystem PUBLIC

@@ -31,18 +31,18 @@
 
 // INCLUDES
 // ///////////////////////////////////////////////////////////////////////////////////////
-#include "Common\BitFlagsIO.h"
-#include "Common\RandomValue.h"
-#include "Common\ThingTemplate.h"
-#include "Common\Xfer.h"
-#include "GameClient\Drawable.h"
-#include "GameLogic\GameLogic.h"
-#include "GameLogic\Module\PhysicsUpdate.h"
-#include "GameLogic\Module\PointDefenseLaserUpdate.h"
-#include "GameLogic\Object.h"
-#include "GameLogic\ObjectIter.h"
-#include "GameLogic\PartitionManager.h"
-#include "GameLogic\Weapon.h"
+#include "Common/BitFlagsIO.h"
+#include "Common/RandomValue.h"
+#include "Common/ThingTemplate.h"
+#include "Common/Xfer.h"
+#include "GameClient/Drawable.h"
+#include "GameLogic/GameLogic.h"
+#include "GameLogic/Module/PhysicsUpdate.h"
+#include "GameLogic/Module/PointDefenseLaserUpdate.h"
+#include "GameLogic/Object.h"
+#include "GameLogic/ObjectIter.h"
+#include "GameLogic/PartitionManager.h"
+#include "GameLogic/Weapon.h"
 #include "PreRTS.h"  // This must go first in EVERY cpp file in the GameEngine
 
 //-------------------------------------------------------------------------------------------------

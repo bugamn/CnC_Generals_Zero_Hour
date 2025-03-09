@@ -37,7 +37,7 @@
 #include "GameLogic/GameLogic.h"
 #include "GameLogic/Object.h"
 #include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
-#include "WWMath/Vector3.h"
+#include "WWMath/vector3.h"
 
 #ifdef _INTERNAL
 // for occasional debugging...

@@ -10,4 +10,4 @@ target_include_directories(Drawable PUBLIC
   "${PROJECT_SOURCE_DIR}/Libraries/Source/WWVegas/WWLib/"
 )
 
-add_subdirectory(Update)
+#add_subdirectory(Update)

@@ -41,7 +41,7 @@
 #include "GameLogic/Object.h"
 #include "GameLogic/TerrainLogic.h"
 #include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
-#include "WWMath/Matrix3D.h"  ///< @todo Replace with our own matrix library
+#include "WWMath/matrix3d.h"  ///< @todo Replace with our own matrix library
 
 //-------------------------------------------------------------------------------------------------
 SpawnPointProductionExitUpdate::SpawnPointProductionExitUpdate(

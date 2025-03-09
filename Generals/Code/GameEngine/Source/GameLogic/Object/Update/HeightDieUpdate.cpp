@@ -33,6 +33,7 @@
 // //////////////////////////////////////////////////////////////////////////////////
 #include "GameLogic/Module/HeightDieUpdate.h"
 
+#include <climits>
 #include "Common/ThingTemplate.h"
 #include "Common/Xfer.h"
 #include "GameClient/InGameUI.h"

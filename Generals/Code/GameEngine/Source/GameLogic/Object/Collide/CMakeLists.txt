@@ -1,7 +1,7 @@
 add_library(Collide
   CollideModule.cpp
   FireWeaponCollide.cpp
-  SquishCollide.cpp
+  # SquishCollide.cpp
 )
 
 target_include_directories(Collide PUBLIC

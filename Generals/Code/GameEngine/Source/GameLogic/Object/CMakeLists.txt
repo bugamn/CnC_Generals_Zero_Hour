@@ -1,15 +1,15 @@
 add_library(Object
-  Locomotor.cpp
-  ObjectCreationList.cpp
+  # Locomotor.cpp
+  # ObjectCreationList.cpp
   Armor.cpp
-  ObjectTypes.cpp
-  Object.cpp
-  PartitionManager.cpp
-  Weapon.cpp
+  # ObjectTypes.cpp
+  # Object.cpp
+  # PartitionManager.cpp
+  # Weapon.cpp
   GhostObject.cpp
   SimpleObjectIterator.cpp
   FiringTracker.cpp
-  WeaponSet.cpp
+  # WeaponSet.cpp
   ExperienceTracker.cpp
 )
 
@@ -25,7 +25,7 @@ add_subdirectory(Die)
 add_subdirectory(Helper)
 add_subdirectory(Damage)
 add_subdirectory(Update)
-add_subdirectory(Contain)
+# add_subdirectory(Contain)
 add_subdirectory(Collide)
 add_subdirectory(Destroy)
 add_subdirectory(Body)

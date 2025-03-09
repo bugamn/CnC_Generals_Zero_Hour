@@ -51,7 +51,7 @@
 #include "GameLogic/Object.h"
 #include "GameLogic/ObjectCreationList.h"
 #include "GameLogic/Weapon.h"
-#include "GameLogic/Weaponset.h"
+#include "GameLogic/WeaponSet.h"
 
 //-------------------------------------------------------------------------------------------------
 FireOCLAfterWeaponCooldownUpdateModuleData::
