@@ -32,6 +32,7 @@
 #include "Common/BitFlagsIO.h"
 #include "PreRTS.h"
 
+template<>
 const char* KindOfMaskType::s_bitNameList[] = {"OBSTACLE",
                                                "SELECTABLE",
                                                "IMMOBILE",

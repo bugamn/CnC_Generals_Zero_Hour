@@ -28,6 +28,10 @@ add_library(Common
 )
 
 add_subdirectory(INI)
+# Commented out dirs need fixes before compiling a single file
+# add_subdirectory(Bezier)
+# add_subdirectory(RTS)
+add_subdirectory(System)
 
 target_include_directories(Common PUBLIC
                            "${PROJECT_SOURCE_DIR}/GameEngine/Include"

@@ -31,6 +31,7 @@
 #include "Common/BitFlagsIO.h"
 #include "PreRTS.h"
 
+template<>
 const char* DisabledMaskType::s_bitNameList[] = {"DEFAULT",
                                                  "DISABLED_HACKED",
                                                  "DISABLED_EMP",

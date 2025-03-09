@@ -54,7 +54,7 @@
 #include "Common/StackDump.h"
 #include "Common/SystemInfo.h"
 #include "Common/UnicodeString.h"
-#include "Common/registry.h"
+#include "Common/Registry.h"
 #include "GameClient/GameText.h"
 #include "GameClient/Keyboard.h"
 #include "GameClient/Mouse.h"

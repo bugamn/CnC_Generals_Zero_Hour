@@ -905,7 +905,7 @@ void MemoryPoolSingleBlock::initBlock(
     }
 #endif
   }
-#endif MEMORYPOOL_DEBUG
+#endif // MEMORYPOOL_DEBUG
 #ifdef MEMORYPOOL_CHECKPOINTING
   m_checkpointInfo = NULL;
 #endif
@@ -2157,7 +2157,7 @@ void *DynamicMemoryAllocator::allocateBytesDoNotZeroImplementation(
         if (thePeakWastedDMA < theWastedDMA) thePeakWastedDMA = theWastedDMA;
       }
     }
-#endif MEMORYPOOL_DEBUG
+#endif // MEMORYPOOL_DEBUG
   } else {
     // too big for our pools -- just go right to the metal.
     MemoryPoolSingleBlock *block =
@@ -2198,7 +2198,7 @@ void *DynamicMemoryAllocator::allocateBytesDoNotZeroImplementation(
     }
 #endif
   }
-#endif MEMORYPOOL_DEBUG
+#endif // MEMORYPOOL_DEBUG
 
   ++m_usedBlocksInDma;
   DEBUG_ASSERTCRASH(m_usedBlocksInDma >= 0,
@@ -2255,7 +2255,7 @@ void DynamicMemoryAllocator::freeBytes(void *pBlockPtr) {
     const char *tagString = block->debugGetLiteralTagString();
 #endif
   }
-#endif MEMORYPOOL_DEBUG
+#endif // MEMORYPOOL_DEBUG
 
   if (block->getOwningBlob()) {
 #ifdef MEMORYPOOL_DEBUG
@@ -2273,7 +2273,7 @@ void DynamicMemoryAllocator::freeBytes(void *pBlockPtr) {
         if (thePeakWastedDMA < theWastedDMA) thePeakWastedDMA = theWastedDMA;
       }
     }
-#endif MEMORYPOOL_DEBUG
+#endif // MEMORYPOOL_DEBUG
     block->getOwningBlob()->getOwningPool()->freeBlock(pBlockPtr);
   } else {
     // was allocated via sysAllocate.

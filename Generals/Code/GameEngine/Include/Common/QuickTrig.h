@@ -34,6 +34,9 @@
 #define __QUICKTRIG_H_
 
 // INCLUDES ///////////////////////////////////////////////////////////////////////////////////////
+#include "Lib/BaseType.h"
+#include "Common/AsciiString.h"
+#include "Common/UnicodeString.h"
 
 //-----------------------------------------------------------------------------
 

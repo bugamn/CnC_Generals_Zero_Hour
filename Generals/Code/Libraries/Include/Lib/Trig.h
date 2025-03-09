@@ -24,6 +24,8 @@
 #ifndef _TRIG_H_
 #define _TRIG_H_
 
+#include "Lib/TypeRedefinitions.h"
+
 Real Sin(Real);
 Real Cos(Real);
 Real Tan(Real);

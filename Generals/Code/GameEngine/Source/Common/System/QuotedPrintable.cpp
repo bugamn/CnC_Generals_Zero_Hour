@@ -30,6 +30,8 @@
 
 #include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
 
+#include "Common/UnicodeString.h"
+
 #define MAGIC_CHAR '_'
 
 // takes an integer and returns an ASCII representation
@@ -97,6 +99,7 @@ AsciiString AsciiStringToQuotedPrintable(AsciiString original) {
   return dest;
 }
 
+// TODO: rewrite this
 // Convert ascii quoted-printable strings into unicode strings
 UnicodeString QuotedPrintableToUnicodeString(AsciiString original) {
   static unsigned short dest[1024];
