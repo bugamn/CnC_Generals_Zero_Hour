@@ -28,6 +28,7 @@ add_library(Common
 )
 
 add_subdirectory(INI)
+add_subdirectory(Audio)
 # Commented out dirs need fixes before compiling a single file
 # add_subdirectory(Bezier)
 # add_subdirectory(RTS)

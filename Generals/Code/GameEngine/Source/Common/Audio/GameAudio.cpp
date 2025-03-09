@@ -65,7 +65,7 @@
 #include "GameLogic/GameLogic.h"
 #include "GameLogic/TerrainLogic.h"
 #include "PreRTS.h"  // This must go first in EVERY cpp file int the GameEngine
-#include "WWMath/Matrix3D.h"
+#include "WWMath/matrix3d.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef _INTERNAL
