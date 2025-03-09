@@ -1,0 +1,34 @@
+add_library(Behavior
+  PropagandaTowerBehavior.cpp
+  ParkingPlaceBehavior.cpp
+  GenerateMinefieldBehavior.cpp
+  BridgeBehavior.cpp
+  PropagandaCenterBehavior.cpp
+  BehaviorModule.cpp
+  FireWeaponWhenDeadBehavior.cpp
+  SpawnBehavior.cpp
+  OverchargeBehavior.cpp
+  RebuildHoleBehavior.cpp
+  DumbProjectileBehavior.cpp
+  SlowDeathBehavior.cpp
+  BridgeTowerBehavior.cpp
+  TechBuildingBehavior.cpp
+  MinefieldBehavior.cpp
+  PrisonBehavior.cpp
+  FireWeaponWhenDamagedBehavior.cpp
+  POWTruckBehavior.cpp
+  BridgeScaffoldBehavior.cpp
+  SupplyWarehouseCripplingBehavior.cpp
+  AutoHealBehavior.cpp
+  PoisonedBehavior.cpp
+  InstantDeathBehavior.cpp
+  JetSlowDeathBehavior.cpp
+)
+
+target_include_directories(Behavior PUBLIC
+  "${PROJECT_SOURCE_DIR}/GameEngine/Include"
+  "${PROJECT_SOURCE_DIR}/GameEngine/Include/Precompiled"
+  "${PROJECT_SOURCE_DIR}/Libraries/Include"
+  "${PROJECT_SOURCE_DIR}/Libraries/Source/WWVegas/"
+  "${PROJECT_SOURCE_DIR}/Libraries/Source/WWVegas/WWLib/"
+)

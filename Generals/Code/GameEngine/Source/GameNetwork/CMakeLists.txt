@@ -1,0 +1,48 @@
+add_library(GameNetwork
+  Transport.cpp
+  Network.cpp
+  GameSpyPersistentStorage.cpp
+  LANAPI.cpp
+  GameSpyGameInfo.cpp
+  GUIUtil.cpp
+  NetMessageStream.cpp
+  LANAPIhandlers.cpp
+  GameSpyChat.cpp
+  LANGameInfo.cpp
+  User.cpp
+  LANAPICallbacks.cpp
+  NetCommandRef.cpp
+  FrameDataManager.cpp
+  FrameMetrics.cpp
+  Connection.cpp
+  NAT.cpp
+  NetCommandList.cpp
+  GameSpyOverlay.cpp
+  IPEnumeration.cpp
+  udp.cpp
+  GameInfo.cpp
+  DisconnectManager.cpp
+  FileTransfer.cpp
+  NetPacket.cpp
+  ConnectionManager.cpp
+  NetCommandMsg.cpp
+  FirewallHelper.cpp
+  DownloadManager.cpp
+  GameSpy.cpp
+  FrameData.cpp
+  NetworkUtil.cpp
+  NetCommandWrapperList.cpp
+  GameMessageParser.cpp
+  GameSpyGP.cpp
+)
+
+target_include_directories(GameNetwork PUBLIC
+  "${PROJECT_SOURCE_DIR}/GameEngine/Include"
+  "${PROJECT_SOURCE_DIR}/GameEngine/Include/Precompiled"
+  "${PROJECT_SOURCE_DIR}/Libraries/Include"
+  "${PROJECT_SOURCE_DIR}/Libraries/Source/WWVegas/"
+  "${PROJECT_SOURCE_DIR}/Libraries/Source/WWVegas/WWLib/"
+)
+
+add_subdirectory(WOLBrowser)
+add_subdirectory(GameSpy)

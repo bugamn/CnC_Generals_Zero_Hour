@@ -1,1 +1,5 @@
+add_subdirectory(GameNetwork)
+add_subdirectory(GameClient)
 add_subdirectory(Common)
+add_subdirectory(GameLogic)
+add_subdirectory(Precompiled)
